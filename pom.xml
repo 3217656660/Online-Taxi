@@ -7,6 +7,10 @@
     <groupId>org.example</groupId>
     <artifactId>Online-Taxi</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>api-commons</module>
+        <module>gateway-one9527</module>
+    </modules>
 
     <!--    总的父工程-->
     <packaging>pom</packaging>
@@ -124,6 +128,7 @@
                 <scope>runtime</scope>
                 <optional>true</optional>
             </dependency>
+
 
         </dependencies>
     </dependencyManagement>
