@@ -1,0 +1,30 @@
+#git Token文件
+/gitHubToken.txt
+
+
+#所有class文件
+*.class
+
+
+#日志文件
+*.log
+logs/
+
+
+#jar包
+*.jar
+!lib/my.jar
+
+
+#targe文件
+provider-loginAndRegister7001/target/
+gateway-one9527/target/
+
+
+#test文件
+provider-loginAndRegister7001/src/test
+gateway-one9527/src/test
+
+
+#忽略所有以 ~ 结尾的文件
+*~
