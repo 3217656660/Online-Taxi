@@ -30,4 +30,10 @@ public class User implements Serializable {
     private Date updateTime;
 
     private Integer isDeleted;
+
+    public User(Integer id,String password){
+        this.id = id;
+        this.password = password;
+    }
+
 }

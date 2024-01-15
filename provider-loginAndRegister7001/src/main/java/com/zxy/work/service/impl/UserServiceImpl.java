@@ -62,5 +62,24 @@ public class UserServiceImpl implements UserService {
         return userDao.selectByMobile(mobile);
     }
 
+    @Override
+    public int updatePassword(User user,String newPassword) {
+        //先比较旧密码输入是否正确
+        String inputOldPassword = user.getPassword();
+        String encodedOldPassword = userDao.selectById(user.getId()).getPassword();
+        boolean matches = PasswordEncoder.matches(inputOldPassword, encodedOldPassword);
+
+        //旧密码输入正确
+        if (matches){
+            //添加更新时间
+            Date now = new Date();
+            user.setUpdateTime(now);
+            newPassword = PasswordEncoder.encode(newPassword);
+            user.setPassword(newPassword);
+            return userDao.update(user);
+        }
+        return 0;
+    }
+
 
 }

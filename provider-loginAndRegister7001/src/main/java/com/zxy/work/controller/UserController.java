@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
+
 
 @RestController
 @Slf4j
@@ -35,30 +37,26 @@ public class UserController {
             log.info( user + "注册成功" );
             return new CommonResult<>( StatusCode.SUCCESS,result );
         }
-        else{
-            log.info( user + "注册失败" );
-            return new CommonResult<>( StatusCode.FAILURE,"注册失败" );
-        }
 
+         log.info( user + "注册失败" );
+         return new CommonResult<>( StatusCode.FAILURE,"注册失败" );
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public CommonResult deleteUser(@RequestBody User user){
 
         log.info( "********注销服务LoginAndRegister7001：*********" );
 
 
-        int result = userService.delete( user );
+        int result = userService.delete(user);
 
         if (result > 0){
             log.info( user + "注销成功" );
             return new CommonResult<>( StatusCode.SUCCESS,user.getId() );
         }
-        else{
-            log.info( user + "注销失败" );
-            return new CommonResult<>( StatusCode.FAILURE,"注销失败" );
-        }
 
+        log.info( user + "注销失败" );
+        return new CommonResult<>( StatusCode.FAILURE,"注销失败" );
     }
 
     @GetMapping("/get/{id}")
@@ -70,13 +68,12 @@ public class UserController {
         if (user == null){
             log.info( "查找失败" );
             return new CommonResult<>(StatusCode.FAILURE,"查找失败");
-        }else {
-            log.info( user + "查找成功" );
-
-            //用户信息脱敏
-            user.setPassword("**********");
-            return new CommonResult<>(StatusCode.SUCCESS,user);
         }
+
+         log.info( user + "查找成功" );
+         //用户信息脱敏
+         user.setPassword("**********");
+         return new CommonResult<>(StatusCode.SUCCESS,user);
     }
 
     @PostMapping("/login")
@@ -97,11 +94,47 @@ public class UserController {
             log.info(user.getId() + "登录失败");
             return new CommonResult<>(StatusCode.FAILURE,"密码不正确");
         }
+
         log.info(user.getId() + "登录成功");
         resultUser.setPassword("**************");
         return new CommonResult<>(StatusCode.SUCCESS,resultUser);
     }
 
+    @PutMapping("/updateMessage")
+    public CommonResult updateUser(@RequestBody User user){
+        log.info( "********更新信息服务LoginAndRegister7001：*********" );
 
+        int result = userService.update(user);
+
+        if (result > 0){
+            log.info(user + "信息更新成功");
+            return new CommonResult(StatusCode.SUCCESS,user);
+        }
+
+         log.info(user + "信息更新失败");
+         return new CommonResult(StatusCode.FAILURE,"修改失败");
+    }
+
+    @PutMapping("/updatePassword")
+    public CommonResult updatePassword(@RequestBody Map<String,Object> requestMapper){
+        Integer id = (Integer) requestMapper.get("id");
+        String password = (String) requestMapper.get("password");
+        String newPassword = (String) requestMapper.get("newPassword");
+
+        log.info( "********更新密码服务LoginAndRegister7001：*********" );
+
+        User user = new User(id,password);
+
+        int result = userService.updatePassword(user,newPassword);
+
+        if (result > 0){
+            log.info(user + "密码更新成功");
+            user.setPassword("**************");
+            return new CommonResult(StatusCode.SUCCESS,user);
+        }
+
+        log.info(user + "密码更新失败");
+        return new CommonResult(StatusCode.FAILURE,"修改失败，原密码错误");
+    }
 
 }

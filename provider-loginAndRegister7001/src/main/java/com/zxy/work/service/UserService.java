@@ -1,7 +1,6 @@
 package com.zxy.work.service;
 
 import com.zxy.work.entities.User;
-import org.apache.ibatis.annotations.Param;
 
 public interface UserService {
 
@@ -14,5 +13,7 @@ public interface UserService {
     User selectById(Integer id);
 
     User selectByMobile(String mobile);
+
+    int updatePassword(User user,String newPassword);
 
 }

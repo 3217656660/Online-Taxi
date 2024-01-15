@@ -30,7 +30,13 @@
 
     <update id="update" parameterType="User" keyProperty="id">
         UPDATE online_taxi.user
-        SET username = #{username}, password = #{password}, mobile = #{mobile}, email = #{email} ,update_time = #{updateTime}
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="mobile != null">mobile = #{mobile},</if>
+            <if test="email != null">email = #{email},</if>
+            update_time = #{updateTime}
+        </set>
         WHERE id = #{id}
     </update>
 
