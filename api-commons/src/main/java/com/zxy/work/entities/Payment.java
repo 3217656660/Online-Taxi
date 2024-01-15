@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -22,9 +23,9 @@ public class Payment implements Serializable {
 
     private Float amount;
 
-    private LocalDate createTime;
+    private Date createTime;
 
-    private LocalDate updateTime;
+    private Date updateTime;
 
     private Integer isDeleted;
 

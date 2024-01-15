@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -24,9 +25,9 @@ public class User implements Serializable {
 
     private String email;
 
-    private LocalDate createTime;
+    private Date createTime;
 
-    private LocalDate updateTime;
+    private Date updateTime;
 
     private Integer isDeleted;
 }

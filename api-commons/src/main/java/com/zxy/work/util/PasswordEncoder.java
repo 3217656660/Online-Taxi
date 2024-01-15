@@ -6,7 +6,7 @@ import org.mindrot.jbcrypt.BCrypt;
  * 密码加密工具
  */
 public class PasswordEncoder {
-    private static final int WORKLOAD = 12; // 加密迭代次数
+    private static final int WORKLOAD = 8; // 加密迭代次数
 
     /**
      * 对密码进行加密
@@ -19,7 +19,6 @@ public class PasswordEncoder {
         String salt = BCrypt.gensalt(WORKLOAD);
 
         // 使用盐值和密码进行哈希计算
-
         return BCrypt.hashpw(password, salt);
     }
 

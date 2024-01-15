@@ -9,10 +9,12 @@ public interface UserDao {
 
     int create(User user);
 
-    int deleteById(@Param("id")Integer id);
+    int delete(User user);
 
     int update(User user);
 
     User selectById(@Param("id")Integer id);
+
+    User selectByMobile(@Param("mobile")String mobile);
 
 }
