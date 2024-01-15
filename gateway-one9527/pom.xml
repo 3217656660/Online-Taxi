@@ -17,7 +17,7 @@
     </properties>
 
     <dependencies>
-        <!--        网关-->
+        <!--        gateway网关-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>

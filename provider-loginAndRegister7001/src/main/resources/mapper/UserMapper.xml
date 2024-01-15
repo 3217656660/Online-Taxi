@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zxy.work.dao.UserDao">
+    <insert id="create" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(id,username,password,mobile,email,create_time,update_time,is_deleted) values(#{id},#{username},#{password},#{mobile},#{email},#{createTime},#{updateTime},#{isDeleted});
+    </insert>
+
+
+    <resultMap id="BaseResultMap" type="com.zxy.work.entities.User">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <id column="username" property="username" jdbcType="VARCHAR"/>
+        <id column="password" property="password" jdbcType="VARCHAR"/>
+        <id column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <id column="email" property="email" jdbcType="VARCHAR"/>
+        <id column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <id column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <id column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+
+</mapper>

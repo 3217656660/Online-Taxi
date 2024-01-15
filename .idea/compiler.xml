@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-commons" />
+        <module name="provider-loginAndRegister7001" />
         <module name="gateway-one9527" />
       </profile>
     </annotationProcessing>

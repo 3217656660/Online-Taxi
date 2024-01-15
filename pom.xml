@@ -10,6 +10,7 @@
     <modules>
         <module>api-commons</module>
         <module>gateway-one9527</module>
+        <module>provider-loginAndRegister7001</module>
     </modules>
 
     <!--    总的父工程-->
