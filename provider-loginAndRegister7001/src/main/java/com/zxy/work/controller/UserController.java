@@ -24,6 +24,11 @@ public class UserController {
     public CommonResult registerUser(@RequestBody User user){
 
         log.info("********注册服务LoginAndRegister7001：");
+
+        //先检查是否已注册
+
+
+        //检查无误后再插入
         int result = userService.create(user);
 
         if (result > 0){
