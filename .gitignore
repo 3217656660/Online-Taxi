@@ -17,14 +17,14 @@ logs/
 
 
 #targe文件
-provider-loginAndRegister7001/target/
+provider-user-service7001/target/
 gateway-one9527/target/
-
+provide-driver-service8001/target/
 
 #test文件
-provider-loginAndRegister7001/src/test
+provider-user-service7001/src/test
 gateway-one9527/src/test
-
+provide-driver-service8001/src/test
 
 #忽略所有以 ~ 结尾的文件
 *~

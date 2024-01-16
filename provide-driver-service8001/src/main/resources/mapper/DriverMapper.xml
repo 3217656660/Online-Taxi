@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zxy.work.dao.DriverMapper">
+
+    <resultMap id="BaseResultMap" type="com.zxy.work.entities.Driver">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="MOBILE" property="mobile" jdbcType="VARCHAR"/>
+        <result column="CAR_TYPE" property="carType" jdbcType="VARCHAR"/>
+        <result column="CAR_NUMBER" property="carNumber" jdbcType="VARCHAR"/>
+        <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <insert id="create" parameterType="Driver" keyProperty="id">
+        insert into online_taxi.driver(ID,NAME,MOBILE,CAR_TYPE,CAR_NUMBER,create_time,update_time,is_deleted) values(#{id},#{name},#{mobile},#{carType},#{carNumber},#{createTime},#{updateTime},#{isDeleted});
+    </insert>
+
+    <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
+    </select>
+
+    <update id="update" parameterType="Driver" keyProperty="id">
+        UPDATE online_taxi.driver
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="carType != null">car_type = #{carType},</if>
+            <if test="carNumber != null">car_number = #{carNumber},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE mobile = #{mobile}
+    </update>
+
+    <update id="delete" parameterType="Driver" keyProperty="id">
+        UPDATE online_taxi.driver
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
+        WHERE mobile = #{mobile}
+    </update>
+
+</mapper>
