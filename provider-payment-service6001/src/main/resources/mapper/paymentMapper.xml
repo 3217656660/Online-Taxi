@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zxy.work.dao.PaymentMapper">
+
+    <resultMap id="BaseResultMap" type="com.zxy.work.entities.Payment">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="ORDER_ID" property="orderId" jdbcType="INTEGER"/>
+        <result column="PAYMENT_METHOD" property="paymentMethod" jdbcType="VARCHAR"/>
+        <result column="AMOUNT" property="amount" jdbcType="Float"/>
+        <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <insert id="create" parameterType="Payment" keyProperty="id">
+        insert into online_taxi.payment(ID,ORDER_ID,PAYMENT_METHOD,AMOUNT,create_time,update_time,is_deleted)
+        values(#{id},#{orderId},#{paymentMethod},#{amount},#{createTime},#{updateTime},#{isDeleted});
+    </insert>
+
+    <update id="delete" parameterType="Payment" keyProperty="id">
+        UPDATE online_taxi.payment
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.payment WHERE is_deleted = 0 AND order_id = #{orderId}
+    </select>
+
+</mapper>

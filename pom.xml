@@ -13,6 +13,7 @@
         <module>provider-user-service7001</module>
         <module>provider-driver-service8001</module>
         <module>provider-order-service9001</module>
+        <module>provider-payment-service6001</module>
     </modules>
 
     <!--    总的父工程-->

@@ -79,11 +79,11 @@ public class OrderController {
 
         if (result > 0){
             log.info(order + "信息更新成功");
-            return new CommonResult(StatusCode.SUCCESS,order);
+            return new CommonResult<>(StatusCode.SUCCESS,order);
         }
 
         log.info(order + "信息更新失败");
-        return new CommonResult(StatusCode.FAILURE,"修改失败");
+        return new CommonResult<>(StatusCode.FAILURE,"修改失败");
     }
 
 
