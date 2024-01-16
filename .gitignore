@@ -15,6 +15,8 @@ logs/
 *.jar
 !lib/my.jar
 
+#忽略所有以 ~ 结尾的文件
+*~
 
 #targe文件
 provider-user-service7001/target/
@@ -22,6 +24,8 @@ gateway-one9527/target/
 provider-driver-service8001/target/
 provider-order-service9001/target/
 provider-payment-service6001/target/
+provider-review-service5001/target/
+
 
 #test文件
 provider-user-service7001/src/test
@@ -29,7 +33,6 @@ gateway-one9527/src/test
 provider-driver-service8001/src/test
 provider-order-service9001/src/test
 provider-payment-service6001/src/test
+provider-review-service5001/src/test
 
 
-#忽略所有以 ~ 结尾的文件
-*~

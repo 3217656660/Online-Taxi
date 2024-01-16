@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zxy.work.dao.ReviewMapper">
+
+    <resultMap id="BaseResultMap" type="com.zxy.work.entities.Review">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="ORDER_ID" property="orderId" jdbcType="INTEGER"/>
+        <result column="RATING" property="rating" jdbcType="INTEGER"/>
+        <result column="COMMENT" property="comment" jdbcType="VARCHAR"/>
+        <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <insert id="create" parameterType="Review" keyProperty="id">
+        insert into online_taxi.review(ID,ORDER_ID,RATING,COMMENT,CREATE_TIME,UPDATE_TIME,IS_DELETED)
+        values(#{id},#{orderId},#{rating},#{comment},#{createTime},#{updateTime},#{isDeleted});
+    </insert>
+
+    <update id="delete" parameterType="Review" keyProperty="id">
+        UPDATE online_taxi.review
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.review WHERE is_deleted = 0 AND order_id = #{orderId}
+    </select>
+
+
+</mapper>
