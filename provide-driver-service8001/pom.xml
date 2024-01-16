@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>provider-loginAndRegister7001</artifactId>
+    <artifactId>provide-driver-service8001</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

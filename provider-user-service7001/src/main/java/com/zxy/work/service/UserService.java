@@ -10,8 +10,6 @@ public interface UserService {
 
     int update(User user);
 
-    User selectById(Integer id);
-
     User selectByMobile(String mobile);
 
     int updatePassword(User user,String newPassword);

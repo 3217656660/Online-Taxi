@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -31,9 +30,11 @@ public class User implements Serializable {
 
     private Integer isDeleted;
 
-    public User(Integer id,String password){
-        this.id = id;
+
+    public User(String mobile, String password) {
+        this.mobile = mobile;
         this.password = password;
+
     }
 
 }

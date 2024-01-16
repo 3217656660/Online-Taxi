@@ -1,15 +1,13 @@
 package com.zxy.work;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@MapperScan("com.zxy.work.dao")
-public class LoginAndRegisterMain7001 {
+public class UserApplicationMain7001 {
     public static void main(String[] args) {
-        SpringApplication.run(LoginAndRegisterMain7001.class,args);
+        SpringApplication.run(UserApplicationMain7001.class,args);
     }
 }

@@ -5,15 +5,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface UserDao {
+public interface UserMapper {
 
     int create(User user);
 
     int delete(User user);
 
     int update(User user);
-
-    User selectById(@Param("id")Integer id);
 
     User selectByMobile(@Param("mobile")String mobile);
 
