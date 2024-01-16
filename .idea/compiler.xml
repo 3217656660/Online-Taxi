@@ -11,11 +11,13 @@
         <module name="provider-user-service7001" />
         <module name="provider-driver-service8001" />
         <module name="provider-payment-service6001" />
-        <module name="gateway-one9527" />
+        <module name="cloud-gateway-gateway9527" />
         <module name="provider-review-service5001" />
         <module name="provider-order-service9001" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="8" />
+    <bytecodeTargetLevel target="8">
+      <module name="provider-customerservice-service4001" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

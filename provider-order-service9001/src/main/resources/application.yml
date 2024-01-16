@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: provider-order-service9001
+    name: provider-order-service
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver

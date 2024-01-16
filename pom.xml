@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>api-commons</module>
-        <module>gateway-one9527</module>
+        <module>cloud-gateway-gateway9527</module>
         <module>provider-user-service7001</module>
         <module>provider-driver-service8001</module>
         <module>provider-order-service9001</module>

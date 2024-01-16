@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>gateway-one9527</artifactId>
+    <artifactId>cloud-gateway-gateway9527</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
