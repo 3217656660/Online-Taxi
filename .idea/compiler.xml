@@ -9,7 +9,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-commons" />
         <module name="provider-user-service7001" />
-        <module name="provide-driver-service8001" />
+        <module name="provider-driver-service8001" />
+        <module name="provider-order-service9001" />
         <module name="gateway-one9527" />
       </profile>
     </annotationProcessing>

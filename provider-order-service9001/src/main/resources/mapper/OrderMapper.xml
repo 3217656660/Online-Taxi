@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zxy.work.dao.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.zxy.work.entities.Order">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="USER_ID" property="userId" jdbcType="INTEGER"/>
+        <result column="DRIVER_ID" property="driverId" jdbcType="INTEGER"/>
+        <result column="START_ADDRESS" property="startAddress" jdbcType="VARCHAR"/>
+        <result column="END_ADDRESS" property="endAddress" jdbcType="VARCHAR"/>
+        <result column="STATUS" property="status" jdbcType="INTEGER"/>
+        <result column="PRICE" property="price" jdbcType="FLOAT"/>
+        <result column="DISTANCE" property="distance" jdbcType="DOUBLE"/>
+        <result column="END_TIME" property="endTime" jdbcType="DATE"/>
+        <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <insert id="create" parameterType="Order" keyProperty="id">
+        insert into online_taxi.order(ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,DISTANCE,create_time,update_time,is_deleted)
+        values(#{id},#{userId},#{driverId},#{startAddress},#{endAddress},#{status},#{distance},#{createTime},#{updateTime},#{isDeleted});
+    </insert>
+
+    <update id="deleteByUserId" parameterType="Order" keyProperty="id">
+        UPDATE online_taxi.order
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="deleteByDriverId" parameterType="Order" keyProperty="id">
+        UPDATE online_taxi.order
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
+        WHERE driver_id = #{driverId}
+    </update>
+
+    <update id="updateByOrderId" parameterType="Order" keyProperty="id">
+        UPDATE online_taxi.order
+        <set>
+            <if test="price != null">price = #{price},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND user_id = #{userId}
+    </select>
+
+    <select id="selectByDriverId" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND driver_id = #{driverId}
+    </select>
+
+    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND id = #{id}
+    </select>
+
+</mapper>

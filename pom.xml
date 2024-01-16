@@ -11,7 +11,8 @@
         <module>api-commons</module>
         <module>gateway-one9527</module>
         <module>provider-user-service7001</module>
-        <module>provide-driver-service8001</module>
+        <module>provider-driver-service8001</module>
+        <module>provider-order-service9001</module>
     </modules>
 
     <!--    总的父工程-->
