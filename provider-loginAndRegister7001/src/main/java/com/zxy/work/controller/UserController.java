@@ -20,6 +20,12 @@ public class UserController {
     @Resource
     private UserService userService;
 
+
+    /**
+     * 注册用户
+     * @param user 传来的用户信息json
+     * @return 注册结果:注册成功时返回注册的账号
+     */
     @PostMapping("/register")
     public CommonResult registerUser(@RequestBody User user){
 
@@ -35,13 +41,18 @@ public class UserController {
 
         if (result > 0){
             log.info( user + "注册成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,result );
+            return new CommonResult<>( StatusCode.SUCCESS,user.getId() );
         }
 
          log.info( user + "注册失败" );
          return new CommonResult<>( StatusCode.FAILURE,"注册失败" );
     }
 
+    /**
+     * 注销用户，逻辑删除
+     * @param user 传来的用户信息json
+     * @return  注销结果
+     */
     @DeleteMapping("/delete")
     public CommonResult deleteUser(@RequestBody User user){
 
@@ -59,6 +70,11 @@ public class UserController {
         return new CommonResult<>( StatusCode.FAILURE,"注销失败" );
     }
 
+    /**
+     * 根据id获取用户信息，对密码信息脱敏
+     * @param id    传来的用户id
+     * @return  获取的结果以及数据
+     */
     @GetMapping("/get/{id}")
     public CommonResult getUserById(@PathVariable("id")Integer id){
 
@@ -76,6 +92,11 @@ public class UserController {
          return new CommonResult<>(StatusCode.SUCCESS,user);
     }
 
+    /**
+     * 用户登录
+     * @param user 传来的用于登录的用户json
+     * @return 登录结果：登录成功时将用户信息返回
+     */
     @PostMapping("/login")
     public CommonResult login(@RequestBody User user){
 
@@ -100,6 +121,11 @@ public class UserController {
         return new CommonResult<>(StatusCode.SUCCESS,resultUser);
     }
 
+    /**
+     * 更新用户信息（不包括密码）
+     * @param user 传来的用户信息json
+     * @return  更新的用户信息结果
+     */
     @PutMapping("/updateMessage")
     public CommonResult updateUser(@RequestBody User user){
         log.info( "********更新信息服务LoginAndRegister7001：*********" );
@@ -115,6 +141,11 @@ public class UserController {
          return new CommonResult(StatusCode.FAILURE,"修改失败");
     }
 
+    /**
+     * 更新用户密码
+     * @param requestMapper 传来的json
+     * @return  更新结果
+     */
     @PutMapping("/updatePassword")
     public CommonResult updatePassword(@RequestBody Map<String,Object> requestMapper){
         Integer id = (Integer) requestMapper.get("id");
@@ -136,5 +167,6 @@ public class UserController {
         log.info(user + "密码更新失败");
         return new CommonResult(StatusCode.FAILURE,"修改失败，原密码错误");
     }
+
 
 }

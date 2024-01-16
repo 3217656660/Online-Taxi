@@ -7,7 +7,7 @@ import com.zxy.work.util.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
+
 import java.util.Date;
 
 @Service
@@ -18,13 +18,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int create(User user) {
+        //产生唯一的账号ID:8位随机整数(1000 0000 - 9999 9999)
+        User existedUser;
+        int min = 10000000;
+        int max = 99999999;
+
+        //临时Id
+        int tempId;
+
+        //查询id是否唯一，不唯一继续生成
+        do {
+            tempId =(int) (Math.random() * (max - min + 1) + min);
+            existedUser = userDao.selectById(tempId);
+        }
+        while( existedUser != null );
 
         //添加时间和逻辑删除默认值
         Date now = new Date();
         user
                 .setCreateTime(now)
                 .setUpdateTime(now)
-                .setIsDeleted(0);
+                .setIsDeleted(0)
+                .setId( tempId );
 
         //对密码进行加密
         String encodedPassword = PasswordEncoder.encode(user.getPassword());
@@ -36,13 +51,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int delete(User user) {
-        //添加时间和逻辑删除默认值
+        //添加时间和逻辑删除的值
         Date now = new Date();
         user
                 .setUpdateTime(now)
                 .setIsDeleted(1);
         return userDao.delete(user);
     }
+
 
     @Override
     public int update(User user) {
@@ -52,15 +68,18 @@ public class UserServiceImpl implements UserService {
         return userDao.update(user);
     }
 
+
     @Override
     public User selectById(Integer id) {
         return userDao.selectById(id);
     }
 
+
     @Override
     public User selectByMobile(String mobile) {
         return userDao.selectByMobile(mobile);
     }
+
 
     @Override
     public int updatePassword(User user,String newPassword) {
@@ -80,6 +99,7 @@ public class UserServiceImpl implements UserService {
         }
         return 0;
     }
+
 
 
 }
