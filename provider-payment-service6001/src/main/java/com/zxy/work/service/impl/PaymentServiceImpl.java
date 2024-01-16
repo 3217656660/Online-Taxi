@@ -3,11 +3,12 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.PaymentMapper;
 import com.zxy.work.entities.Payment;
 import com.zxy.work.service.PaymentService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.xml.crypto.Data;
 import java.util.Date;
 
+@Service
 public class PaymentServiceImpl implements PaymentService {
 
     @Resource

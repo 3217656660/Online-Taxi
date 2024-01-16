@@ -1,7 +1,6 @@
 package com.zxy.work.controller;
 
 import com.zxy.work.entities.CommonResult;
-import com.zxy.work.entities.Order;
 import com.zxy.work.entities.Payment;
 import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.PaymentService;

@@ -1,6 +1,5 @@
 package com.zxy.work.dao;
 
-import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

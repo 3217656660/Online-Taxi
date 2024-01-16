@@ -9,7 +9,7 @@
         <id column="ID" property="id" jdbcType="INTEGER"/>
         <result column="ORDER_ID" property="orderId" jdbcType="INTEGER"/>
         <result column="PAYMENT_METHOD" property="paymentMethod" jdbcType="VARCHAR"/>
-        <result column="AMOUNT" property="amount" jdbcType="Float"/>
+        <result column="AMOUNT" property="amount" jdbcType="FLOAT"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
         <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
@@ -22,7 +22,7 @@
 
     <update id="delete" parameterType="Payment" keyProperty="id">
         UPDATE online_taxi.payment
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
         WHERE id = #{id}
     </update>
 
