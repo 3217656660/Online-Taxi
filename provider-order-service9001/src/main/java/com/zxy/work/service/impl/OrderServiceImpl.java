@@ -27,35 +27,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+
     /**
-     * 用户取消订单
+     * 取消订单
      * @param order 传来的订单json
      * @return 取消结果
      */
     @Override
-    public int deleteByUser(Order order) {
+    public int delete(Order order) {
         Date now = new Date();
         order.setUpdateTime(now)
                 .setStatus(5)//已取消
                 .setIsDeleted(1);
 
-        return orderMapper.deleteByUser(order);
-    }
-
-
-    /**
-     * 司机取消订单
-     * @param order 传来的订单json
-     * @return 取消结果
-     */
-    @Override
-    public int deleteByDriver(Order order) {
-        Date now = new Date();
-        order.setUpdateTime(now)
-                .setStatus(5)//已取消
-                .setIsDeleted(1);
-
-        return orderMapper.deleteByDriver(order);
+        return orderMapper.delete(order);
     }
 
 
@@ -65,10 +50,10 @@ public class OrderServiceImpl implements OrderService {
      * @return  更新结果
      */
     @Override
-    public int updateByOrderId(Order order) {
+    public int update(Order order) {
         Date now = new Date();
         order.setUpdateTime(now);
-        return orderMapper.updateByOrderId(order);
+        return orderMapper.update(order);
     }
 
 
@@ -103,6 +88,8 @@ public class OrderServiceImpl implements OrderService {
     public Order selectByOrderId(Integer id) {
         return orderMapper.selectByOrderId(id);
     }
+
+
 
 
 

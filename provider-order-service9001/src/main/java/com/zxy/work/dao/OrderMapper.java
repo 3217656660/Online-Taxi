@@ -12,11 +12,9 @@ public interface OrderMapper {
 
     int create(Order order);
 
-    int deleteByUser(Order order);
+    int delete(Order order);
 
-    int deleteByDriver(Order order);
-
-    int updateByOrderId(Order order);
+    int update(Order order);
 
     List<Order> selectByUserId(@Param("userId") Integer userId);
 

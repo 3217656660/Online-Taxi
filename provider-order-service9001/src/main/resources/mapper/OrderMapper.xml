@@ -25,19 +25,13 @@
         values(#{id},#{userId},#{driverId},#{startAddress},#{endAddress},#{status},#{distance},#{createTime},#{updateTime},#{isDeleted});
     </insert>
 
-    <update id="deleteByUserId" parameterType="Order" keyProperty="id">
+    <update id="delete" parameterType="Order" keyProperty="id">
         UPDATE online_taxi.order
         SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
-        WHERE user_id = #{userId}
+        WHERE id = #{id}
     </update>
 
-    <update id="deleteByDriverId" parameterType="Order" keyProperty="id">
-        UPDATE online_taxi.order
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
-        WHERE driver_id = #{driverId}
-    </update>
-
-    <update id="updateByOrderId" parameterType="Order" keyProperty="id">
+    <update id="update" parameterType="Order" keyProperty="id">
         UPDATE online_taxi.order
         <set>
             <if test="price != null">price = #{price},</if>
