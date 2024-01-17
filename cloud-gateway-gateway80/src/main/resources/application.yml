@@ -14,8 +14,16 @@ spring:
       discovery:
         locator:
           enabled: true #开启从注册中心动态创建路由功能，利用微服务名进行路由
+
       routes:
-        - id: update-route  #更新路由,用来更新更新时间，而不用手动更新
-          uri: lb://provide-loginAndRegister
+        - id: consumer-route   #用来标识是消费者的路由
+          uri: lb://consumer-feign-client #负载均衡访问消费者
+          #uri: http://localhost:4001  #直接访问消费者
           predicates:
-            - Path=/user/update/**  #断言，路径相匹配的进行路由
+            - Path=/consumer/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  #暴露出要监控的路径

@@ -17,10 +17,21 @@
     </properties>
 
     <dependencies>
+<!--        注：必须要加loadBalance 依赖，不然会导致无法在配置文件中用lb指定用服务名访问       -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
         <!--        gateway网关-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
 <!--        nacos-->
@@ -28,6 +39,7 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+
 
         <!--    引入自己定义的api通用包    -->
         <dependency>

@@ -17,7 +17,7 @@ public class MyGateWayFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("******come in myGateWayFilter:"  + new Date());
+/*
         String uname = exchange.getRequest().getQueryParams().getFirst("uname");
         if (uname == null){
             log.info("用户名为null，非法用户");
@@ -25,6 +25,7 @@ public class MyGateWayFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();//离开
         }
 
+*/
         return chain.filter(exchange);//放行
     }
 
