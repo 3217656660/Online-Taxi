@@ -17,7 +17,8 @@
     </resultMap>
 
     <insert id="create" parameterType="Driver" keyProperty="id">
-        insert into online_taxi.driver(ID,NAME,MOBILE,CAR_TYPE,CAR_NUMBER,create_time,update_time,is_deleted) values(#{id},#{name},#{mobile},#{carType},#{carNumber},#{createTime},#{updateTime},#{isDeleted});
+        insert into online_taxi.driver(ID,NAME,MOBILE,CAR_TYPE,CAR_NUMBER,create_time,update_time,is_deleted)
+        values(#{id},#{name},#{mobile},#{carType},#{carNumber},#{createTime},#{updateTime},#{isDeleted});
     </insert>
 
     <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
