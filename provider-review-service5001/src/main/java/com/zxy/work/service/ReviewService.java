@@ -1,7 +1,6 @@
 package com.zxy.work.service;
 
 import com.zxy.work.entities.Review;
-import org.apache.ibatis.annotations.Param;
 
 public interface ReviewService {
 

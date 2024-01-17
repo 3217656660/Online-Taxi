@@ -1,8 +1,6 @@
 package com.zxy.work.service;
 
-import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Driver;
-import com.zxy.work.entities.StatusCode;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

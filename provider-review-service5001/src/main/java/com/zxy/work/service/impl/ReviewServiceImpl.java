@@ -1,7 +1,6 @@
 package com.zxy.work.service.impl;
 
 import com.zxy.work.dao.ReviewMapper;
-import com.zxy.work.entities.Payment;
 import com.zxy.work.entities.Review;
 import com.zxy.work.service.ReviewService;
 import org.springframework.stereotype.Service;

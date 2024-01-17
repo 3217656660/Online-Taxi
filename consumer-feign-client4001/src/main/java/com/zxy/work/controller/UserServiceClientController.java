@@ -1,11 +1,8 @@
 package com.zxy.work.controller;
 
 
-import com.zxy.work.entities.CommonResult;
-import com.zxy.work.entities.StatusCode;
 import com.zxy.work.entities.User;
 import com.zxy.work.service.UserServiceClient;
-import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
