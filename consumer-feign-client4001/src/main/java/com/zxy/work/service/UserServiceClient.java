@@ -1,6 +1,5 @@
 package com.zxy.work.service;
 
-import com.zxy.work.entities.CommonResult;
 
 
 import com.zxy.work.entities.User;
@@ -18,7 +17,7 @@ public interface UserServiceClient {
 
 
     @GetMapping("/user/get/{mobile}")
-    Map<String,Object> get(@PathVariable("mobile")String mobile);
+    Map<String,Object> getByMobile(@PathVariable("mobile")String mobile);
 
 
     @DeleteMapping("/user/update/delete")

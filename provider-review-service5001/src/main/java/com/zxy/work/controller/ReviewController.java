@@ -1,10 +1,10 @@
 package com.zxy.work.controller;
 
 import com.zxy.work.entities.CommonResult;
-import com.zxy.work.entities.Payment;
 import com.zxy.work.entities.Review;
 import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.ReviewService;
+import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +28,11 @@ public class ReviewController {
 
         if (result > 0){
             log.info( review + "评价创建成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,"评价创建成功" );
+            return new CommonResult<>( StatusCode.SUCCESS, MyString.REVIEW_SUCCESS );
         }
 
         log.info( review + "评价创建失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"评价创建失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.REVIEW_ERROR );
     }
 
 
@@ -45,11 +45,11 @@ public class ReviewController {
 
         if (result > 0){
             log.info( review + "删除成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,review.getId() );
+            return new CommonResult<>( StatusCode.SUCCESS,review.getId() + MyString.DELETE_SUCCESS );
         }
 
         log.info( review + "删除失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"删除失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
     }
 
 
@@ -62,11 +62,12 @@ public class ReviewController {
 
         if (review == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>( StatusCode.FAILURE,MyString.FIND_ERROR );
         }
 
         log.info( review + "查找成功" );
         return new CommonResult<>(StatusCode.SUCCESS,review);
     }
+
 
 }

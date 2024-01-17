@@ -9,12 +9,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-commons" />
         <module name="provider-user-service7001" />
+        <module name="cloud-gateway-gateway80" />
         <module name="provider-driver-service8001" />
         <module name="provider-payment-service6001" />
-        <module name="cloud-gateway-gateway9527" />
         <module name="provider-review-service5001" />
         <module name="provider-order-service9001" />
-        <module name="consumer-feign-client80" />
+        <module name="consumer-feign-client4001" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">

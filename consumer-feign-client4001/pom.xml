@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>consumer-feign-client80</artifactId>
+    <artifactId>consumer-feign-client4001</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

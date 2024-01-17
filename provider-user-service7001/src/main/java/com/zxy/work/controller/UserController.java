@@ -5,6 +5,7 @@ import com.zxy.work.entities.StatusCode;
 import com.zxy.work.entities.User;
 
 import com.zxy.work.service.UserService;
+import com.zxy.work.util.MyString;
 import com.zxy.work.util.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class UserController {
 
         //检查该手机号否已注册
         User registeredUser = userService.selectByMobile( user.getMobile() );
-        if ( registeredUser != null ) return new CommonResult<>( StatusCode.FAILURE );
+        if ( registeredUser != null ) return new CommonResult<>( StatusCode.FAILURE,MyString.MOBILE_EXIST );
 
 
         //开始注册
@@ -42,11 +43,11 @@ public class UserController {
 
         if (result > 0){
             log.info( user + "注册成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,"注册成功" );
+            return new CommonResult<>( StatusCode.SUCCESS,MyString.REGISTER_SUCCESS );
         }
 
          log.info( user + "注册失败" );
-         return new CommonResult<>( StatusCode.FAILURE);
+         return new CommonResult<>( StatusCode.FAILURE,MyString.REGISTER_ERROR );
     }
 
 
@@ -64,11 +65,11 @@ public class UserController {
 
         if (result > 0){
             log.info( user + "注销成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,user.getMobile() );
+            return new CommonResult<>( StatusCode.SUCCESS,user.getMobile() + MyString.DELETE_SUCCESS );
         }
 
         log.info( user + "注销失败" );
-        return new CommonResult<>( StatusCode.FAILURE );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
     }
 
 
@@ -85,7 +86,7 @@ public class UserController {
         User user = userService.selectByMobile(mobile);
         if (user == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE);
+            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
         }
 
          log.info( user + "查找成功" );
@@ -110,7 +111,7 @@ public class UserController {
 
         //获取该账号的加密密码
         User resultUser = userService.selectByMobile( user.getMobile() );
-        if (resultUser == null) return new CommonResult<>(StatusCode.FAILURE,"账号不存在");
+        if (resultUser == null) return new CommonResult<>(StatusCode.FAILURE, MyString.ACCOUNT_ERROR);
 
         String encodedPassword = resultUser.getPassword();
 
@@ -118,7 +119,7 @@ public class UserController {
         boolean matches = PasswordEncoder.matches(inputPassword, encodedPassword);
         if (!matches){
             log.info(user.getMobile() + "登录失败");
-            return new CommonResult<>(StatusCode.FAILURE,"密码不正确");
+            return new CommonResult<>(StatusCode.FAILURE,MyString.PASSWORD_ERROR);
         }
 
         log.info(user.getMobile() + "登录成功");
@@ -145,7 +146,7 @@ public class UserController {
         }
 
          log.info(user + "信息更新失败");
-         return new CommonResult(StatusCode.FAILURE);
+         return new CommonResult(StatusCode.FAILURE,MyString.UPDATE_ERROR);
     }
 
 
@@ -173,7 +174,7 @@ public class UserController {
         }
 
         log.info(user + "密码更新失败");
-        return new CommonResult(StatusCode.FAILURE);
+        return new CommonResult(StatusCode.FAILURE,MyString.UPDATE_ERROR);
     }
 
 

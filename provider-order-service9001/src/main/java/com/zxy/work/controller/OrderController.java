@@ -4,6 +4,7 @@ import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Order;
 import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.OrderService;
+import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,11 +35,11 @@ public class OrderController {
 
         if (result > 0){
             log.info( order + "订单创建成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,"订单创建成功" );
+            return new CommonResult<>( StatusCode.SUCCESS, MyString.ORDER_CREATE_SUCCESS );
         }
 
         log.info( order + "订单创建失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"订单创建失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.ORDER_CREATE_ERROR );
     }
 
 
@@ -56,11 +57,11 @@ public class OrderController {
 
         if (result > 0){
             log.info( order + "取消成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,order.getId() );
+            return new CommonResult<>( StatusCode.SUCCESS,order.getId() + MyString.ORDER_CANCEL_SUCCESS );
         }
 
         log.info( order + "取消失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"取消失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.ORDER_CANCEL_ERROR );
     }
 
 
@@ -82,7 +83,7 @@ public class OrderController {
         }
 
         log.info(order + "信息更新失败");
-        return new CommonResult<>(StatusCode.FAILURE,"修改失败");
+        return new CommonResult<>(StatusCode.FAILURE,MyString.UPDATE_ERROR);
     }
 
 
@@ -100,7 +101,7 @@ public class OrderController {
 
         if (order == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
         }
 
         log.info( order + "查找成功" );
@@ -123,7 +124,7 @@ public class OrderController {
 
         if (orderList == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
         }
 
         log.info( orderList + "查找成功" );
@@ -146,7 +147,7 @@ public class OrderController {
 
         if (orderList == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
         }
 
         log.info( orderList + "查找成功" );

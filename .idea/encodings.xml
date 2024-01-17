@@ -3,10 +3,10 @@
   <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/api-commons/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-commons/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cloud-gateway-gateway9527/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cloud-gateway-gateway9527/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/consumer-feign-client80/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/consumer-feign-client80/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-gateway-gateway80/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-gateway-gateway80/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/consumer-feign-client4001/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/consumer-feign-client4001/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/provider-customerservice-service4001/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/provider-customerservice-service4001/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/provider-driver-service8001/src/main/java" charset="UTF-8" />

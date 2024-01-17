@@ -4,6 +4,7 @@ import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Payment;
 import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.PaymentService;
+import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,11 +27,11 @@ public class PaymentController {
 
         if (result > 0){
             log.info( payment + "支付创建成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,"支付创建成功" );
+            return new CommonResult<>( StatusCode.SUCCESS, MyString.PAYMENT_SUCCESS );
         }
 
         log.info( payment + "支付创建失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"支付创建失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.PAYMENT_ERROR );
     }
 
 
@@ -43,11 +44,11 @@ public class PaymentController {
 
         if (result > 0){
             log.info( payment + "删除成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,payment.getId() );
+            return new CommonResult<>( StatusCode.SUCCESS,payment.getId() + MyString.DELETE_SUCCESS );
         }
 
         log.info( payment + "删除失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"删除失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
     }
 
 
@@ -60,7 +61,7 @@ public class PaymentController {
 
         if (payment == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
         }
 
         log.info( payment + "查找成功" );

@@ -20,19 +20,19 @@ logs/
 
 #targe文件
 provider-user-service7001/target/
-cloud-gateway-gateway9527/target/
+cloud-gateway-gateway80/target/
 provider-driver-service8001/target/
 provider-order-service9001/target/
 provider-payment-service6001/target/
 provider-review-service5001/target/
-consumer-feign-client80/target/
+consumer-feign-client4001/target/
 
 #test文件
 provider-user-service7001/src/test
-cloud-gateway-gateway9527/src/test
+cloud-gateway-gateway80/src/test
 provider-driver-service8001/src/test
 provider-order-service9001/src/test
 provider-payment-service6001/src/test
 provider-review-service5001/src/test
-consumer-feign-client80/src/test
+consumer-feign-client4001/src/test
 

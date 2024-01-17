@@ -4,6 +4,7 @@ import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.DriverService;
+import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class DriverController {
 
         //检查该手机号否已注册
         Driver registeredDriver = driverService.selectByMobile( driver.getMobile() );
-        if ( registeredDriver != null ) return new CommonResult<>( StatusCode.FAILURE,"您当前手机号已经注册过了:" );
+        if ( registeredDriver != null ) return new CommonResult<>( StatusCode.FAILURE,MyString.MOBILE_EXIST );
 
 
         //开始注册
@@ -38,11 +39,11 @@ public class DriverController {
 
         if (result > 0){
             log.info( driver + "注册成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,"司机注册成功" );
+            return new CommonResult<>( StatusCode.SUCCESS,MyString.REGISTER_SUCCESS );
         }
 
         log.info( driver + "注册失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"司机注册失败" );
+        return new CommonResult<>( StatusCode.FAILURE, MyString.REGISTER_ERROR );
     }
 
 
@@ -60,11 +61,11 @@ public class DriverController {
 
         if (result > 0){
             log.info( driver + "注销成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,driver.getMobile() );
+            return new CommonResult<>( StatusCode.SUCCESS,driver.getMobile() + MyString.DELETE_SUCCESS );
         }
 
         log.info( driver + "注销失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"注销失败" );
+        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
     }
 
 
@@ -81,7 +82,7 @@ public class DriverController {
         Driver driver = driverService.selectByMobile(mobile);
         if (driver == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>( StatusCode.FAILURE,MyString.FIND_ERROR );
         }
 
         log.info( driver + "查找成功" );
@@ -95,7 +96,7 @@ public class DriverController {
      * @return  更新的信息结果
      */
     @PutMapping("/update/message")
-    public CommonResult updateUser(@RequestBody Driver driver){
+    public CommonResult updateDriver(@RequestBody Driver driver){
 
         log.info( "********更新信息服务8001：*********" );
 
@@ -107,7 +108,7 @@ public class DriverController {
         }
 
         log.info(driver + "信息更新失败");
-        return new CommonResult(StatusCode.FAILURE,"修改失败");
+        return new CommonResult(StatusCode.FAILURE,MyString.UPDATE_ERROR);
     }
 
 
