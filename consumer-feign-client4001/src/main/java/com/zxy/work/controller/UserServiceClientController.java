@@ -1,6 +1,7 @@
 package com.zxy.work.controller;
 
 
+import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.User;
 import com.zxy.work.service.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +54,12 @@ public class UserServiceClientController {
     public Map<String,Object> updatePassword(@RequestBody Map<String,Object> requestMapper){
         return userServiceClient.updatePassword(requestMapper);
     }
+
+
+    @GetMapping("/getById/{id}")
+    public Map<String,Object> getById(@PathVariable("id")Integer id){
+        return userServiceClient.getById(id);
+    }
+
 
 }

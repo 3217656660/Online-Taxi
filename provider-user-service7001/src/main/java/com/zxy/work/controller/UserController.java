@@ -177,5 +177,21 @@ public class UserController {
     }
 
 
+    /**
+     * 通过ID查找用户
+     * @param id 传来的ID
+     * @return  传回用户json
+     */
+    @GetMapping("/getById/{id}")
+    public CommonResult getById(@PathVariable("id")Integer id){
+        User user = userService.selectById(id);
+
+        if ( user == null )
+            return new CommonResult<>( StatusCode.FAILURE,MyString.FIND_ERROR );
+
+        user.setPassword("***********");
+        return new CommonResult<>( StatusCode.SUCCESS,user );
+    }
+
 
 }

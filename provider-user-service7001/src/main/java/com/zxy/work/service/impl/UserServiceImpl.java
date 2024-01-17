@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -77,6 +78,9 @@ public class UserServiceImpl implements UserService {
         return 0;
     }
 
-
+    @Override
+    public User selectById(Integer id) {
+        return userMapper.selectById(id);
+    }
 
 }

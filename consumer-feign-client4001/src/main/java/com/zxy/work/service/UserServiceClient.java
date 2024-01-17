@@ -2,6 +2,7 @@ package com.zxy.work.service;
 
 
 
+import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,10 @@ public interface UserServiceClient {
 
     @PutMapping("/user/update/password")
     Map<String,Object> updatePassword(@RequestBody Map<String,Object> requestMapper);
+
+
+    @GetMapping("/user/getById/{id}")
+    Map<String,Object> getById(@PathVariable("id")Integer id);
 
 
 }

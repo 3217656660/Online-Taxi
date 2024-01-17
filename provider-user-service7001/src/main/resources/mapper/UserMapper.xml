@@ -17,12 +17,15 @@
     </resultMap>
 
     <insert id="create" parameterType="User" keyProperty="id">
-        insert into online_taxi.user(id,username,password,mobile,email,create_time,update_time,is_deleted) values(#{id},#{username},#{password},#{mobile},#{email},#{createTime},#{updateTime},#{isDeleted});
+        insert into online_taxi.user(id,username,password,mobile,email,create_time,update_time,is_deleted)
+        values(#{id},#{username},#{password},#{mobile},#{email},#{createTime},#{updateTime},#{isDeleted});
     </insert>
 
-    <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.user WHERE is_deleted = 0 AND mobile = #{mobile}
-    </select>
+    <update id="delete" parameterType="User" keyProperty="id">
+        UPDATE online_taxi.user
+        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
+        WHERE mobile = #{mobile}
+    </update>
 
     <update id="update" parameterType="User" keyProperty="id">
         UPDATE online_taxi.user
@@ -35,10 +38,13 @@
         WHERE mobile = #{mobile}
     </update>
 
-    <update id="delete" parameterType="User" keyProperty="id">
-        UPDATE online_taxi.user
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE mobile = #{mobile}
-    </update>
+    <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.user WHERE is_deleted = 0 AND mobile = #{mobile}
+    </select>
+
+    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.user WHERE id = #{id}
+    </select>
+
 
 </mapper>

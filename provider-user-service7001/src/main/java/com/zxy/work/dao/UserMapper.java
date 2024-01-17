@@ -4,6 +4,7 @@ import com.zxy.work.entities.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+
 @Mapper
 public interface UserMapper {
 
@@ -14,5 +15,7 @@ public interface UserMapper {
     int update(User user);
 
     User selectByMobile(@Param("mobile")String mobile);
+
+    User selectById(@Param("id")Integer id);
 
 }
