@@ -15,6 +15,7 @@
         <module>provider-order-service9001</module>
         <module>provider-payment-service6001</module>
         <module>provider-review-service5001</module>
+        <module>consumer-feign-client80</module>
     </modules>
 
     <!--    总的父工程-->

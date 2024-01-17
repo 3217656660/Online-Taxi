@@ -14,6 +14,7 @@
         <module name="cloud-gateway-gateway9527" />
         <module name="provider-review-service5001" />
         <module name="provider-order-service9001" />
+        <module name="consumer-feign-client80" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">

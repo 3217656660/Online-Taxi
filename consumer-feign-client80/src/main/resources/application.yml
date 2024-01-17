@@ -1,0 +1,11 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: consumer-feign-client
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #配置Nacos地址
+

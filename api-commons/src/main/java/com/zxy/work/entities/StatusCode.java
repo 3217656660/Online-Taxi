@@ -14,4 +14,15 @@ public enum StatusCode implements Serializable {
 
     private final int code;
     private final String message;
+
+    /**
+     * 构造函数，用于构造与数据库交互失败的返回信息
+     * @param code 编码
+     */
+    StatusCode(int code) {
+        this.code = code;
+        this.message = null;
+    }
+
+
 }

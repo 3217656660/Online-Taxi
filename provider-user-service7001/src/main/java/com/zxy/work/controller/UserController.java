@@ -34,7 +34,7 @@ public class UserController {
 
         //检查该手机号否已注册
         User registeredUser = userService.selectByMobile( user.getMobile() );
-        if ( registeredUser != null ) return new CommonResult<>( StatusCode.FAILURE,"您当前手机号已经注册过了:" );
+        if ( registeredUser != null ) return new CommonResult<>( StatusCode.FAILURE );
 
 
         //开始注册
@@ -46,7 +46,7 @@ public class UserController {
         }
 
          log.info( user + "注册失败" );
-         return new CommonResult<>( StatusCode.FAILURE,"注册失败" );
+         return new CommonResult<>( StatusCode.FAILURE);
     }
 
 
@@ -68,7 +68,7 @@ public class UserController {
         }
 
         log.info( user + "注销失败" );
-        return new CommonResult<>( StatusCode.FAILURE,"注销失败" );
+        return new CommonResult<>( StatusCode.FAILURE );
     }
 
 
@@ -85,7 +85,7 @@ public class UserController {
         User user = userService.selectByMobile(mobile);
         if (user == null){
             log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,"查找失败");
+            return new CommonResult<>(StatusCode.FAILURE);
         }
 
          log.info( user + "查找成功" );
@@ -110,6 +110,8 @@ public class UserController {
 
         //获取该账号的加密密码
         User resultUser = userService.selectByMobile( user.getMobile() );
+        if (resultUser == null) return new CommonResult<>(StatusCode.FAILURE,"账号不存在");
+
         String encodedPassword = resultUser.getPassword();
 
         //匹配
@@ -143,7 +145,7 @@ public class UserController {
         }
 
          log.info(user + "信息更新失败");
-         return new CommonResult(StatusCode.FAILURE,"修改失败");
+         return new CommonResult(StatusCode.FAILURE);
     }
 
 
@@ -171,7 +173,7 @@ public class UserController {
         }
 
         log.info(user + "密码更新失败");
-        return new CommonResult(StatusCode.FAILURE,"修改失败，原密码错误");
+        return new CommonResult(StatusCode.FAILURE);
     }
 
 
