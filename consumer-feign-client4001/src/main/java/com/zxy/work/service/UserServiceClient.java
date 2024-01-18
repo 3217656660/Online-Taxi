@@ -29,6 +29,10 @@ public interface UserServiceClient {
     Map<String,Object> login(@RequestBody User user);
 
 
+    @PostMapping("/user/logout")
+    void logout(@RequestBody User user);
+
+
     @PutMapping("/user/update/message")
     Map<String,Object> updateMessage(@RequestBody User user);
 

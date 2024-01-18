@@ -1,5 +1,7 @@
 package com.zxy.work.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.zxy.work.entities.Order;
 import com.zxy.work.service.OrderServiceClient;
 import lombok.extern.slf4j.Slf4j;
@@ -10,45 +12,47 @@ import java.util.Map;
 
 @RestController
 @Slf4j
-@RequestMapping("/consumer/order")
+@RequestMapping("/taxi/order")
+@SaCheckLogin
 public class OrderServiceClientController {
     @Resource
     private OrderServiceClient orderServiceClient;
 
 
-    @PostMapping("/update/create")
+    @PostMapping("/create")
+    @SaIgnore
     Map<String,Object> create(@RequestBody Order order){
         return orderServiceClient.create(order);
     }
 
 
-    @DeleteMapping("/update/delete")
+    @DeleteMapping("/delete")
     Map<String,Object> delete(@RequestBody Order order){
         return orderServiceClient.delete(order);
     }
 
 
-    @PutMapping("/update/message")
-    Map<String,Object> update(@RequestBody Order order){
+    @PutMapping("/message")
+    Map<String,Object> updateMessage(@RequestBody Order order){
         return orderServiceClient.update(order);
     }
 
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/getById/{id}")
     Map<String,Object> getById(@PathVariable("id")Integer id){
         return orderServiceClient.getById(id);
     }
 
 
 
-    @GetMapping("/get/user/history/{userId}")
+    @GetMapping("/getByUserId/{userId}")
     Map<String,Object>getByUserId(@PathVariable("userId")Integer userId){
         return orderServiceClient.getByUserId(userId);
     }
 
 
 
-    @GetMapping("/get/driver/history/{driverId}")
+    @GetMapping("/getByDriverId/{driverId}")
     Map<String,Object> getByDriverId(@PathVariable("driverId")Integer driverId){
         return orderServiceClient.getByDriverId(driverId);
     }

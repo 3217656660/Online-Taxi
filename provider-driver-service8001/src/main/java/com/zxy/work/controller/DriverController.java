@@ -47,6 +47,12 @@ public class DriverController {
     }
 
 
+    @PostMapping("/logout")
+    void logout(@RequestBody Driver driver){
+        //完成退出登录功能
+    }
+
+
     /**
      * 注销司机，逻辑删除
      * @param driver 传来的用户信息json

@@ -29,6 +29,16 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
+
+        <!-- Sa-Token 权限认证（Reactor响应式集成），在线文档：https://sa-token.cc -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-reactor-spring-boot-starter</artifactId>
+            <version>1.34.0</version>
+        </dependency>
+
+
+<!--        没有引入web是因为，web包有tomcat，但是gateway包默认使用netty，会产生错误-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

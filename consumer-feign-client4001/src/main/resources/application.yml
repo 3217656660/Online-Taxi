@@ -22,3 +22,13 @@ management:
     web:
       exposure:
         include: '*'  #暴露出要监控的路径
+
+# 配置 sa-token
+sa-token:
+  token-style: uuid
+  token-name: X-Token
+  is-read-cookie: false
+  is-read-header: true
+
+
+

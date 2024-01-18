@@ -128,6 +128,17 @@ public class UserController {
 
 
     /**
+     * 退出登录
+     * @param user  用户对象
+     */
+    @PostMapping("/logout")
+    public void logout(@RequestBody User user){
+        log.info( "********退出登录服务7001：*********" );
+        //退出登录需要的处理逻辑
+    }
+
+
+    /**
      * 更新用户信息（不包括密码）
      * @param user 传来的用户信息json
      * @return  更新的用户信息结果

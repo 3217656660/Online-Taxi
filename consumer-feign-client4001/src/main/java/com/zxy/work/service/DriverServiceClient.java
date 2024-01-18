@@ -14,6 +14,12 @@ public interface DriverServiceClient {
     Map<String,Object> register(@RequestBody Driver driver);
 
 
+    @PostMapping("/driver/login")
+    Map<String,Object> login(@RequestBody Driver driver);
+
+
+    @PostMapping("/driver/logout")
+    void logout(@RequestBody Driver driver);
 
     @DeleteMapping("/driver/update/delete")
     Map<String,Object> delete(@RequestBody Driver driver);

@@ -9,8 +9,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public enum StatusCode implements Serializable {
     SUCCESS(200,"Success"),
-    FAILURE(600,"Failure"),
-    NOTFOUND(404,"Not Found");
+    FAILURE(600,"Failure");
 
     private final int code;
     private final String message;

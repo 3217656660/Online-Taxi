@@ -18,9 +18,8 @@ spring:
       routes:
         - id: consumer-route   #用来标识是消费者的路由
           uri: lb://consumer-feign-client #负载均衡访问消费者
-          #uri: http://localhost:4001  #直接访问消费者
           predicates:
-            - Path=/consumer/**
+            - Path=/taxi/**
 
 management:
   endpoints:
