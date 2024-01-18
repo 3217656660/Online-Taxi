@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 开启sa-token注解鉴权
  */
 @Configuration
-public class SaTokenConfigure implements WebMvcConfigurer {
+public class SaTokenConfig implements WebMvcConfigurer {
 
     // 注册 Sa-Token 拦截器，打开注解式鉴权功能
     @Override

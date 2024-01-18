@@ -36,4 +36,7 @@ public class MyString {
 
     public final static String ORDER_CANCEL_SUCCESS = "订单取消成功";
 
+    public final static String ORDER_NOT_SOLVED = "请先处理未处理的订单";
+
+
 }
