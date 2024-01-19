@@ -14,6 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class DriverActionTakeOrderVo implements Serializable {
+    private Integer userId;
     private Integer driverId;
     private String nowAddress;
     private Double nowAddressLongitude;//地点经度

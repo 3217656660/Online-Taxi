@@ -5,7 +5,7 @@ import org.mindrot.jbcrypt.BCrypt;
 /**
  * 密码加密工具
  */
-public class PasswordEncoder {
+public final class  PasswordEncoder {
     private static final int WORKLOAD = 8; // 加密迭代次数
 
     /**

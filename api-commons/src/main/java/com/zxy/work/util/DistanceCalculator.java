@@ -3,7 +3,7 @@ package com.zxy.work.util;
 /**
  *  使用经纬度计算两地的大致距离
  */
-public class DistanceCalculator {
+public final class DistanceCalculator {
 
     /**
      * 使用 Haversine 公式计算两地之间的距离

@@ -1,6 +1,6 @@
 package com.zxy.work.util;
 
-public class MyString {
+public final class MyString {
 
     public final static String ACCOUNT_ERROR = "账号不存在";
 
@@ -36,7 +36,21 @@ public class MyString {
 
     public final static String ORDER_CANCEL_SUCCESS = "订单取消成功";
 
+    public final static String ORDER_NOT_EXIST = "订单不存在";
+
+    public final static String ORDER_NOT_TAKEN = "订单还未被接单";
+
+    public final static String ORDER_TAKE_ERROR = "接单失败";
+
+    public final static String ORDER_TAKE_SUCCESS = "接单成功";
+
     public final static String ORDER_NOT_SOLVED = "请先处理未处理的订单";
+
+    public final static String MODIFY_ADDRESS_SUCCESS = "位置更新成功";
+
+    public final static String GET_ADDRESS_ERROR = "位置获取失败";
+
+    public final static String REQUEST_PAYMENT_SUCCESS = "发起收款成功";
 
 
 }
