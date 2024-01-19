@@ -35,5 +35,5 @@ provider-order-service9001/src/test
 provider-payment-service6001/src/test
 provider-review-service5001/src/test
 consumer-feign-client4001/src/test
-api-commons/src/test/
+api-commons/src/test
 
