@@ -87,6 +87,12 @@ public class OrderController {
     }
 
 
+    @PostMapping("/updateByStatusAndUserId")
+    public void updateByStatusAndUserId(@RequestBody Order order){
+        orderService.updateByStatusAndUserId(order);
+    }
+
+
     /**
      * 根据订单号获取订单信息
      * @param id    传来的订单号
@@ -156,7 +162,11 @@ public class OrderController {
     }
 
 
+    @PostMapping("/getByUserOrderStatus")
+    public CommonResult getByUserOrderStatus(@RequestBody Order order){
 
+        return new CommonResult<>(StatusCode.SUCCESS,orderService.selectByUserOrderStatus(order));
+    }
 
 
 

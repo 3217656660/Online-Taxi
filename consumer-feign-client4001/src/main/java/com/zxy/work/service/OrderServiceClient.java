@@ -32,4 +32,12 @@ public interface OrderServiceClient {
     @GetMapping("/order/get/driver/history/{driverId}")
     Map<String,Object> getByDriverId(@PathVariable("driverId")Integer driverId);
 
+
+    @PostMapping("/order/getByUserOrderStatus")
+    Map<String,Object> getByUserOrderStatus(@RequestBody Order order);
+
+
+    @PostMapping("/order/updateByStatusAndUserId")
+    Map<String,Object> updateByStatusAndUserId(@RequestBody Order order);
+
 }

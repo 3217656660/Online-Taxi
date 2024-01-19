@@ -39,6 +39,7 @@ sa-token:
   token-style: uuid
   token-name: X-Token
   is-read-cookie: false
+
   is-read-header: true
 
 

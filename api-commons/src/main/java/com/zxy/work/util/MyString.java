@@ -42,6 +42,8 @@ public final class MyString {
 
     public final static String ORDER_TAKE_ERROR = "接单失败";
 
+    public final static String NO_ACCEPTABLE_ORDER = "没有可接的订单";
+
     public final static String ORDER_TAKE_SUCCESS = "接单成功";
 
     public final static String ORDER_NOT_SOLVED = "请先处理未处理的订单";
@@ -51,6 +53,7 @@ public final class MyString {
     public final static String GET_ADDRESS_ERROR = "位置获取失败";
 
     public final static String REQUEST_PAYMENT_SUCCESS = "发起收款成功";
+
 
 
 }

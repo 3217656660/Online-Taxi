@@ -9,10 +9,7 @@ import com.zxy.work.util.MyString;
 import com.zxy.work.util.RedisUtil;
 import com.zxy.work.vo.DriverActionTakeOrderVo;
 import com.zxy.work.vo.UserCreateOrderVo;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +44,16 @@ public class MainServiceClientController {
     @Resource
     private RedisUtil redisUtil;
 
+    //创建订单前先查询有没有未支付的订单或者未完成的订单，如果有那么返回
+    //抽取方法中公共部分，形成公共方法
+    //进行支付
+    //完成支付
 
     @PostMapping("/createOrder")
     public ResponseEntity<String> createOrder(@RequestBody UserCreateOrderVo userCreateOrderVo){
         //用 用户id到redis索引是否已经下了订单，如果有那么返回请先处理那个订单
+        //orderHash存UserCreateOrderVo
+        //order: 存order
         String key = "order:" + userCreateOrderVo.getUserId();
         if ( redisUtil.get(key) != null )
             return new ResponseEntity<>(MyString.ORDER_NOT_SOLVED,HttpStatus.OK);
@@ -76,7 +79,16 @@ public class MainServiceClientController {
 
         //订单对象放入redis中，有效时间5分钟，5分钟内订单没有被司机接单或者用户主动取消订单，则redis会自动移除它
         //使用用户Id作为临时订单Id，用户不可一次下两单
-        return redisUtil.set(key, userCreateOrderVo, 5 * 60)
+        Order order = new Order();
+        order.setCreateTime(userCreateOrderVo.getCreateTime())
+                .setUpdateTime(userCreateOrderVo.getUpdateTime())
+                .setStatus(userCreateOrderVo.getStatus())
+                .setIsDeleted(userCreateOrderVo.getIsDeleted())
+                .setDistance(userCreateOrderVo.getDistance())
+                .setStartAddress(userCreateOrderVo.getStartAddress())
+                .setEndAddress(userCreateOrderVo.getEndAddress())
+                .setUserId(userCreateOrderVo.getUserId());
+        return redisUtil.set(key, order, 5 * 60)
                 ? new ResponseEntity<>(MyString.ORDER_CREATE_SUCCESS,HttpStatus.OK)
                 : new ResponseEntity<>(MyString.ORDER_CREATE_ERROR,HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -90,22 +102,25 @@ public class MainServiceClientController {
         //2.orderHash中也移除
         redisUtil.hdel("orderHash",key);
         //如果是待出发状态取消的订单，那么持久化该订单
-        if (order.getStatus() == 1)
-           orderServiceClient.create(order);
+        if (order.getStatus() == 1){
+            order.setStatus(5);
+            orderServiceClient.create(order);
+        }
         else if (order.getStatus() > 1) //如果是司机已经到达起始地点或以后，不允许用户再取消订单
             return ResponseEntity.ok(MyString.ORDER_CANCEL_ERROR);
 
-        return ResponseEntity.ok("订单取消成功");
+        return ResponseEntity.ok(MyString.ORDER_CANCEL_SUCCESS);
     }
 
 
     @GetMapping("/getAbleOrderList")
-    public ResponseEntity< List<UserCreateOrderVo> > getAbleOrderList(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
+    public ResponseEntity< Object > getAbleOrderList(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
         //1.从redis中取出orderHash
         Map<Object, Object> orderHash = redisUtil.hmget("orderHash");
+
         //没有用户下单
         if ( orderHash.isEmpty() )
-            return new ResponseEntity<>(null,HttpStatus.OK);
+            return new ResponseEntity<>(MyString.NO_ACCEPTABLE_ORDER,HttpStatus.OK);
         //2.遍历map，匹配其中开始位置经纬度与司机位置经纬度得出的距离小于10公里且处于未被接单的订单列表，并返回
         Set<Object> orderHashSet = orderHash.keySet();
         UserCreateOrderVo userCreateOrderVo;
@@ -121,7 +136,9 @@ public class MainServiceClientController {
         }
 
         //将符合条件的订单返回
-        return new ResponseEntity<>(userCreateOrderVoList,HttpStatus.OK);
+        return userCreateOrderVoList.isEmpty()
+                ? ResponseEntity.ok(MyString.NO_ACCEPTABLE_ORDER)
+                : ResponseEntity.ok(userCreateOrderVoList);
     }
 
 
@@ -209,9 +226,13 @@ public class MainServiceClientController {
         Order redisOrder = (Order) a;
         redisOrder.setStatus(2).setUpdateTime(new Date());
         redisUtil.set(key, redisOrder,2 * 60 * 60);
+        //修改订单状态
+        orderServiceClient.updateByStatusAndUserId(redisOrder);
+
         //设置司机当前位置
         String driverKey = "driver:" + driverActionTakeOrderVo.getDriverId();
-        redisUtil.set(driverKey,driverActionTakeOrderVo);
+        redisUtil.set(driverKey,driverActionTakeOrderVo,5 * 60);
+
         return ResponseEntity.status(HttpStatus.OK).body(redisOrder);
     }
 
@@ -233,7 +254,7 @@ public class MainServiceClientController {
 
         //设置司机当前位置
         String driverKey = "driver:" + driverActionTakeOrderVo.getDriverId();
-        redisUtil.set(driverKey,driverActionTakeOrderVo);
+        redisUtil.set(driverKey,driverActionTakeOrderVo,3 * 60);
         return  ResponseEntity.ok(MyString.MODIFY_ADDRESS_SUCCESS);
     }
 
@@ -269,43 +290,53 @@ public class MainServiceClientController {
         String paymentKey = "payment:" + order.getUserId();
         //把完成了的订单UserCreateOrderVo移除
         redisUtil.hdel("orderHash",key);
-        //通过数据库获取创建好的订单id
-        Map<String, Object> result = orderServiceClient.getByUserId(order.getUserId());
+        Object a = redisUtil.get(key);
+        if (a == null)
+            return ResponseEntity.ok("服务器出问题了，请您线下完成付款");
+        //通过数据库获取创建好的订单id,注：用户只能有一个在进行的订单，数据库中也是如此
+        //也就是数据库中每一个用户的订单最终status状态只有5或者4，只要有3就再下单的时候提醒支付，不然无法下单
+        //1（只有一个）、2（只有一个）、3（只有一个），并且1、2、3互斥。4、5可以有多个，0只存在于redis中（相对于一个用户Id来说）
+        Map<String, Object> result = orderServiceClient.getByUserOrderStatus(order);
+        Map<String, Object> data = (Map<String, Object>) result.get("data");
+        Integer orderId = (Integer) data.get("id");
         //设置完整的订单并更新到redis和数据库中
+        Order redisOrder = (Order) a;
         Date now = new Date();
-        order.setUpdateTime(now)
+        redisOrder.setUpdateTime(now)
                 .setStatus(3)
                 .setEndTime(now)
-                .setId(  (  (Order) result.get("data")  ).getId()  );
-        //有效期3分钟
-        redisUtil.set(key,order,3 * 60);
-        orderServiceClient.update(order);
+                .setId(orderId);
+        //有效期3分钟,并将订单信息更新到数据库
+        redisUtil.set(key,redisOrder,3 * 60);
+        orderServiceClient.update(redisOrder);
         //创建支付，方式为待支付
         Payment payment = new Payment();
         payment.setIsDeleted(0)
                 .setCreateTime(now)
                 .setUpdateTime(now)
                 .setAmount(order.getPrice())
-                .setOrderId(order.getId())
+                .setOrderId(orderId)
                 .setPaymentMethod("待支付");
+
+        //支付表持久化, 并返回对应的paymentId
+        paymentServiceClient.create(payment);
+        result = paymentServiceClient.getByOrderId(orderId);
+        data = (Map<String, Object>) result.get("data");
+        Integer paymentId = (Integer) data.get("id");
+        payment.setId(paymentId);
         //支付表存入redis,有效期3分钟
         redisUtil.set(paymentKey,payment,3 * 60);
-        //支付表持久化
-        paymentServiceClient.create(payment);
         return ResponseEntity.ok(MyString.REQUEST_PAYMENT_SUCCESS);
     }
 
 
-    @GetMapping("/getPayment")
-    public ResponseEntity<Object> getPayment(@RequestBody Order order){
+    @GetMapping("/goToPayment")
+    public ResponseEntity<Object> goToPayment(@RequestBody Order order){
         String paymentKey = "payment:" + order.getUserId();
         Object payment = redisUtil.get(paymentKey);
         //支付表不在缓存里，就到数据库查询
         return payment == null ? ResponseEntity.ok( paymentServiceClient.getByOrderId( order.getId() ) ) : ResponseEntity.ok( payment );
     }
-
-
-
 
 
 

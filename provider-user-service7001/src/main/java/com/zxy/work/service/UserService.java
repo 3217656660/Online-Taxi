@@ -1,9 +1,6 @@
 package com.zxy.work.service;
 
 import com.zxy.work.entities.User;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 public interface UserService {
 

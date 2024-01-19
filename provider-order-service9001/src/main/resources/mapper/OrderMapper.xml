@@ -39,7 +39,7 @@
             <if test="status != null">status = #{status},</if>
             update_time = #{updateTime}
         </set>
-        WHERE id = #{id}
+        WHERE id = #{id} AND is_deleted = 0
     </update>
 
     <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
@@ -53,5 +53,20 @@
     <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
         SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND id = #{id}
     </select>
+
+    <select id="selectByUserOrderStatus" parameterType="Order" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND user_id = #{userId} AND status = 2
+    </select>
+
+    <update id="updateByStatusAndUserId" parameterType="Order" keyProperty="id">
+        UPDATE online_taxi.order
+        <set>
+            <if test="price != null">price = #{price},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
+    </update>
 
 </mapper>

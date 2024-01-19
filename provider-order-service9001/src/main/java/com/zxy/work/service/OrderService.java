@@ -19,4 +19,8 @@ public interface OrderService {
 
     Order selectByOrderId(Integer id);
 
+    Order selectByUserOrderStatus(Order order);
+
+    void updateByStatusAndUserId(Order order);
+
 }

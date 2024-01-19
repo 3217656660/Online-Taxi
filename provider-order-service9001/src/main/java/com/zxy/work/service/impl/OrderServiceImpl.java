@@ -57,6 +57,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+
+
     /**
      * 用户查询历史订单
      * @param userId 传来的用户id
@@ -90,7 +92,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Override
+    public Order selectByUserOrderStatus(Order order){
+        return orderMapper.selectByUserOrderStatus(order);
+    }
 
+
+    @Override
+    public void updateByStatusAndUserId(Order order) {
+        orderMapper.updateByStatusAndUserId(order);
+    }
 
 
 }
