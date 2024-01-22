@@ -23,7 +23,7 @@
     <update id="delete" parameterType="Payment">
         UPDATE online_taxi.payment
         SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE id = #{id}
+        WHERE id = #{id} AND amount > 0
     </update>
 
     <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">

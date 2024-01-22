@@ -8,6 +8,7 @@ import com.zxy.work.util.MyString;
 import com.zxy.work.util.encode.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.Date;
 
@@ -102,7 +103,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Object login(User user) {
-        User resultUser = userMapper.selectById( user.getId() );
+        User resultUser = userMapper.selectByMobile( user.getMobile() );
         if (resultUser == null) return MyString.ACCOUNT_ERROR;
 
         //匹配密码
@@ -123,7 +124,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object updatePassword(User user,String newPassword) {
         String inputOldPassword = user.getPassword();
-        String encodedOldPassword = userMapper.selectById( user.getId() ).getPassword();
+        User resultUser = userMapper.selectById(user.getId());
+        if (resultUser == null)
+            return MyString.ACCOUNT_ERROR;
+
+        String encodedOldPassword = resultUser.getPassword();
         boolean matches = PasswordEncoder.matches(inputOldPassword, encodedOldPassword);
         if (matches){
             Date now = new Date();

@@ -1,16 +1,12 @@
 package com.zxy.work.controller;
 
-import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Order;
-import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.OrderService;
-import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @RestController
 @Slf4j

@@ -56,6 +56,7 @@ public final class MyString {
 
     public final static String REQUEST_PAYMENT_SUCCESS = "发起收款成功";
 
+    public final static String SERVE_ERROR = "服务器出问题了";
 
 
 }

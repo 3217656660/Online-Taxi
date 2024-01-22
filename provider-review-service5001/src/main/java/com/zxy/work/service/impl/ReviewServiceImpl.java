@@ -1,9 +1,7 @@
 package com.zxy.work.service.impl;
 
 import com.zxy.work.dao.ReviewMapper;
-import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Review;
-import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.ReviewService;
 import com.zxy.work.util.MyString;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,10 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
-    public Object create(Review review) {        //开始创建
+    public Object create(Review review) {
+        if ( reviewMapper.selectByOrderId(review.getOrderId()) != null )
+            return MyString.REVIEW_ERROR;
+
         Date now = new Date();
         review.setCreateTime(now)
                 .setUpdateTime(now)

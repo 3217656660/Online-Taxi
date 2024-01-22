@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Map;
 
 @RestController
 @Slf4j
@@ -20,7 +19,11 @@ public class ReviewServiceClientController {
     @Resource
     private ReviewServiceClient reviewServiceClient;
 
-
+    /**
+     * 创建评论
+     * @param review 传来的评论信息
+     * @return  评论结果
+     */
     @PostMapping("/create")
     @SaIgnore
     public ResponseEntity<String> create(@RequestBody Review review){
@@ -28,18 +31,33 @@ public class ReviewServiceClientController {
     }
 
 
+    /**
+     * 删除评论
+     * @param review    评论信息
+     * @return  评论删除结果
+     */
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestBody Review review){
         return reviewServiceClient.delete(review);
     }
 
 
+    /**
+     * 通过订单id获得评论
+     * @param orderId   传来的订单id
+     * @return  查询结果
+     */
     @GetMapping("/getByOrderId/{orderId}")
     public ResponseEntity<String> getByOrderId(@PathVariable("orderId") Integer orderId){
         return reviewServiceClient.getByOrderId(orderId);
     }
 
 
+    /**
+     * 通过id查询评论
+     * @param id    评论id
+     * @return  查询结果
+     */
     @GetMapping("/getById/{id}")
     ResponseEntity<String> getById(@PathVariable("id") Integer id){
         return reviewServiceClient.getById(id);

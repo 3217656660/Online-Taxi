@@ -1,10 +1,7 @@
 package com.zxy.work.controller;
 
-import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Review;
-import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.ReviewService;
-import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +28,11 @@ public class ReviewController {
     }
 
 
+    /**
+     * 删除评论
+     * @param review    评论信息
+     * @return  评论删除结果
+     */
     @DeleteMapping("/update/delete")
     public ResponseEntity<Object> deleteReview(@RequestBody Review review){
         log.info( "********删除评价信息服务5001：*********" );
@@ -38,6 +40,11 @@ public class ReviewController {
     }
 
 
+    /**
+     * 通过订单id获得评论
+     * @param orderId   传来的订单id
+     * @return  查询结果
+     */
     @GetMapping("/getByOrderId/{orderId}")
     public ResponseEntity<Object> getReviewByOrderId(@PathVariable("orderId") Integer orderId){
         log.info( "********order id查询评价服务5001：*********" );
@@ -45,6 +52,11 @@ public class ReviewController {
     }
 
 
+    /**
+     * 通过id查询评论
+     * @param id    评论id
+     * @return  查询结果
+     */
     @GetMapping("/getById/{id}")
     public ResponseEntity<Object> getById(@PathVariable("id") Integer id){
         log.info( "********id查询评价服务5001：*********" );

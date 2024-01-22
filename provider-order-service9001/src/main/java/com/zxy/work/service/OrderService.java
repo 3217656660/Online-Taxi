@@ -2,8 +2,6 @@ package com.zxy.work.service;
 
 import com.zxy.work.entities.Order;
 
-import java.util.List;
-
 
 public interface OrderService {
 

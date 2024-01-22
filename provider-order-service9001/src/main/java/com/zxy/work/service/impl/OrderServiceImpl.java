@@ -1,9 +1,7 @@
 package com.zxy.work.service.impl;
 
 import com.zxy.work.dao.OrderMapper;
-import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Order;
-import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.OrderService;
 import com.zxy.work.util.MyString;
 import org.springframework.stereotype.Service;

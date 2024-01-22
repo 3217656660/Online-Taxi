@@ -33,7 +33,7 @@
             <if test="username != null">username = #{username},</if>
             <if test="password != null">password = #{password},</if>
             <if test="email != null">email = #{email},</if>
-            update_time = #{update_time}
+            update_time = #{updateTime}
         </set>
         WHERE is_deleted = 0 AND id = #{id}
     </update>
