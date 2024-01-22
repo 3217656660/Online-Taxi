@@ -6,6 +6,7 @@ import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.OrderService;
 import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -26,20 +27,9 @@ public class OrderController {
      * @return 创建结果
      */
     @PostMapping("/update/create")
-    public CommonResult createOrder(@RequestBody Order order){
-
+    public ResponseEntity<Object> createOrder(@RequestBody Order order){
         log.info( "********订单创建服务9001：*********" );
-
-        //开始创建
-        int result = orderService.create( order );
-
-        if (result > 0){
-            log.info( order + "订单创建成功" );
-            return new CommonResult<>( StatusCode.SUCCESS, MyString.ORDER_CREATE_SUCCESS );
-        }
-
-        log.info( order + "订单创建失败" );
-        return new CommonResult<>( StatusCode.FAILURE,MyString.ORDER_CREATE_ERROR );
+        return ResponseEntity.ok( orderService.create(order) );
     }
 
 
@@ -49,19 +39,9 @@ public class OrderController {
      * @return  取消结果
      */
     @DeleteMapping("/update/delete")
-    public CommonResult deleteOrder(@RequestBody Order order){
-
+    public ResponseEntity<Object> deleteOrder(@RequestBody Order order){
         log.info( "********取消服务9001：*********" );
-
-        int result = orderService.delete(order);
-
-        if (result > 0){
-            log.info( order + "取消成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,order.getId() + MyString.ORDER_CANCEL_SUCCESS );
-        }
-
-        log.info( order + "取消失败" );
-        return new CommonResult<>( StatusCode.FAILURE,MyString.ORDER_CANCEL_ERROR );
+        return ResponseEntity.ok( orderService.delete(order) );
     }
 
 
@@ -71,22 +51,16 @@ public class OrderController {
      * @return  更新的订单信息结果
      */
     @PutMapping("/update/message")
-    public CommonResult updateUser(@RequestBody Order order){
-
+    public ResponseEntity<Object> updateUser(@RequestBody Order order){
         log.info( "********更新信息服务9001：*********" );
-
-        int result = orderService.update(order);
-
-        if (result > 0){
-            log.info(order + "信息更新成功");
-            return new CommonResult<>(StatusCode.SUCCESS,order);
-        }
-
-        log.info(order + "信息更新失败");
-        return new CommonResult<>(StatusCode.FAILURE,MyString.UPDATE_ERROR);
+        return ResponseEntity.ok( orderService.update(order) );
     }
 
 
+    /**
+     * 通过订单状态和用户id更新订单
+     * @param order 传来的订单信息
+     */
     @PostMapping("/updateByStatusAndUserId")
     public void updateByStatusAndUserId(@RequestBody Order order){
         orderService.updateByStatusAndUserId(order);
@@ -99,73 +73,44 @@ public class OrderController {
      * @return  获取的结果以及数据
      */
     @GetMapping("/get/{id}")
-    public CommonResult getOrderById(@PathVariable("id")Integer id){
-
+    public ResponseEntity<Object> getOrderById(@PathVariable("id")Integer id){
         log.info( "********查询服务9001：*********" );
-
-        Order order = orderService.selectByOrderId(id);
-
-        if (order == null){
-            log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
-        }
-
-        log.info( order + "查找成功" );
-        return new CommonResult<>(StatusCode.SUCCESS,order);
-
+        return ResponseEntity.ok( orderService.selectByOrderId(id) );
     }
 
 
     /**
-     * 根据用户Id获取订单信息
+     * 根据用户Id获取历史订单信息
      * @param userId    传来的用户Id
      * @return  获取的结果以及数据
      */
     @GetMapping("/get/user/history/{userId}")
-    public CommonResult getOrderByUserId(@PathVariable("userId")Integer userId){
-
+    public ResponseEntity<Object> getOrderByUserId(@PathVariable("userId")Integer userId){
         log.info( "********用户历史订单查询服务9001：*********" );
-
-        List<Order> orderList = orderService.selectByUserId(userId);
-
-        if (orderList == null){
-            log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
-        }
-
-        log.info( orderList + "查找成功" );
-        return new CommonResult<>(StatusCode.SUCCESS,orderList);
-
+        return ResponseEntity.ok( orderService.selectByUserId(userId) );
     }
 
 
     /**
-     * 根据司机Id获取订单信息
+     * 根据司机Id获取历史订单信息
      * @param driverId    传来的司机Id
      * @return  获取的结果以及数据
      */
     @GetMapping("/get/driver/history/{driverId}")
-    public CommonResult getOrderByDriverId(@PathVariable("driverId")Integer driverId){
-
+    public ResponseEntity<Object> getOrderByDriverId(@PathVariable("driverId")Integer driverId){
         log.info( "********司机历史订单查询服务9001：*********" );
-
-        List<Order> orderList = orderService.selectByDriverId(driverId);
-
-        if (orderList == null){
-            log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
-        }
-
-        log.info( orderList + "查找成功" );
-        return new CommonResult<>(StatusCode.SUCCESS,orderList);
-
+        return ResponseEntity.ok( orderService.selectByDriverId(driverId) );
     }
 
 
+    /**
+     * 通过用户订单状态获得订单信息
+     * @param order 传来的订单信息
+     * @return  获取到的信息
+     */
     @PostMapping("/getByUserOrderStatus")
-    public CommonResult getByUserOrderStatus(@RequestBody Order order){
-
-        return new CommonResult<>(StatusCode.SUCCESS,orderService.selectByUserOrderStatus(order));
+    public ResponseEntity<Object> getByUserOrderStatus(@RequestBody Order order){
+        return ResponseEntity.ok( orderService.selectByUserOrderStatus(order) );
     }
 
 

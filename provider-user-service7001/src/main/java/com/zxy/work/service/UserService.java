@@ -4,16 +4,18 @@ import com.zxy.work.entities.User;
 
 public interface UserService {
 
-    int create(User user);
+    Object create(User user);
 
-    int delete(User user);
+    Object delete(User user);
 
-    int update(User user);
+    Object update(User user);
 
-    User selectByMobile(String mobile);
+    Object selectByMobile(String mobile);
 
-    int updatePassword(User user,String newPassword);
+    Object login(User user);
 
-    User selectById(Integer id);
+    Object updatePassword(User user,String newPassword);
+
+    Object selectById(Integer id);
 
 }

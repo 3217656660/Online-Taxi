@@ -15,4 +15,6 @@ public interface DriverMapper {
 
     Driver selectByMobile(@Param("mobile") String mobile);
 
+    Driver selectById(@Param("id") Integer id);
+
 }

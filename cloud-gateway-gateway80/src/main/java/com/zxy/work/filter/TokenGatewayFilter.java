@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
  * 只有请求头中带有token才可以访问,是第一层拦截，用于屏蔽无效请求。
  * 第二层拦截的检验用对应业务的注解实现。
  */
-@Component
+//@Component
 @Slf4j
 public class TokenGatewayFilter implements GlobalFilter, Ordered {
 

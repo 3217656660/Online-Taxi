@@ -1,13 +1,18 @@
 package com.zxy.work.service;
 
 import com.zxy.work.entities.Payment;
+import org.apache.ibatis.annotations.Param;
 
 public interface PaymentService {
 
-    int create(Payment payment);
+    Object create(Payment payment);
 
-    int delete(Payment payment);
+    Object delete(Payment payment);
 
-    Payment selectByOrderId(Integer orderId);
+    Object selectByOrderId(Integer orderId);
+
+    Object selectById(Integer id);
+
+    Object update(Payment payment);
 
 }

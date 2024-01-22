@@ -5,6 +5,7 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import com.zxy.work.entities.Order;
 import com.zxy.work.service.OrderServiceClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -21,43 +22,39 @@ public class OrderServiceClientController {
 
     @PostMapping("/create")
     @SaIgnore
-    Map<String,Object> create(@RequestBody Order order){
+    ResponseEntity<String> create(@RequestBody Order order){
         return orderServiceClient.create(order);
     }
 
 
     @DeleteMapping("/delete")
-    Map<String,Object> delete(@RequestBody Order order){
+    ResponseEntity<String> delete(@RequestBody Order order){
         return orderServiceClient.delete(order);
     }
 
 
     @PutMapping("/message")
-    Map<String,Object> updateMessage(@RequestBody Order order){
+    ResponseEntity<String> updateMessage(@RequestBody Order order){
         return orderServiceClient.update(order);
     }
 
 
     @GetMapping("/getById/{id}")
-    Map<String,Object> getById(@PathVariable("id")Integer id){
+    ResponseEntity<String> getById(@PathVariable("id")Integer id){
         return orderServiceClient.getById(id);
     }
 
 
-
     @GetMapping("/getByUserId/{userId}")
-    Map<String,Object>getByUserId(@PathVariable("userId")Integer userId){
+    ResponseEntity<String> getByUserId(@PathVariable("userId")Integer userId){
         return orderServiceClient.getByUserId(userId);
     }
 
 
-
     @GetMapping("/getByDriverId/{driverId}")
-    Map<String,Object> getByDriverId(@PathVariable("driverId")Integer driverId){
+    ResponseEntity<String> getByDriverId(@PathVariable("driverId")Integer driverId){
         return orderServiceClient.getByDriverId(driverId);
     }
-
-
 
 
 }

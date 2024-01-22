@@ -2,16 +2,19 @@ package com.zxy.work.service;
 
 
 import com.zxy.work.entities.Driver;
+import org.apache.ibatis.annotations.Param;
 
 
 public interface DriverService {
 
-    int create(Driver driver);
+    Object create(Driver driver);
 
-    int delete(Driver driver);
+    Object delete(Driver driver);
 
-    int update(Driver driver);
+    Object update(Driver driver);
 
-    Driver selectByMobile(String mobile);
+    Object selectByMobile(String mobile);
+
+    Object selectById(Integer id);
 
 }

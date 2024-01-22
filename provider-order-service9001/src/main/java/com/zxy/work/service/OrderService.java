@@ -7,19 +7,19 @@ import java.util.List;
 
 public interface OrderService {
 
-    int create(Order order);
+    Object create(Order order);
 
-    int delete(Order order);
+    Object delete(Order order);
 
-    int update(Order order);
+    Object update(Order order);
 
-    List<Order> selectByUserId(Integer userId);
+    Object selectByUserId(Integer userId);
 
-    List<Order> selectByDriverId(Integer driverId);
+    Object selectByDriverId(Integer driverId);
 
-    Order selectByOrderId(Integer id);
+    Object selectByOrderId(Integer id);
 
-    Order selectByUserOrderStatus(Order order);
+    Object selectByUserOrderStatus(Order order);
 
     void updateByStatusAndUserId(Order order);
 

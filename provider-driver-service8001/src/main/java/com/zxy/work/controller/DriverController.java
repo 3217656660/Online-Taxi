@@ -6,6 +6,7 @@ import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.DriverService;
 import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -25,31 +26,11 @@ public class DriverController {
      * @return 注册结果
      */
     @PostMapping("/update/register")
-    public CommonResult registerDriver(@RequestBody Driver driver){
-
+    public ResponseEntity<Object> registerDriver(@RequestBody Driver driver){
         log.info( "********司机注册服务8001：*********" );
+        //参数校验
 
-        //检查该手机号否已注册
-        Driver registeredDriver = driverService.selectByMobile( driver.getMobile() );
-        if ( registeredDriver != null ) return new CommonResult<>( StatusCode.FAILURE,MyString.MOBILE_EXIST );
-
-
-        //开始注册
-        int result = driverService.create( driver );
-
-        if (result > 0){
-            log.info( driver + "注册成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,MyString.REGISTER_SUCCESS );
-        }
-
-        log.info( driver + "注册失败" );
-        return new CommonResult<>( StatusCode.FAILURE, MyString.REGISTER_ERROR );
-    }
-
-
-    @PostMapping("/logout")
-    void logout(@RequestBody Driver driver){
-        //完成退出登录功能
+        return ResponseEntity.ok( driverService.create(driver) );
     }
 
 
@@ -59,19 +40,11 @@ public class DriverController {
      * @return  注销结果
      */
     @DeleteMapping("/update/delete")
-    public CommonResult deleteDriver(@RequestBody Driver driver){
-
+    public ResponseEntity<Object> deleteDriver(@RequestBody Driver driver){
         log.info( "********注销服务8001：*********" );
+        //参数校验
 
-        int result = driverService.delete(driver);
-
-        if (result > 0){
-            log.info( driver + "注销成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,driver.getMobile() + MyString.DELETE_SUCCESS );
-        }
-
-        log.info( driver + "注销失败" );
-        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
+        return ResponseEntity.ok( driverService.delete(driver) );
     }
 
 
@@ -80,19 +53,12 @@ public class DriverController {
      * @param mobile    传来的司机手机号
      * @return  获取的结果以及数据
      */
-    @GetMapping("/get/{mobile}")
-    public CommonResult getDriverByMobile(@PathVariable("mobile")String mobile){
+    @GetMapping("/getByMobile/{mobile}")
+    public ResponseEntity<Object> getDriverByMobile(@PathVariable("mobile")String mobile){
+        log.info( "********通过手机号查询服务8001：*********" );
+        //参数校验
 
-        log.info( "********查询服务8001：*********" );
-
-        Driver driver = driverService.selectByMobile(mobile);
-        if (driver == null){
-            log.info( "查找失败" );
-            return new CommonResult<>( StatusCode.FAILURE,MyString.FIND_ERROR );
-        }
-
-        log.info( driver + "查找成功" );
-        return new CommonResult<>(StatusCode.SUCCESS,driver);
+        return  ResponseEntity.ok( driverService.selectByMobile(mobile) );
     }
 
 
@@ -102,20 +68,25 @@ public class DriverController {
      * @return  更新的信息结果
      */
     @PutMapping("/update/message")
-    public CommonResult updateDriver(@RequestBody Driver driver){
-
+    public ResponseEntity<Object> updateDriver(@RequestBody Driver driver){
         log.info( "********更新信息服务8001：*********" );
+        //参数校验
 
-        int result = driverService.update(driver);
-
-        if (result > 0){
-            log.info(driver + "信息更新成功");
-            return new CommonResult(StatusCode.SUCCESS,driver);
-        }
-
-        log.info(driver + "信息更新失败");
-        return new CommonResult(StatusCode.FAILURE,MyString.UPDATE_ERROR);
+        return ResponseEntity.ok( driverService.update(driver) );
     }
+
+
+    /**
+     * 通过id查找司机
+     * @param id 司机id
+     * @return  查找结果
+     */
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Object> getById(@PathVariable("id") Integer id){
+        log.info( "********通过id查找信息服务8001：*********" );
+        return ResponseEntity.ok( driverService.selectById(id) );
+    }
+
 
 
 }

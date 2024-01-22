@@ -1,4 +1,4 @@
-package com.zxy.work.util;
+package com.zxy.work.util.encode;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -7,6 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
  */
 public final class  PasswordEncoder {
     private static final int WORKLOAD = 8; // 加密迭代次数
+
 
     /**
      * 对密码进行加密
@@ -21,6 +22,7 @@ public final class  PasswordEncoder {
         // 使用盐值和密码进行哈希计算
         return BCrypt.hashpw(password, salt);
     }
+
 
     /**
      * 校验密码是否匹配

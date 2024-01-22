@@ -6,6 +6,7 @@ import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.PaymentService;
 import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -19,54 +20,39 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping("/update/create")
-    public CommonResult createPayment(@RequestBody Payment payment){
+    public ResponseEntity<Object> createPayment(@RequestBody Payment payment){
         log.info( "********支付创建服务6001：*********" );
-
-        //开始创建
-        int result = paymentService.create( payment );
-
-        if (result > 0){
-            log.info( payment + "支付创建成功" );
-            return new CommonResult<>( StatusCode.SUCCESS, MyString.PAYMENT_SUCCESS );
-        }
-
-        log.info( payment + "支付创建失败" );
-        return new CommonResult<>( StatusCode.FAILURE,MyString.PAYMENT_ERROR );
+        return ResponseEntity.ok( paymentService.create(payment) );
     }
 
 
     @DeleteMapping("/update/delete")
-    public CommonResult deletePayment(@RequestBody Payment payment){
-
+    public ResponseEntity<Object> deletePayment(@RequestBody Payment payment){
         log.info( "********删除支付信息服务6001：*********" );
-
-        int result = paymentService.delete(payment);
-
-        if (result > 0){
-            log.info( payment + "删除成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,payment.getId() + MyString.DELETE_SUCCESS );
-        }
-
-        log.info( payment + "删除失败" );
-        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
+        return ResponseEntity.ok( paymentService.delete(payment) );
     }
 
 
-    @GetMapping("/get/{orderId}")
-    public CommonResult getPaymentByOrderId(@PathVariable("orderId")Integer orderId){
-
+    @GetMapping("/getByOrderId/{orderId}")
+    public ResponseEntity<Object> getPaymentByOrderId(@PathVariable("orderId")Integer orderId){
         log.info( "********查询支付服务6001：*********" );
-
-        Payment payment = paymentService.selectByOrderId(orderId);
-
-        if (payment == null){
-            log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
-        }
-
-        log.info( payment + "查找成功" );
-        return new CommonResult<>(StatusCode.SUCCESS,payment);
+        return ResponseEntity.ok( paymentService.selectByOrderId(orderId) );
     }
+
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Object> getById(@PathVariable("id")Integer id){
+        log.info( "********查询支付服务6001：*********" );
+        return ResponseEntity.ok( paymentService.selectById(id) );
+    }
+
+
+    @PutMapping("/update/message")
+    public ResponseEntity<Object> update(@RequestBody Payment payment){
+        log.info( "********更新支付服务6001：*********" );
+        return ResponseEntity.ok( paymentService.update(payment) );
+    }
+
 
 
 }

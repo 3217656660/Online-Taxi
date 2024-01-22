@@ -31,10 +31,10 @@ public class User implements Serializable {
     private Integer isDeleted;
 
 
-    public User(String mobile, String password) {
-        this.mobile = mobile;
+    public User(Integer id, String password) {
+        this.id = id;
         this.password = password;
-
     }
+
 
 }

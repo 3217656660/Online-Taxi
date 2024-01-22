@@ -14,4 +14,7 @@ public interface ReviewMapper {
 
     Review selectByOrderId(@Param("orderId") Integer orderId);
 
+    Review selectById(@Param("id") Integer id);
+
+
 }

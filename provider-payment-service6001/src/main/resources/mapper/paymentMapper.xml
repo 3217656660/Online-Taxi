@@ -20,7 +20,7 @@
         values(#{id},#{orderId},#{paymentMethod},#{amount},#{createTime},#{updateTime},#{isDeleted});
     </insert>
 
-    <update id="delete" parameterType="Payment" keyProperty="id">
+    <update id="delete" parameterType="Payment">
         UPDATE online_taxi.payment
         SET update_time = #{updateTime} , is_deleted = #{isDeleted}
         WHERE id = #{id}
@@ -29,5 +29,19 @@
     <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
         SELECT * FROM online_taxi.payment WHERE is_deleted = 0 AND order_id = #{orderId}
     </select>
+
+    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.payment WHERE is_deleted = 0 AND id = #{id}
+    </select>
+
+    <update id="update" parameterType="Payment">
+        UPDATE online_taxi.payment
+        <set>
+            <if test="paymentMethod != null">payment_method = #{paymentMethod},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
 
 </mapper>

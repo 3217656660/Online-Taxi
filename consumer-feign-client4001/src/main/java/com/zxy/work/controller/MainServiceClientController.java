@@ -4,9 +4,9 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.zxy.work.entities.Order;
 import com.zxy.work.entities.Payment;
 import com.zxy.work.service.*;
+import com.zxy.work.util.cache.CacheUtil;
 import com.zxy.work.util.DistanceCalculator;
 import com.zxy.work.util.MyString;
-import com.zxy.work.util.RedisUtil;
 import com.zxy.work.vo.DriverActionTakeOrderVo;
 import com.zxy.work.vo.UserCreateOrderVo;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +41,10 @@ public class MainServiceClientController {
     @Resource
     private DriverServiceClient driverServiceClient;
 
+
     @Resource
-    private RedisUtil redisUtil;
+    private CacheUtil redisUtil;//抽象缓存工具类，以便框架替换
+
 
     //创建订单前先查询有没有未支付的订单或者未完成的订单，如果有那么返回
     //抽取方法中公共部分，形成公共方法
@@ -296,7 +298,10 @@ public class MainServiceClientController {
         //通过数据库获取创建好的订单id,注：用户只能有一个在进行的订单，数据库中也是如此
         //也就是数据库中每一个用户的订单最终status状态只有5或者4，只要有3就再下单的时候提醒支付，不然无法下单
         //1（只有一个）、2（只有一个）、3（只有一个），并且1、2、3互斥。4、5可以有多个，0只存在于redis中（相对于一个用户Id来说）
-        Map<String, Object> result = orderServiceClient.getByUserOrderStatus(order);
+        log.info("" + orderServiceClient.getByUserOrderStatus(order));
+        log.info("" + orderServiceClient.getByUserOrderStatus(order).getBody());
+
+        Map<String, Object> result = ( Map<String, Object> ) orderServiceClient.getByUserOrderStatus(order);
         Map<String, Object> data = (Map<String, Object>) result.get("data");
         Integer orderId = (Integer) data.get("id");
         //设置完整的订单并更新到redis和数据库中
@@ -320,7 +325,7 @@ public class MainServiceClientController {
 
         //支付表持久化, 并返回对应的paymentId
         paymentServiceClient.create(payment);
-        result = paymentServiceClient.getByOrderId(orderId);
+        result = ( Map<String, Object> ) paymentServiceClient.getByOrderId(orderId);
         data = (Map<String, Object>) result.get("data");
         Integer paymentId = (Integer) data.get("id");
         payment.setId(paymentId);

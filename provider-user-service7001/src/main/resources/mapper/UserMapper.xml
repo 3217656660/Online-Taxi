@@ -21,21 +21,21 @@
         values(#{id},#{username},#{password},#{mobile},#{email},#{createTime},#{updateTime},#{isDeleted});
     </insert>
 
-    <update id="delete" parameterType="User" keyProperty="id">
+    <update id="delete" parameterType="User">
         UPDATE online_taxi.user
         SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE mobile = #{mobile}
+        WHERE is_deleted = 0 AND id = #{id}
     </update>
 
-    <update id="update" parameterType="User" keyProperty="id">
+    <update id="update" parameterType="User">
         UPDATE online_taxi.user
         <set>
             <if test="username != null">username = #{username},</if>
             <if test="password != null">password = #{password},</if>
             <if test="email != null">email = #{email},</if>
-            update_time = #{updateTime}
+            update_time = #{update_time}
         </set>
-        WHERE mobile = #{mobile}
+        WHERE is_deleted = 0 AND id = #{id}
     </update>
 
     <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
@@ -43,8 +43,7 @@
     </select>
 
     <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.user WHERE id = #{id}
+        SELECT * FROM online_taxi.user WHERE is_deleted = 0 AND id = #{id}
     </select>
-
 
 </mapper>

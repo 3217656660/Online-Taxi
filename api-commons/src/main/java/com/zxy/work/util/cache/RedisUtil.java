@@ -1,4 +1,4 @@
-package com.zxy.work.util;
+package com.zxy.work.util.cache;
 
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,10 +13,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 自定义RedisUtil
+ * 自定义RedisUtil,实现了缓存工具类接口
  */
 @Component
-public final class RedisUtil {
+public final class RedisUtil implements CacheUtil {
 
     @Resource
     private RedisTemplate<String,Object> redisTemplate;
@@ -29,7 +29,7 @@ public final class RedisUtil {
      * @param key 键
      * @param time 时间（秒）
      */
-    private boolean expire(String key,long time){
+    public boolean expire(String key,long time){
         try{
             if (time > 0){
                 redisTemplate.expire(key,time, TimeUnit.SECONDS);

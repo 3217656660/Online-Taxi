@@ -18,6 +18,8 @@ public final class MyString {
 
     public final static String FIND_ERROR = "查找失败";
 
+    public final static String UPDATE_SUCCESS = "信息更新成功";
+
     public final static String UPDATE_ERROR = "信息更新失败";
 
     public final static String REVIEW_SUCCESS = "评价成功";

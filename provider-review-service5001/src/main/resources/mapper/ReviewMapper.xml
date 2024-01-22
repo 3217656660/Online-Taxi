@@ -30,5 +30,9 @@
         SELECT * FROM online_taxi.review WHERE is_deleted = 0 AND order_id = #{orderId}
     </select>
 
+    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.review WHERE is_deleted = 0 AND id = #{id}
+    </select>
+
 
 </mapper>

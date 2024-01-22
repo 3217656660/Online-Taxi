@@ -25,7 +25,7 @@
         SELECT * FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
     </select>
 
-    <update id="update" parameterType="Driver" keyProperty="id">
+    <update id="update" parameterType="Driver">
         UPDATE online_taxi.driver
         <set>
             <if test="name != null">name = #{name},</if>
@@ -33,13 +33,17 @@
             <if test="carNumber != null">car_number = #{carNumber},</if>
             update_time = #{updateTime}
         </set>
-        WHERE mobile = #{mobile}
+        WHERE is_deleted = 0 AND id = #{id}
     </update>
 
-    <update id="delete" parameterType="Driver" keyProperty="id">
+    <update id="delete" parameterType="Driver">
         UPDATE online_taxi.driver
         SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE mobile = #{mobile}
+        WHERE is_deleted = 0 AND id = #{id}
     </update>
+
+    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.driver WHERE is_deleted = 0 AND id = #{id}
+    </select>
 
 </mapper>

@@ -28,7 +28,7 @@
     <update id="delete" parameterType="Order" keyProperty="id">
         UPDATE online_taxi.order
         SET update_time = #{updateTime} , is_deleted = #{isDeleted} , status = #{status}
-        WHERE id = #{id}
+        WHERE id = #{id} AND is_deleted = 0
     </update>
 
     <update id="update" parameterType="Order" keyProperty="id">

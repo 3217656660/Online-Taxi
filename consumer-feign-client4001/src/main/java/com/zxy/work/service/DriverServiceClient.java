@@ -2,6 +2,7 @@ package com.zxy.work.service;
 
 import com.zxy.work.entities.Driver;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -11,28 +12,22 @@ public interface DriverServiceClient {
 
 
     @PostMapping("/driver/update/register")
-    Map<String,Object> register(@RequestBody Driver driver);
+    ResponseEntity<String> register(@RequestBody Driver driver);
 
-
-    @PostMapping("/driver/login")
-    Map<String,Object> login(@RequestBody Driver driver);
-
-
-    @PostMapping("/driver/logout")
-    void logout(@RequestBody Driver driver);
 
     @DeleteMapping("/driver/update/delete")
-    Map<String,Object> delete(@RequestBody Driver driver);
+    ResponseEntity<String> delete(@RequestBody Driver driver);
 
 
-
-    @GetMapping("/driver/get/{mobile}")
-    Map<String,Object> getByMobile(@PathVariable("mobile")String mobile);
-
+    @GetMapping("/driver/getByMobile/{mobile}")
+    ResponseEntity<String> getByMobile(@PathVariable("mobile")String mobile);
 
 
     @PutMapping("/driver/update/message")
-    Map<String,Object> update(@RequestBody Driver driver);
+    ResponseEntity<String> update(@RequestBody Driver driver);
 
+
+    @GetMapping("/driver/getById/{id}")
+    ResponseEntity<String> getById(@PathVariable("id") Integer id);
 
 }

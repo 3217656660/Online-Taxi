@@ -1,8 +1,11 @@
 package com.zxy.work.service.impl;
 
 import com.zxy.work.dao.OrderMapper;
+import com.zxy.work.entities.CommonResult;
 import com.zxy.work.entities.Order;
+import com.zxy.work.entities.StatusCode;
 import com.zxy.work.service.OrderService;
+import com.zxy.work.util.MyString;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,14 +19,20 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
 
 
+    /**
+     * 创建订单
+     * @param order 传来的用户信息json
+     * @return 创建结果
+     */
     @Override
-    public int create(Order order) {
+    public Object create(Order order) {
         Date now = new Date();
         order.setCreateTime(now)
                 .setUpdateTime(now)
                 .setIsDeleted(0);
-
-        return orderMapper.create(order);
+        return orderMapper.create(order) == 0
+                ? MyString.ORDER_CREATE_ERROR
+                : MyString.ORDER_CREATE_SUCCESS;
     }
 
 
@@ -34,13 +43,14 @@ public class OrderServiceImpl implements OrderService {
      * @return 取消结果
      */
     @Override
-    public int delete(Order order) {
+    public Object delete(Order order) {
         Date now = new Date();
         order.setUpdateTime(now)
                 .setStatus(5)//已取消
                 .setIsDeleted(1);
-
-        return orderMapper.delete(order);
+        return orderMapper.delete(order) == 0
+                ? MyString.ORDER_CANCEL_ERROR
+                : MyString.ORDER_CANCEL_SUCCESS;
     }
 
 
@@ -50,13 +60,13 @@ public class OrderServiceImpl implements OrderService {
      * @return  更新结果
      */
     @Override
-    public int update(Order order) {
+    public Object update(Order order) {
         Date now = new Date();
         order.setUpdateTime(now);
-        return orderMapper.update(order);
+        return orderMapper.update(order) == 0
+                ? MyString.UPDATE_ERROR
+                : order;
     }
-
-
 
 
     /**
@@ -65,8 +75,11 @@ public class OrderServiceImpl implements OrderService {
      * @return 历史订单
      */
     @Override
-    public List<Order> selectByUserId(Integer userId) {
-        return orderMapper.selectByUserId(userId);
+    public Object selectByUserId(Integer userId) {
+        List<Order> orderList = orderMapper.selectByUserId(userId);
+        return orderList == null
+                ? MyString.FIND_ERROR
+                : orderList;
     }
 
 
@@ -76,8 +89,11 @@ public class OrderServiceImpl implements OrderService {
      * @return 历史订单
      */
     @Override
-    public List<Order> selectByDriverId(Integer driverId) {
-        return orderMapper.selectByDriverId(driverId);
+    public Object selectByDriverId(Integer driverId) {
+        List<Order> orderList = orderMapper.selectByDriverId(driverId);
+        return orderList == null
+                ? MyString.FIND_ERROR
+                : orderList;
     }
 
 
@@ -87,17 +103,29 @@ public class OrderServiceImpl implements OrderService {
      * @return 订单对象
      */
     @Override
-    public Order selectByOrderId(Integer id) {
-        return orderMapper.selectByOrderId(id);
+    public Object selectByOrderId(Integer id) {
+        Order order = orderMapper.selectByOrderId(id);
+        return order == null
+                ? MyString.FIND_ERROR
+                : order;
     }
 
 
+    /**
+     * 通过用户订单状态获得订单信息
+     * @param order 传来的订单信息
+     * @return  获取到的信息
+     */
     @Override
-    public Order selectByUserOrderStatus(Order order){
+    public Object selectByUserOrderStatus(Order order){
         return orderMapper.selectByUserOrderStatus(order);
     }
 
 
+    /**
+     * 通过订单状态和用户id更新订单
+     * @param order 传来的订单信息
+     */
     @Override
     public void updateByStatusAndUserId(Order order) {
         orderMapper.updateByStatusAndUserId(order);

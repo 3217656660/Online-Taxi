@@ -1,14 +1,11 @@
 package com.zxy.work.controller;
 
-import com.zxy.work.entities.CommonResult;
-import com.zxy.work.entities.StatusCode;
+
 import com.zxy.work.entities.User;
 import com.zxy.work.service.UserService;
-import com.zxy.work.util.MyString;
-import com.zxy.work.util.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import java.util.Map;
 
@@ -28,25 +25,11 @@ public class UserController {
      * @return 注册结果:注册成功时返回注册的账号
      */
     @PostMapping("/update/register")
-    public CommonResult registerUser(@RequestBody User user){
-
+    public ResponseEntity<Object> registerUser(@RequestBody User user){
         log.info( "********用户注册服务7001：*********" );
+        //参数校验
 
-        //检查该手机号否已注册
-        User registeredUser = userService.selectByMobile( user.getMobile() );
-        if ( registeredUser != null ) return new CommonResult<>( StatusCode.FAILURE,MyString.MOBILE_EXIST );
-
-
-        //开始注册
-        int result = userService.create( user );
-
-        if (result > 0){
-            log.info( user + "注册成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,MyString.REGISTER_SUCCESS );
-        }
-
-         log.info( user + "注册失败" );
-         return new CommonResult<>( StatusCode.FAILURE,MyString.REGISTER_ERROR );
+        return ResponseEntity.ok( userService.create(user) );
     }
 
 
@@ -56,19 +39,11 @@ public class UserController {
      * @return  注销结果
      */
     @DeleteMapping("/update/delete")
-    public CommonResult deleteUser(@RequestBody User user){
-
+    public ResponseEntity<Object>  deleteUser(@RequestBody User user){
+        //参数校验
         log.info( "********注销服务7001：*********" );
 
-        int result = userService.delete(user);
-
-        if (result > 0){
-            log.info( user + "注销成功" );
-            return new CommonResult<>( StatusCode.SUCCESS,user.getMobile() + MyString.DELETE_SUCCESS );
-        }
-
-        log.info( user + "注销失败" );
-        return new CommonResult<>( StatusCode.FAILURE,MyString.DELETE_ERROR );
+        return ResponseEntity.ok( userService.delete(user) );
     }
 
 
@@ -78,20 +53,11 @@ public class UserController {
      * @return  获取的结果以及数据
      */
     @GetMapping("/get/{mobile}")
-    public CommonResult getUserByMobile(@PathVariable("mobile")String mobile){
-
+    public ResponseEntity<Object>  getUserByMobile(@PathVariable("mobile")String mobile){
         log.info( "********查询服务7001：*********" );
+        //参数校验
 
-        User user = userService.selectByMobile(mobile);
-        if (user == null){
-            log.info( "查找失败" );
-            return new CommonResult<>(StatusCode.FAILURE,MyString.FIND_ERROR);
-        }
-
-         log.info( user + "查找成功" );
-         //用户信息脱敏
-         user.setPassword("**********");
-         return new CommonResult<>(StatusCode.SUCCESS,user);
+        return ResponseEntity.ok( userService.selectByMobile(mobile) );
     }
 
 
@@ -101,29 +67,11 @@ public class UserController {
      * @return 登录结果：登录成功时将用户信息返回
      */
     @PostMapping("/login")
-    public CommonResult login(@RequestBody User user){
-
+    public ResponseEntity<Object> login(@RequestBody User user){
         log.info( "********登录服务7001：*********" );
+        //参数校验
 
-        //获取输入的密码
-        String inputPassword = user.getPassword();
-
-        //获取该账号的加密密码
-        User resultUser = userService.selectByMobile( user.getMobile() );
-        if (resultUser == null) return new CommonResult<>(StatusCode.FAILURE, MyString.ACCOUNT_ERROR);
-
-        String encodedPassword = resultUser.getPassword();
-
-        //匹配
-        boolean matches = PasswordEncoder.matches(inputPassword, encodedPassword);
-        if (!matches){
-            log.info(user.getMobile() + "登录失败");
-            return new CommonResult<>(StatusCode.FAILURE,MyString.PASSWORD_ERROR);
-        }
-
-        log.info(user.getMobile() + "登录成功");
-        resultUser.setPassword("**************");
-        return new CommonResult<>(StatusCode.SUCCESS,resultUser);
+        return ResponseEntity.ok( userService.login(user) );
     }
 
 
@@ -144,19 +92,11 @@ public class UserController {
      * @return  更新的用户信息结果
      */
     @PutMapping("/update/message")
-    public CommonResult updateUser(@RequestBody User user){
-
+    public ResponseEntity<Object> updateUser(@RequestBody User user){
         log.info( "********更新信息服务7001：*********" );
+        //参数校验
 
-        int result = userService.update(user);
-
-        if (result > 0){
-            log.info(user + "信息更新成功");
-            return new CommonResult(StatusCode.SUCCESS,user);
-        }
-
-         log.info(user + "信息更新失败");
-         return new CommonResult(StatusCode.FAILURE,MyString.UPDATE_ERROR);
+         return ResponseEntity.ok( userService.update(user) );
     }
 
 
@@ -166,43 +106,26 @@ public class UserController {
      * @return  更新结果
      */
     @PutMapping("/update/password")
-    public CommonResult updatePassword(@RequestBody Map<String,Object> requestMapper){
-        String mobile = (String) requestMapper.get("mobile");
+    public ResponseEntity<Object> updatePassword(@RequestBody Map<String,Object> requestMapper){
+        Integer id = (Integer) requestMapper.get("id");
         String password = (String) requestMapper.get("password");
         String newPassword = (String) requestMapper.get("newPassword");
+        User user = new User(id,password);
+        //检验
 
         log.info( "********更新密码服务7001：*********" );
-
-        User user = new User(mobile,password);
-
-        int result = userService.updatePassword(user,newPassword);
-
-        if (result > 0){
-            log.info(user + "密码更新成功");
-            user.setPassword("**************");
-            return new CommonResult(StatusCode.SUCCESS,user);
-        }
-
-        log.info(user + "密码更新失败");
-        return new CommonResult(StatusCode.FAILURE,MyString.UPDATE_ERROR);
+        return ResponseEntity.ok( userService.updatePassword(user ,newPassword) );
     }
 
 
     /**
      * 通过ID查找用户
      * @param id 传来的ID
-     * @return  传回用户json
+     * @return  查询结果
      */
     @GetMapping("/getById/{id}")
-    public CommonResult getById(@PathVariable("id")Integer id){
-        User user = userService.selectById(id);
-
-        if ( user == null )
-            return new CommonResult<>( StatusCode.FAILURE,MyString.FIND_ERROR );
-
-        user.setPassword("***********");
-        return new CommonResult<>( StatusCode.SUCCESS,user );
+    public ResponseEntity<Object> getById(@PathVariable("id")Integer id)  {
+        return ResponseEntity.ok( userService.selectById(id) );
     }
-
 
 }
