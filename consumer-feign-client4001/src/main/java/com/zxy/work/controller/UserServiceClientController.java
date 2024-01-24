@@ -20,7 +20,7 @@ import java.util.Objects;
 
 @RestController
 @Slf4j
-@RequestMapping("/taxi/user/")
+@RequestMapping("/taxi/user")
 @SaCheckLogin
 public class UserServiceClientController {
 

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -18,7 +19,8 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @Slf4j
-public class TokenGatewayFilter implements GlobalFilter, Ordered {
+@Order(1)
+public class TokenGatewayFilter implements GlobalFilter{
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -26,7 +28,7 @@ public class TokenGatewayFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getPath().value();
         String token = exchange.getRequest().getHeaders().getFirst("X-Token");
 
-
+        log.info("" + exchange.getRequest().getPath());
         //排除注册、登录、退出登录的路径或者token有效放行
         if ( path.endsWith("/login") ||  path.endsWith("/register")  ||  path.endsWith("/logout") || token != null ){
             log.info( "放行了不需要token的请求，或放行了一条token:" + token );
@@ -37,12 +39,6 @@ public class TokenGatewayFilter implements GlobalFilter, Ordered {
         log.info("拦截了一条没有token的非法请求");
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);//"Unauthorized"
         return  exchange.getResponse().setComplete();
-    }
-
-    //指定过滤顺序
-    @Override
-    public int getOrder() {
-        return 0;
     }
 
 }
