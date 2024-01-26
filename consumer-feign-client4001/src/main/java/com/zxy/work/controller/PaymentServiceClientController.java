@@ -25,7 +25,6 @@ public class PaymentServiceClientController {
      * @return  创建支付结果
      */
     @PostMapping("/create")
-    @SaIgnore
     public ResponseEntity<String> create(@RequestBody Payment payment){
         return paymentServiceClient.create(payment);
     }

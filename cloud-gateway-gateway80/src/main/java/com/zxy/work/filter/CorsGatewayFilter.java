@@ -29,7 +29,6 @@ public class CorsGatewayFilter implements GlobalFilter {
 
         ServerHttpResponse response = exchange.getResponse();
         HttpHeaders headers = response.getHeaders();
-        log.info("headers" + headers);
         headers.add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN);
         headers.add(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, ALLOWED_HEADERS);
         headers.add(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);

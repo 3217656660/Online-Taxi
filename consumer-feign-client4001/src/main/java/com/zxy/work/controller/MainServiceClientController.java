@@ -42,7 +42,6 @@ public class MainServiceClientController {
     @Resource
     private DriverServiceClient driverServiceClient;
 
-
     @Resource
     private CacheUtil redisUtil;//抽象缓存工具类，以便框架替换
 

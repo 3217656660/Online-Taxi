@@ -24,7 +24,6 @@ public class OrderServiceClientController {
      * @return 创建结果
      */
     @PostMapping("/create")
-    @SaIgnore
     ResponseEntity<String> create(@RequestBody Order order){
         return orderServiceClient.create(order);
     }

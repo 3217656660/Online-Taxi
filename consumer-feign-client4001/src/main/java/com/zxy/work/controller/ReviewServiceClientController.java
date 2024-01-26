@@ -25,7 +25,6 @@ public class ReviewServiceClientController {
      * @return  评论结果
      */
     @PostMapping("/create")
-    @SaIgnore
     public ResponseEntity<String> create(@RequestBody Review review){
         return reviewServiceClient.create(review);
     }

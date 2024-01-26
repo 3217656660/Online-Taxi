@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 
 
 /**
@@ -28,9 +29,8 @@ public class TokenGatewayFilter implements GlobalFilter{
         String path = exchange.getRequest().getPath().value();
         String token = exchange.getRequest().getHeaders().getFirst("X-Token");
 
-        log.info("" + exchange.getRequest().getPath());
         //排除注册、登录、退出登录的路径或者token有效放行
-        if ( path.endsWith("/login") ||  path.endsWith("/register")  ||  path.endsWith("/logout") || token != null ){
+        if ( path.endsWith("/login") ||  path.endsWith("/register")  || !Objects.equals(token, "") ){
             log.info( "放行了不需要token的请求，或放行了一条token:" + token );
             return chain.filter(exchange);
         }
