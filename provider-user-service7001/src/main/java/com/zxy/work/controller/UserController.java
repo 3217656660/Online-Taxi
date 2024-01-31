@@ -27,7 +27,7 @@ public class UserController {
      */
     @PostMapping("/update/register")
     public ResponseEntity<Object> registerUser(@RequestBody User user){
-        log.info( "********用户注册服务7001：*********" );
+        log.info( "用户注册服务提供者:" + user.getMobile());
         //参数校验
 
         return ResponseEntity.ok( userService.create(user) );
@@ -42,7 +42,7 @@ public class UserController {
     @DeleteMapping("/update/delete")
     public ResponseEntity<Object>  deleteUser(@RequestBody User user){
         //参数校验
-        log.info( "********注销服务7001：*********" );
+        log.info( "用户注销服务提供者：" + user.getId() );
 
         return ResponseEntity.ok( userService.delete(user) );
     }
@@ -55,7 +55,7 @@ public class UserController {
      */
     @GetMapping("/get/{mobile}")
     public ResponseEntity<Object>  getUserByMobile(@PathVariable("mobile")String mobile){
-        log.info( "********查询服务7001：*********" );
+        log.info( "用户查询服务提供者：" + mobile );
         //参数校验
 
         return ResponseEntity.ok( userService.selectByMobile(mobile) );
@@ -69,7 +69,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody User user){
-        log.info( "********登录服务7001：*********" );
+        log.info( "用户登录服务提供者：" + user.getMobile() );
         //参数校验
 
         return ResponseEntity.ok( userService.login(user) );
@@ -82,7 +82,7 @@ public class UserController {
      */
     @PostMapping("/logout")
     public void logout(@RequestBody User user){
-        log.info( "********退出登录服务7001：*********" );
+        log.info( "用户退出登录服务提供者" + user.getId());
         //退出登录需要的处理逻辑
     }
 
@@ -94,7 +94,7 @@ public class UserController {
      */
     @PutMapping("/update/message")
     public ResponseEntity<Object> updateUser(@RequestBody User user){
-        log.info( "********更新信息服务7001：*********" );
+        log.info( "用户更新信息服务提供者：" + user);
         //参数校验
 
          return ResponseEntity.ok( userService.update(user) );
@@ -114,7 +114,7 @@ public class UserController {
         User user = new User(id,password);
         //检验
 
-        log.info( "********更新密码服务7001：*********" );
+        log.info( "用户更新密码服务提供者：" + id);
         return ResponseEntity.ok( userService.updatePassword(user ,newPassword) );
     }
 
@@ -126,6 +126,7 @@ public class UserController {
      */
     @GetMapping("/getById/{id}")
     public ResponseEntity<Object> getById(@PathVariable("id")Integer id)  {
+        log.info( "通过id获取用户服务提供者：" + id);
         return ResponseEntity.ok( userService.selectById(id) );
     }
 

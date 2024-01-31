@@ -27,6 +27,7 @@ public class DriverServiceClientController {
      */
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody Driver driver){
+        log.info("注册成为司机：" + driver.getMobile());
        return driverServiceClient.register(driver);
     }
 
@@ -38,6 +39,7 @@ public class DriverServiceClientController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestBody Driver driver){
+        log.info("注销司机：" + driver.getId());
         return driverServiceClient.delete(driver);
     }
 
@@ -49,6 +51,7 @@ public class DriverServiceClientController {
      */
     @GetMapping("/getByMobile/{mobile}")
     public ResponseEntity<String> getByMobile(@PathVariable("mobile")String mobile){
+        log.info("通过电话获取司机：" + mobile);
         return driverServiceClient.getByMobile(mobile);
     }
 
@@ -60,6 +63,7 @@ public class DriverServiceClientController {
      */
     @PutMapping("/message")
     public ResponseEntity<String> updateMessage(@RequestBody Driver driver){
+        log.info("更新司机信息：" + driver);
         return driverServiceClient.update(driver);
     }
 
@@ -71,6 +75,7 @@ public class DriverServiceClientController {
      */
     @GetMapping("/getById/{id}")
     ResponseEntity<String> getById(@PathVariable Integer id){
+        log.info("通过id获取司机：" + id);
         return driverServiceClient.getById(id);
     }
 

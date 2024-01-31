@@ -26,6 +26,7 @@ public class PaymentServiceClientController {
      */
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Payment payment){
+        log.info("创建支付：" + payment);
         return paymentServiceClient.create(payment);
     }
 
@@ -37,6 +38,7 @@ public class PaymentServiceClientController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestBody Payment payment){
+        log.info("删除支付：" + payment);
         return paymentServiceClient.delete(payment);
     }
 
@@ -48,6 +50,7 @@ public class PaymentServiceClientController {
      */
     @GetMapping("/getByOrderId/{orderId}")
     public ResponseEntity<String> getByOrderId(@PathVariable("orderId")Integer orderId){
+        log.info("通过订单id获取支付：" + orderId);
         return paymentServiceClient.getByOrderId(orderId);
     }
 
@@ -59,6 +62,7 @@ public class PaymentServiceClientController {
      */
     @GetMapping("/getById/{id}")
     ResponseEntity<String> getById(@PathVariable("id")Integer id){
+        log.info("通过id获取支付：" + id);
         return paymentServiceClient.getById(id);
     }
 
@@ -70,6 +74,7 @@ public class PaymentServiceClientController {
      */
     @PutMapping("/update")
     ResponseEntity<String> update(@RequestBody Payment payment){
+        log.info("更新支付：" + payment);
         return paymentServiceClient.update(payment);
     }
 

@@ -1,6 +1,7 @@
 package com.zxy.work.handler;
 
 import cn.dev33.satoken.exception.SaTokenException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * 全局异常捕获类
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
 
@@ -22,6 +24,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTokenException(SaTokenException  e) {
         // 处理 TokenException 异常
         HttpStatus status = HttpStatus.UNAUTHORIZED;
+        log.info("SaTokenException:" + e);
         return new ResponseEntity<>(e.getMessage(), status);
     }
 

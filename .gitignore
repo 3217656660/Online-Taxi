@@ -10,7 +10,6 @@
 *.log
 logs/
 
-
 #jar包
 *.jar
 !lib/my.jar
@@ -26,6 +25,7 @@ provider-order-service9001/target/
 provider-payment-service6001/target/
 provider-review-service5001/target/
 consumer-feign-client4001/target/
+api-commons/target/
 
 #test文件
 provider-user-service7001/src/test
@@ -37,3 +37,5 @@ provider-review-service5001/src/test
 consumer-feign-client4001/src/test
 api-commons/src/test
 
+#将公共配置信息隐藏
+api-commons/src/main/resources/config/application.yml

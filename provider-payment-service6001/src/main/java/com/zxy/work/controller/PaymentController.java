@@ -23,7 +23,7 @@ public class PaymentController {
      */
     @PostMapping("/update/create")
     public ResponseEntity<Object> createPayment(@RequestBody Payment payment){
-        log.info( "********支付创建服务6001：*********" );
+        log.info("创建支付服务提供者：" + payment);
         return ResponseEntity.ok( paymentService.create(payment) );
     }
 
@@ -35,7 +35,7 @@ public class PaymentController {
      */
     @DeleteMapping("/update/delete")
     public ResponseEntity<Object> deletePayment(@RequestBody Payment payment){
-        log.info( "********删除支付信息服务6001：*********" );
+        log.info("删除支付服务提供者：" + payment);
         return ResponseEntity.ok( paymentService.delete(payment) );
     }
 
@@ -47,7 +47,7 @@ public class PaymentController {
      */
     @GetMapping("/getByOrderId/{orderId}")
     public ResponseEntity<Object> getPaymentByOrderId(@PathVariable("orderId")Integer orderId){
-        log.info( "********查询支付服务6001：*********" );
+        log.info("通过订单id获取支付服务提供者：" + orderId);
         return ResponseEntity.ok( paymentService.selectByOrderId(orderId) );
     }
 
@@ -59,7 +59,7 @@ public class PaymentController {
      */
     @GetMapping("/getById/{id}")
     public ResponseEntity<Object> getById(@PathVariable("id")Integer id){
-        log.info( "********查询支付服务6001：*********" );
+        log.info("通过id获取支付服务提供者：" + id);
         return ResponseEntity.ok( paymentService.selectById(id) );
     }
 
@@ -71,7 +71,7 @@ public class PaymentController {
      */
     @PutMapping("/update/message")
     public ResponseEntity<Object> update(@RequestBody Payment payment){
-        log.info( "********更新支付服务6001：*********" );
+        log.info("更新支付服务提供者：" + payment);
         return ResponseEntity.ok( paymentService.update(payment) );
     }
 

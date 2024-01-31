@@ -24,7 +24,7 @@ public class DriverController {
      */
     @PostMapping("/update/register")
     public ResponseEntity<Object> registerDriver(@RequestBody Driver driver){
-        log.info( "********司机注册服务8001：*********" );
+        log.info("注册成为司机服务提供者：" + driver.getMobile());
         //参数校验
 
         return ResponseEntity.ok( driverService.create(driver) );
@@ -38,7 +38,7 @@ public class DriverController {
      */
     @DeleteMapping("/update/delete")
     public ResponseEntity<Object> deleteDriver(@RequestBody Driver driver){
-        log.info( "********注销服务8001：*********" );
+        log.info("注销司机服务提供者：" + driver.getId());
         //参数校验
 
         return ResponseEntity.ok( driverService.delete(driver) );
@@ -52,7 +52,7 @@ public class DriverController {
      */
     @GetMapping("/getByMobile/{mobile}")
     public ResponseEntity<Object> getDriverByMobile(@PathVariable("mobile")String mobile){
-        log.info( "********通过手机号查询服务8001：*********" );
+        log.info("通过电话获取司机服务提供者：" + mobile);
         //参数校验
 
         return  ResponseEntity.ok( driverService.selectByMobile(mobile) );
@@ -66,7 +66,7 @@ public class DriverController {
      */
     @PutMapping("/update/message")
     public ResponseEntity<Object> updateDriver(@RequestBody Driver driver){
-        log.info( "********更新信息服务8001：*********" );
+        log.info("更新司机信息服务提供者：" + driver);
         //参数校验
 
         return ResponseEntity.ok( driverService.update(driver) );
@@ -80,7 +80,7 @@ public class DriverController {
      */
     @GetMapping("/getById/{id}")
     public ResponseEntity<Object> getById(@PathVariable("id") Integer id){
-        log.info( "********通过id查找信息服务8001：*********" );
+        log.info("通过id获取司机服务提供者：" + id);
         return ResponseEntity.ok( driverService.selectById(id) );
     }
 

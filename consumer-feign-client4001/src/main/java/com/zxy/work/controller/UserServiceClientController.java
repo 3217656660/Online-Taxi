@@ -36,6 +36,7 @@ public class UserServiceClientController {
     @PostMapping("/register")
     @SaIgnore
     public ResponseEntity<String>  register(@RequestBody User user){
+        log.info("用户注册:" + user.getMobile());
         return userServiceClient.register(user);
     }
 
@@ -47,6 +48,7 @@ public class UserServiceClientController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<String>  delete(@RequestBody User user){
+        log.info("用户注销：" + user.getMobile());
         return userServiceClient.delete(user);
     }
 
@@ -58,6 +60,7 @@ public class UserServiceClientController {
      */
     @GetMapping("/getByMobile/{mobile}")
     public ResponseEntity<String> getByMobile(@PathVariable("mobile")String mobile){
+        log.info("通过手机号获取用户" + mobile);
         return userServiceClient.getByMobile(mobile);
     }
 
@@ -72,13 +75,17 @@ public class UserServiceClientController {
     public ResponseEntity <Object> login(@RequestBody User user){
         Object result =  userServiceClient.login(user).getBody();
         // 登录失败
-        if ( Objects.equals(result,MyString.ACCOUNT_ERROR) || Objects.equals(result,MyString.PASSWORD_ERROR) )
+        if ( Objects.equals(result,MyString.ACCOUNT_ERROR) || Objects.equals(result,MyString.PASSWORD_ERROR) ){
+            log.info("用户登录失败原因：" + result);
             return ResponseEntity.ok(result);
+        }
+
         // 登录成功
         StpUtil.login( user.getMobile() );
         String token = StpUtil.getTokenValue();
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Token", token);
+        log.info("用户登录成功，手机号为：" + user.getMobile() + "token为：" + token);
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
     }
 
@@ -103,17 +110,19 @@ public class UserServiceClientController {
      */
     @PutMapping("/message")
     public ResponseEntity<String>  updateMessage(@RequestBody User user){
+        log.info("用户更新信息：" + user);
         return userServiceClient.updateMessage(user);
     }
 
 
     /**
-     * 更新用户密码
+     * 通过用户id更新用户密码
      * @param requestMapper 前端传来的json
      * @return 更新密码的结果
      */
     @PutMapping("/password")
     public ResponseEntity<String> updatePassword(@RequestBody Map<String,Object> requestMapper){
+        log.info("用户更新密码：" + requestMapper.get("id"));
         return userServiceClient.updatePassword(requestMapper);
     }
 
@@ -125,6 +134,7 @@ public class UserServiceClientController {
      */
     @GetMapping("/getById/{id}")
     public ResponseEntity<String> getById(@PathVariable("id")Integer id){
+        log.info("通过id获取用户" + id);
         return userServiceClient.getById(id);
     }
 

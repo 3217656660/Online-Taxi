@@ -23,7 +23,7 @@ public class ReviewController {
      */
     @PostMapping("/update/create")
     public ResponseEntity<Object> createReview(@RequestBody Review review){
-        log.info( "********评价创建服务5001：*********" );
+        log.info("创建评论服务提供者：" + review);
         return ResponseEntity.ok( reviewService.create(review) );
     }
 
@@ -35,7 +35,7 @@ public class ReviewController {
      */
     @DeleteMapping("/update/delete")
     public ResponseEntity<Object> deleteReview(@RequestBody Review review){
-        log.info( "********删除评价信息服务5001：*********" );
+        log.info("删除评论服务提供者：" + review.getId());
         return ResponseEntity.ok( reviewService.delete(review) );
     }
 
@@ -47,7 +47,7 @@ public class ReviewController {
      */
     @GetMapping("/getByOrderId/{orderId}")
     public ResponseEntity<Object> getReviewByOrderId(@PathVariable("orderId") Integer orderId){
-        log.info( "********order id查询评价服务5001：*********" );
+        log.info("通过订单id获得评论服务提供者：" + orderId);
         return ResponseEntity.ok( reviewService.selectByOrderId(orderId) );
     }
 
@@ -59,7 +59,7 @@ public class ReviewController {
      */
     @GetMapping("/getById/{id}")
     public ResponseEntity<Object> getById(@PathVariable("id") Integer id){
-        log.info( "********id查询评价服务5001：*********" );
+        log.info("通过id查询评论服务提供者：" + id);
         return ResponseEntity.ok( reviewService.selectById(id) );
     }
 

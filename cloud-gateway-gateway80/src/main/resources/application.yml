@@ -5,10 +5,18 @@ spring:
   application:
     name: cloud-gateway-gateway
 
+  redis:
+    host: ${host}
+    port: ${redis.port}
+    password: ${redis.password}
+
+  config:
+    import: classpath:/config/application.yml
+
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848 #配置Nacos地址
+        server-addr: ${host}:${nacos.port}
 
     gateway:
       discovery:

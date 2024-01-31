@@ -24,7 +24,7 @@ public class OrderController {
      */
     @PostMapping("/update/create")
     public ResponseEntity<Object> createOrder(@RequestBody Order order){
-        log.info( "********订单创建服务9001：*********" );
+        log.info("创建订单服务提供者:" + order);
         return ResponseEntity.ok( orderService.create(order) );
     }
 
@@ -36,7 +36,7 @@ public class OrderController {
      */
     @DeleteMapping("/update/delete")
     public ResponseEntity<Object> deleteOrder(@RequestBody Order order){
-        log.info( "********取消服务9001：*********" );
+        log.info("取消订单服务提供者:" + "取消用户" + order.getUserId());
         return ResponseEntity.ok( orderService.delete(order) );
     }
 
@@ -48,19 +48,11 @@ public class OrderController {
      */
     @PutMapping("/update/message")
     public ResponseEntity<Object> updateUser(@RequestBody Order order){
-        log.info( "********更新信息服务9001：*********" );
+        log.info("更新订单服务提供者:" + order);
         return ResponseEntity.ok( orderService.update(order) );
     }
 
 
-    /**
-     * 通过订单状态和用户id更新订单
-     * @param order 传来的订单信息
-     */
-    @PostMapping("/updateByStatusAndUserId")
-    public void updateByStatusAndUserId(@RequestBody Order order){
-        orderService.updateByStatusAndUserId(order);
-    }
 
 
     /**
@@ -70,7 +62,7 @@ public class OrderController {
      */
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getOrderById(@PathVariable("id")Integer id){
-        log.info( "********查询服务9001：*********" );
+        log.info("通过id获取订单服务提供者:" + id);
         return ResponseEntity.ok( orderService.selectByOrderId(id) );
     }
 
@@ -82,7 +74,7 @@ public class OrderController {
      */
     @GetMapping("/get/user/history/{userId}")
     public ResponseEntity<Object> getOrderByUserId(@PathVariable("userId")Integer userId){
-        log.info( "********用户历史订单查询服务9001：*********" );
+        log.info("根据用户Id获取历史订单服务提供者:" + userId);
         return ResponseEntity.ok( orderService.selectByUserId(userId) );
     }
 
@@ -94,7 +86,7 @@ public class OrderController {
      */
     @GetMapping("/get/driver/history/{driverId}")
     public ResponseEntity<Object> getOrderByDriverId(@PathVariable("driverId")Integer driverId){
-        log.info( "********司机历史订单查询服务9001：*********" );
+        log.info("根据司机Id获取历史订单服务提供者:" + driverId);
         return ResponseEntity.ok( orderService.selectByDriverId(driverId) );
     }
 
@@ -106,11 +98,20 @@ public class OrderController {
      */
     @PostMapping("/getByUserOrderStatus")
     public ResponseEntity<Object> getByUserOrderStatus(@RequestBody Order order){
+        log.info("通过用户订单状态获得订单信息服务提供者:" + order);
         return ResponseEntity.ok( orderService.selectByUserOrderStatus(order) );
     }
 
 
-
+    /**
+     * 通过订单状态和用户id更新订单
+     * @param order 传来的订单信息
+     */
+    @PostMapping("/updateByStatusAndUserId")
+    public void updateByStatusAndUserId(@RequestBody Order order){
+        log.info("通过订单状态和用户id更新订单服务提供者:" + order);
+        orderService.updateByStatusAndUserId(order);
+    }
 
 
 

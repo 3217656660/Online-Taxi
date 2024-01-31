@@ -26,6 +26,7 @@ public class ReviewServiceClientController {
      */
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Review review){
+        log.info("创建评论：" + review);
         return reviewServiceClient.create(review);
     }
 
@@ -37,6 +38,7 @@ public class ReviewServiceClientController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestBody Review review){
+        log.info("删除评论：" + review.getId());
         return reviewServiceClient.delete(review);
     }
 
@@ -48,6 +50,7 @@ public class ReviewServiceClientController {
      */
     @GetMapping("/getByOrderId/{orderId}")
     public ResponseEntity<String> getByOrderId(@PathVariable("orderId") Integer orderId){
+        log.info("通过订单id获得评论：" + orderId);
         return reviewServiceClient.getByOrderId(orderId);
     }
 
@@ -59,6 +62,7 @@ public class ReviewServiceClientController {
      */
     @GetMapping("/getById/{id}")
     ResponseEntity<String> getById(@PathVariable("id") Integer id){
+        log.info("通过id查询评论：" + id);
         return reviewServiceClient.getById(id);
     }
 
