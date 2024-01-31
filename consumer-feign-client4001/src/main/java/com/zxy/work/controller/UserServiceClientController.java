@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,7 +36,7 @@ public class UserServiceClientController {
      */
     @PostMapping("/register")
     @SaIgnore
-    public ResponseEntity<String>  register(@RequestBody User user){
+    public ResponseEntity<String>  register(@Valid @RequestBody User user){
         log.info("用户注册:" + user.getMobile());
         return userServiceClient.register(user);
     }
@@ -47,7 +48,7 @@ public class UserServiceClientController {
      * @return 注册结果信息
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String>  delete(@RequestBody User user){
+    public ResponseEntity<String>  delete(@Valid @RequestBody User user){
         log.info("用户注销：" + user.getMobile());
         return userServiceClient.delete(user);
     }
@@ -59,7 +60,7 @@ public class UserServiceClientController {
      * @return 查询结果：成功时返回查询到的用户信息（已脱敏），失败时返回失败信息
      */
     @GetMapping("/getByMobile/{mobile}")
-    public ResponseEntity<String> getByMobile(@PathVariable("mobile")String mobile){
+    public ResponseEntity<String> getByMobile(@Valid @PathVariable("mobile")String mobile){
         log.info("通过手机号获取用户" + mobile);
         return userServiceClient.getByMobile(mobile);
     }
@@ -72,7 +73,7 @@ public class UserServiceClientController {
      */
     @PostMapping("/login")
     @SaIgnore
-    public ResponseEntity <Object> login(@RequestBody User user){
+    public ResponseEntity <Object> login(@Valid @RequestBody User user){
         Object result =  userServiceClient.login(user).getBody();
         // 登录失败
         if ( Objects.equals(result,MyString.ACCOUNT_ERROR) || Objects.equals(result,MyString.PASSWORD_ERROR) ){
@@ -95,7 +96,7 @@ public class UserServiceClientController {
      * @param user 前端传来的json
      */
     @PostMapping("/logout")
-    public void logout(@RequestBody User user){
+    public void logout(@Valid @RequestBody User user){
         userServiceClient.logout(user);
         //使token失效
         StpUtil.logout( user.getMobile() );
@@ -109,7 +110,7 @@ public class UserServiceClientController {
      * @return 更新信息的结果
      */
     @PutMapping("/message")
-    public ResponseEntity<String>  updateMessage(@RequestBody User user){
+    public ResponseEntity<String>  updateMessage(@Valid @RequestBody User user){
         log.info("用户更新信息：" + user);
         return userServiceClient.updateMessage(user);
     }

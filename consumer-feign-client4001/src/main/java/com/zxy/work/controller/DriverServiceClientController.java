@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 
 @RestController
@@ -26,7 +27,7 @@ public class DriverServiceClientController {
      * @return 认证结果
      */
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody Driver driver){
+    public ResponseEntity<String> register(@Valid @RequestBody Driver driver){
         log.info("注册成为司机：" + driver.getMobile());
        return driverServiceClient.register(driver);
     }
@@ -38,7 +39,7 @@ public class DriverServiceClientController {
      * @return 删除结果
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestBody Driver driver){
+    public ResponseEntity<String> delete(@Valid @RequestBody Driver driver){
         log.info("注销司机：" + driver.getId());
         return driverServiceClient.delete(driver);
     }

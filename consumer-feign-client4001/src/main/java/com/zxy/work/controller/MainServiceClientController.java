@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -126,7 +127,7 @@ public class MainServiceClientController {
      * @return  可以接单的列表
      */
     @GetMapping("/getAbleOrderList")
-    public ResponseEntity< Object > getAbleOrderList(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
+    public ResponseEntity<Object> getAbleOrderList(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
         //1.从redis中取出orderHash
         Map<Object, Object> orderHash = redisUtil.hmget("orderHash");
 
@@ -241,7 +242,7 @@ public class MainServiceClientController {
      * @return  订单信息
      */
     @PostMapping("/arriveStartAddress")
-    public ResponseEntity<Object> arriveStartAddress(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
+    public ResponseEntity<Object> arriveStartAddress(@Valid @RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
         //司机到达预定开始位置
         String key = "order:" + driverActionTakeOrderVo.getUserId();
         Object a = redisUtil.get(key);
@@ -270,7 +271,7 @@ public class MainServiceClientController {
      * @return  设置结果
      */
     @PutMapping("/setDriverAddress")
-    public ResponseEntity<Object> setDriverAddress(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
+    public ResponseEntity<Object> setDriverAddress(@Valid @RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
         //更新司机当前位置
         String key = "order:" + driverActionTakeOrderVo.getUserId();
         Object a = redisUtil.get(key);

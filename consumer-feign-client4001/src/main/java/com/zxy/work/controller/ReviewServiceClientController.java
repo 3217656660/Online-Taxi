@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 @RestController
 @Slf4j
@@ -25,7 +26,7 @@ public class ReviewServiceClientController {
      * @return  评论结果
      */
     @PostMapping("/create")
-    public ResponseEntity<String> create(@RequestBody Review review){
+    public ResponseEntity<String> create(@Valid @RequestBody Review review){
         log.info("创建评论：" + review);
         return reviewServiceClient.create(review);
     }
@@ -37,7 +38,7 @@ public class ReviewServiceClientController {
      * @return  评论删除结果
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestBody Review review){
+    public ResponseEntity<String> delete(@Valid @RequestBody Review review){
         log.info("删除评论：" + review.getId());
         return reviewServiceClient.delete(review);
     }

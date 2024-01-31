@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 /**
  * 用户创建订单请求json集
@@ -16,6 +17,7 @@ import java.util.Date;
 public class UserCreateOrderVo {
     private Integer id;
 
+    @NotNull
     private Integer userId;
 
     private Integer driverId;
