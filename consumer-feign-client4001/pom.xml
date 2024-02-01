@@ -22,6 +22,11 @@
             <artifactId>api-commons</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+<!--        webSocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
 
         <!--    参数校验    -->
         <dependency>
