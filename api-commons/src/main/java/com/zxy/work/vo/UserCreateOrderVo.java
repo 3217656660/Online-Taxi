@@ -1,5 +1,6 @@
 package com.zxy.work.vo;
 
+import com.zxy.work.entities.Order;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class UserCreateOrderVo {
+
     private Integer id;
 
     @NotNull
