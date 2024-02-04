@@ -16,7 +16,7 @@
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
-    <insert id="create" parameterType="User" keyProperty="id">
+    <insert id="create" parameterType="User" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
         insert into online_taxi.user(id,username,password,mobile,email,create_time,update_time,is_deleted)
         values(#{id},#{username},#{password},#{mobile},#{email},#{createTime},#{updateTime},#{isDeleted});
     </insert>

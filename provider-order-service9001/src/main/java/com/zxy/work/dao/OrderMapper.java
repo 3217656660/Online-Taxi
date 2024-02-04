@@ -21,9 +21,6 @@ public interface OrderMapper {
 
     Order selectByOrderId(@Param("id") Integer id);
 
-    Order selectByUserOrderStatus(Order order);
-
-    void updateByStatusAndUserId(Order order);
-
+    Order selectNotSolve(@Param("userId")Integer userId);
 
 }

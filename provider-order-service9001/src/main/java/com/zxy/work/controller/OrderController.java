@@ -53,8 +53,6 @@ public class OrderController {
     }
 
 
-
-
     /**
      * 根据订单号获取订单信息
      * @param id    传来的订单号
@@ -89,30 +87,5 @@ public class OrderController {
         log.info("根据司机Id获取历史订单服务提供者:" + driverId);
         return ResponseEntity.ok( orderService.selectByDriverId(driverId) );
     }
-
-
-    /**
-     * 通过用户订单状态获得订单信息
-     * @param order 传来的订单信息
-     * @return  获取到的信息
-     */
-    @PostMapping("/getByUserOrderStatus")
-    public ResponseEntity<Object> getByUserOrderStatus(@RequestBody Order order){
-        log.info("通过用户订单状态获得订单信息服务提供者:" + order);
-        return ResponseEntity.ok( orderService.selectByUserOrderStatus(order) );
-    }
-
-
-    /**
-     * 通过订单状态和用户id更新订单
-     * @param order 传来的订单信息
-     */
-    @PostMapping("/updateByStatusAndUserId")
-    public void updateByStatusAndUserId(@RequestBody Order order){
-        log.info("通过订单状态和用户id更新订单服务提供者:" + order);
-        orderService.updateByStatusAndUserId(order);
-    }
-
-
 
 }

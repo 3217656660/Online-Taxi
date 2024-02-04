@@ -31,12 +31,4 @@ public interface OrderServiceClient {
     @GetMapping("/order/get/driver/history/{driverId}")
     ResponseEntity<String> getByDriverId(@PathVariable("driverId")Integer driverId);
 
-
-    @PostMapping("/order/getByUserOrderStatus")
-    ResponseEntity<String> getByUserOrderStatus(@RequestBody Order order);
-
-
-    @PostMapping("/order/updateByStatusAndUserId")
-    ResponseEntity<String> updateByStatusAndUserId(@RequestBody Order order);
-
 }

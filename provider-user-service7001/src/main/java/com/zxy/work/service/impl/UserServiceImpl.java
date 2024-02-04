@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword( encodedPassword );
         return userMapper.create(user) == 0
                 ? MyString.REGISTER_ERROR
-                : MyString.REGISTER_SUCCESS;
+                : user;
     }
 
 

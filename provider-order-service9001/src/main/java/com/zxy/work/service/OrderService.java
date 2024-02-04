@@ -17,8 +17,4 @@ public interface OrderService {
 
     Object selectByOrderId(Integer id);
 
-    Object selectByUserOrderStatus(Order order);
-
-    void updateByStatusAndUserId(Order order);
-
 }

@@ -27,7 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .setIsDeleted(0);
         return reviewMapper.create(review) == 0
                 ? MyString.REVIEW_ERROR
-                :MyString.REVIEW_SUCCESS;
+                : review;
     }
 
 

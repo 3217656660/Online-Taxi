@@ -33,7 +33,7 @@ public class DriverServiceImpl implements DriverService {
                 .setIsDeleted(0);
         return driverMapper.create(driver) == 0
                 ? MyString.REGISTER_ERROR
-                : MyString.REGISTER_SUCCESS;
+                : driver;
     }
 
 

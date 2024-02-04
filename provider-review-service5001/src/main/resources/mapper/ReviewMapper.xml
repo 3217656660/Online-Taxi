@@ -15,7 +15,7 @@
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
-    <insert id="create" parameterType="Review" keyProperty="id">
+    <insert id="create" parameterType="Review" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
         insert into online_taxi.review(ID,ORDER_ID,RATING,COMMENT,CREATE_TIME,UPDATE_TIME,IS_DELETED)
         values(#{id},#{orderId},#{rating},#{comment},#{createTime},#{updateTime},#{isDeleted});
     </insert>

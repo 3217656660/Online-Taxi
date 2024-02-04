@@ -15,7 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class NotificationMessage implements Serializable {
-    // 消息类型，如"orderAccept", "locationUpdate", "arrivalNotice", "orderFinish"
+    // 消息类型，如"orderAccept", "locationUpdate", "arrivalNotice", "orderFinish","cancelOrder","paymentNotice"
     private String type;
     // 消息内容
     private Object content;

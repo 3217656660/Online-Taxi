@@ -27,12 +27,18 @@ public class OrderServiceImpl implements OrderService {
         Date now = new Date();
         order.setCreateTime(now)
                 .setUpdateTime(now)
-                .setIsDeleted(0);
+                .setIsDeleted(0)
+                .setStatus(0);
+        //1.查询数据库中是否还有待处理的订单
+        //2.如果有待处理的订单，那么让用户去处理该订单
+        //3.如果没有，则重新创建一个订单
+        Order notSolve = orderMapper.selectNotSolve(order.getUserId());
+        if (notSolve != null) return notSolve;
+
         return orderMapper.create(order) == 0
                 ? MyString.ORDER_CREATE_ERROR
-                : MyString.ORDER_CREATE_SUCCESS;
+                : order;
     }
-
 
 
     /**
@@ -107,27 +113,5 @@ public class OrderServiceImpl implements OrderService {
                 ? MyString.FIND_ERROR
                 : order;
     }
-
-
-    /**
-     * 通过用户订单状态获得订单信息
-     * @param order 传来的订单信息
-     * @return  获取到的信息
-     */
-    @Override
-    public Object selectByUserOrderStatus(Order order){
-        return orderMapper.selectByUserOrderStatus(order);
-    }
-
-
-    /**
-     * 通过订单状态和用户id更新订单
-     * @param order 传来的订单信息
-     */
-    @Override
-    public void updateByStatusAndUserId(Order order) {
-        orderMapper.updateByStatusAndUserId(order);
-    }
-
 
 }

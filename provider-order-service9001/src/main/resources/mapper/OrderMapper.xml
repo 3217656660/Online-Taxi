@@ -20,7 +20,7 @@
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
-    <insert id="create" parameterType="Order" keyProperty="id">
+    <insert id="create" parameterType="Order" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
         insert into online_taxi.order(ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,DISTANCE,create_time,update_time,is_deleted)
         values(#{id},#{userId},#{driverId},#{startAddress},#{endAddress},#{status},#{distance},#{createTime},#{updateTime},#{isDeleted});
     </insert>
@@ -34,6 +34,7 @@
     <update id="update" parameterType="Order" >
         UPDATE online_taxi.order
         <set>
+            <if test="driveId != null">drive_id = #{driveId},</if>
             <if test="price != null">price = #{price},</if>
             <if test="endTime != null">end_time = #{endTime},</if>
             <if test="status != null">status = #{status},</if>
@@ -54,19 +55,11 @@
         SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND id = #{id}
     </select>
 
-    <select id="selectByUserOrderStatus" parameterType="Order" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.order WHERE is_deleted = 0 AND user_id = #{userId} AND status = 2
+<!--    &gt;	表示大于号-->
+<!--    &lt;	表示小于号-->
+    <select id="selectNotSolve" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT * FROM online_taxi.order
+                 WHERE is_deleted = 0 AND user_id = #{userId} AND status &lt; 4
     </select>
-
-    <update id="updateByStatusAndUserId" parameterType="Order" >
-        UPDATE online_taxi.order
-        <set>
-            <if test="price != null">price = #{price},</if>
-            <if test="endTime != null">end_time = #{endTime},</if>
-            <if test="status != null">status = #{status},</if>
-            update_time = #{updateTime}
-        </set>
-        WHERE user_id = #{userId} AND is_deleted = 0 AND status = 1
-    </update>
 
 </mapper>

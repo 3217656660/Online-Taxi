@@ -24,7 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .setIsDeleted(0);
         return paymentMapper.create(payment) == 0
                 ? MyString.PAYMENT_ERROR
-                : MyString.PAYMENT_SUCCESS;
+                : payment;
     }
 
 
