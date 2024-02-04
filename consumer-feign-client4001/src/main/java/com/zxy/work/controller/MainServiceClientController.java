@@ -273,7 +273,7 @@ public class MainServiceClientController {
 
 
     /**
-     * 获取司机的位置
+     * 从缓存中获取司机的位置
      * @param order 传来的订单信息
      * @return  查询结果
      */

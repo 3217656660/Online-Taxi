@@ -1,7 +1,6 @@
 package com.zxy.work.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaIgnore;
 import com.zxy.work.entities.Order;
 import com.zxy.work.service.OrderServiceClient;
 import lombok.extern.slf4j.Slf4j;

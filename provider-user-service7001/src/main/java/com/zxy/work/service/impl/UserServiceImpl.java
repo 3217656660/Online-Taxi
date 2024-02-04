@@ -29,10 +29,7 @@ public class UserServiceImpl implements UserService {
     public Object create(User user) {
         //添加时间和逻辑删除默认值
         Date now = new Date();
-        user
-                .setCreateTime(now)
-                .setUpdateTime(now)
-                .setIsDeleted(0);
+        user.setCreateTime(now).setUpdateTime(now).setIsDeleted(0);
 
         //先检查手机号是否已经注册
         User registeredUser = userMapper.selectByMobile(user.getMobile());

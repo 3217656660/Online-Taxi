@@ -1,6 +1,5 @@
 package com.zxy.work.vo;
 
-import com.zxy.work.entities.Order;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

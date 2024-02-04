@@ -5,7 +5,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
 import com.zxy.work.entities.User;
-import com.zxy.work.service.UserServiceClient;
+import com.zxy.work.service.*;
 import com.zxy.work.util.MyString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -28,9 +28,22 @@ public class UserServiceClientController {
     @Resource
     private UserServiceClient userServiceClient;
 
+    @Resource
+    private ReviewServiceClient reviewServiceClient;
+
+    @Resource
+    private PaymentServiceClient paymentServiceClient;
+
+    @Resource
+    private OrderServiceClient orderServiceClient;
+
+    @Resource
+    private DriverServiceClient driverServiceClient;
+
+
 
     /**
-     * 用户注册
+     * 用户注册.成功后，存入缓存中
      * @param user 前端传来的用户信息json
      * @return 注册结果：成功时返回注册的用户信息，失败时返回失败信息
      */
@@ -50,6 +63,8 @@ public class UserServiceClientController {
     @DeleteMapping("/delete")
     public ResponseEntity<String>  delete(@Valid @RequestBody User user){
         log.info("用户注销：" + user.getMobile());
+        //删除用户所有相关内容
+
         return userServiceClient.delete(user);
     }
 
@@ -74,20 +89,19 @@ public class UserServiceClientController {
     @PostMapping("/login")
     @SaIgnore
     public ResponseEntity <Object> login(@Valid @RequestBody User user){
-        Object result =  userServiceClient.login(user).getBody();
-        // 登录失败
-        if ( Objects.equals(result,MyString.ACCOUNT_ERROR) || Objects.equals(result,MyString.PASSWORD_ERROR) ){
-            log.info("用户登录失败原因：" + result);
-            return ResponseEntity.ok(result);
+        String userJson =  userServiceClient.login(user).getBody();
+        //登录失败
+        if ( Objects.equals(userJson, MyString.ACCOUNT_ERROR) || Objects.equals(userJson, MyString.PASSWORD_ERROR) ){
+            log.info("用户登录失败原因：" + userJson);
+            return ResponseEntity.ok(userJson);
         }
-
-        // 登录成功
+        //登录成功
         StpUtil.login( user.getMobile() );
         String token = StpUtil.getTokenValue();
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Token", token);
-        log.info("用户登录成功，手机号为：" + user.getMobile() + "token为：" + token);
-        return new ResponseEntity<>(result, headers, HttpStatus.OK);
+        log.info("用户登录成功，手机号为：{},token为：{}", user.getMobile(), token);
+        return new ResponseEntity<>(userJson, headers, HttpStatus.OK);
     }
 
 
@@ -98,7 +112,6 @@ public class UserServiceClientController {
     @PostMapping("/logout")
     public void logout(@Valid @RequestBody User user){
         userServiceClient.logout(user);
-        //使token失效
         StpUtil.logout( user.getMobile() );
         log.info("手机号：" + user.getMobile() + "退出登录成功");
     }

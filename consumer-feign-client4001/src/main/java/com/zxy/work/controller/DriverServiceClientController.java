@@ -29,7 +29,7 @@ public class DriverServiceClientController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody Driver driver){
         log.info("注册成为司机：" + driver.getMobile());
-       return driverServiceClient.register(driver);
+        return driverServiceClient.register(driver);
     }
 
 
