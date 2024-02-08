@@ -7,6 +7,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.zxy.work.entities.User;
 import com.zxy.work.service.*;
 import com.zxy.work.util.MyString;
+import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,6 @@ public class UserServiceClientController {
 
     @Resource
     private DriverServiceClient driverServiceClient;
-
 
 
     /**

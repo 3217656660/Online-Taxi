@@ -34,7 +34,7 @@
     <update id="update" parameterType="Order" >
         UPDATE online_taxi.order
         <set>
-            <if test="driveId != null">drive_id = #{driveId},</if>
+            <if test="driverId != null">driver_id = #{driverId},</if>
             <if test="price != null">price = #{price},</if>
             <if test="endTime != null">end_time = #{endTime},</if>
             <if test="status != null">status = #{status},</if>
