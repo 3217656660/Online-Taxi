@@ -55,7 +55,7 @@ public class MainServiceClientController {
 
 
     /**
-     * 检查用户登录状态 ,如果未登录，则抛出异常：`NotLoginException`
+     * 检查用户登录状态 ,如果未登录，则抛出异常：NotLoginException
      */
     @GetMapping("/checkLogin")
     public void checkLogin(){
@@ -116,7 +116,7 @@ public class MainServiceClientController {
         //1.用户主动取消订单，如果是司机已经到达起始地点或以后，不允许用户再取消订单
         //2.将order,orderHash移除
         //3.数据库中也更新订单状态
-        //4.如果取消成功，且status为1，则websocket推送到司机端
+        //4.如果取消成功，且status为1（司机已接单），则websocket推送到司机端
         String key = "order:" + order.getId();
         if (order.getStatus() > 1 || Objects.equals( orderServiceClient.delete(order).getBody(), MyString.ORDER_CANCEL_ERROR ))
             return ResponseEntity.ok(MyString.ORDER_CANCEL_ERROR);

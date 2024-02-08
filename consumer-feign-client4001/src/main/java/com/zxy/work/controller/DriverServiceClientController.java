@@ -39,7 +39,7 @@ public class DriverServiceClientController {
      * @return 删除结果
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@Valid @RequestBody Driver driver){
+    public ResponseEntity<String> delete(@RequestBody Driver driver){
         log.info("注销司机：" + driver.getId());
         return driverServiceClient.delete(driver);
     }

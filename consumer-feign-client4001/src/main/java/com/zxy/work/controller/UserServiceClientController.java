@@ -41,6 +41,9 @@ public class UserServiceClientController {
     @Resource
     private DriverServiceClient driverServiceClient;
 
+    @Resource
+    private CacheUtil redisUtil;
+
 
     /**
      * 用户注册.成功后，存入缓存中
