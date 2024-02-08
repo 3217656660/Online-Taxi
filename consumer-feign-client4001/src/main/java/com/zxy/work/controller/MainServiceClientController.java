@@ -1,6 +1,7 @@
 package com.zxy.work.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zxy.work.entities.NotificationMessage;
@@ -54,6 +55,15 @@ public class MainServiceClientController {
 
 
     /**
+     * 检查用户登录状态 ,如果未登录，则抛出异常：`NotLoginException`
+     */
+    @GetMapping("/checkLogin")
+    public void checkLogin(){
+        StpUtil.checkLogin();
+    }
+
+
+    /**
      * 创建订单，并放到缓存里
      * @param userCreateOrderVo 传来的要保存的信息
      * @return  创建结果
@@ -89,8 +99,8 @@ public class MainServiceClientController {
         String key = "order:" + tempOrder.getId();
         userCreateOrderVo.setId(tempOrder.getId());
         redisUtil.hset("orderHash", key, userCreateOrderVo,5 * 60);//5分钟自动过期
-        return redisUtil.set(key, order, 5 * 60)
-                ? ResponseEntity.ok(order)
+        return redisUtil.set(key, tempOrder, 5 * 60)
+                ? ResponseEntity.ok(tempOrder)
                 : ResponseEntity.ok(MyString.ORDER_CREATE_ERROR);
     }
 
@@ -111,7 +121,7 @@ public class MainServiceClientController {
         if (order.getStatus() > 1 || Objects.equals( orderServiceClient.delete(order).getBody(), MyString.ORDER_CANCEL_ERROR ))
             return ResponseEntity.ok(MyString.ORDER_CANCEL_ERROR);
         redisUtil.del(key);
-        redisUtil.hdel("orderHash",key);
+        redisUtil.hdel("orderHash", key);
         if (order.getStatus() == 1) {
             NotificationMessage message = new NotificationMessage();
             message.setType("cancelOrder")
