@@ -17,7 +17,6 @@ public class DriverActionTakeOrderVo implements Serializable {
     private Integer id;
     private Integer userId;
     private Integer driverId;
-    private String nowAddress;
     private Double nowAddressLongitude;//地点经度
     private Double nowAddressLatitude;//地点纬度
 }

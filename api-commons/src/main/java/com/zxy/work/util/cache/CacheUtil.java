@@ -1,6 +1,9 @@
 package com.zxy.work.util.cache;
 
 
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.redis.connection.RedisGeoCommands;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -328,6 +331,38 @@ public interface CacheUtil {
      * @return 移除的个数
      */
      long setRemove(String key, Object... values);
+
+
+//=======================地理位置geo==============================
+
+    /**
+     * 添加一个地理位置
+     * @param key 地理位置集合键值
+     * @param longitude 经度
+     * @param latitude 纬度
+     * @param member 具体位置的键值
+     */
+    void geoadd(String key, double longitude, double latitude, String member);
+
+
+    /**
+     * 查找
+     *
+     * @param key       地理位置集合键值
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @param radius    以上述经纬度的地理位置为中心，相距radius（米）
+     * @return 相距radius（米）的地理位置列表
+     */
+    List<GeoResult<RedisGeoCommands.GeoLocation<Object>>> georadius(String key, double longitude, double latitude, double radius);
+
+
+    /**
+     * 删除对应key地理位置集合的相应位置
+     * @param key 地理位置集合键值
+     * @param member 具体位置的键值
+     */
+    void geodelete(String key, String member);
 
 
 }

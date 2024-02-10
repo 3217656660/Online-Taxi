@@ -1,15 +1,14 @@
 package com.zxy.work.util.cache;
 
 
+import org.springframework.data.geo.*;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -542,6 +541,57 @@ public final class RedisUtil implements CacheUtil {
             e.printStackTrace();
             return 0;
         }
+    }
+
+
+    //=======================地理位置geo==============================
+
+    /**
+     * 添加一个地理位置
+     * @param key 地理位置集合键值
+     * @param longitude 经度
+     * @param latitude 纬度
+     * @param member 具体位置的键值
+     */
+    @Override
+    public void geoadd(String key, double longitude, double latitude, String member) {
+        Point point = new Point(longitude, latitude);
+        try {
+            redisTemplate.opsForGeo().add(key, point, member);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 查找相距位置小于等于 radius（米）的地理位置列表, 其中附带距离以及按从短到长排序
+     * @param key       地理位置集合键值
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @param radius    半径（米）
+     * @return 相距位置小于等于 radius（米）的地理位置列表
+     */
+    @Override
+    public List< GeoResult<RedisGeoCommands.GeoLocation<Object>> > georadius(String key, double longitude, double latitude, double radius) {
+        Point point = new Point(longitude, latitude);
+        Circle circle = new Circle(point, new Distance(radius));
+        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults
+                = redisTemplate.opsForGeo().radius(key, circle, RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().sortAscending());
+        if (geoResults == null) return null;
+
+        return geoResults.getContent();
+    }
+
+
+    /**
+     * 删除对应key地理位置集合的相应位置
+     * @param key 地理位置集合键值
+     * @param member 具体位置的键值
+     */
+    @Override
+    public void geodelete(String key, String member) {
+        redisTemplate.opsForGeo().remove(key, member);
     }
 
 }
