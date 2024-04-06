@@ -1,14 +1,11 @@
 package com.zxy.work.service;
 
 
-
-
+import com.zxy.work.entities.ApiResponse;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.User;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 /**
  * 远程调用 provider-user-service 服务提供者
  */
@@ -17,35 +14,31 @@ public interface UserServiceClient {
 
 
     @PostMapping("/user/update/register")
-    ResponseEntity<String> register(@RequestBody User user);
+    ApiResponse<String> register(@RequestBody User user) throws MyException;
 
-
-    @GetMapping("/user/get/{mobile}")
-    ResponseEntity<String>  getByMobile(@PathVariable("mobile")String mobile);
-
+    @GetMapping("/user/get")
+    ApiResponse<Object> getByMobile(@RequestParam("mobile") String mobile);
 
     @DeleteMapping("/user/update/delete")
-    ResponseEntity<String>  delete(@RequestBody User user);
-
+    ApiResponse<String> delete(@RequestParam("mobile")String mobile);
 
     @PostMapping("/user/login")
-    ResponseEntity<String> login(@RequestBody User user);
+    ApiResponse<String> login(@RequestBody User user);
 
+    @GetMapping("/user/checkLogin")
+    ApiResponse<String> checkLogin();
 
     @PostMapping("/user/logout")
-    void logout(@RequestBody User user);
-
+    ApiResponse<String> logout(@RequestParam("mobile")String mobile);
 
     @PutMapping("/user/update/message")
-    ResponseEntity<String>  updateMessage(@RequestBody User user);
-
+    ApiResponse<String> updateMessage(@RequestBody User user);
 
     @PutMapping("/user/update/password")
-    ResponseEntity<String> updatePassword(@RequestBody Map<String,Object> requestMapper);
-
-
-    @GetMapping("/user/getById/{id}")
-    ResponseEntity<String> getById(@PathVariable("id")Integer id);
-
+    ApiResponse<String> updatePassword(
+            @RequestParam("mobile") String mobile,
+            @RequestParam("oldPassword") String oldPassword,
+            @RequestParam("newPassword") String newPassword
+    );
 
 }

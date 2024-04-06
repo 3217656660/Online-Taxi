@@ -2,15 +2,16 @@ package com.zxy.work.service.impl;
 
 
 import com.zxy.work.dao.UserMapper;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.User;
 import com.zxy.work.service.UserService;
-import com.zxy.work.util.MyString;
+import com.zxy.work.util.cache.CacheUtil;
 import com.zxy.work.util.encode.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 @Service
 @Slf4j
@@ -19,47 +20,83 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private CacheUtil redisUtil;
+
+    /**
+     * 设置通用缓存TTL(30分钟)
+     */
+    private static final int cacheTTL = 30 * 60;
+
+    /**
+     * 设置缓存通用key前缀
+     */
+    private static final String commonKey = "user:mobile:";
 
     /**
      * 用户注册
      * @param user 传来的用户信息
      * @return  注册结果
      */
+    @Transactional
     @Override
-    public Object create(User user) {
-        //添加时间和逻辑删除默认值
-        Date now = new Date();
-        user.setCreateTime(now).setUpdateTime(now).setIsDeleted(0);
-
+    public int create(User user) throws MyException {
+        String key = commonKey + user.getMobile();
         //先检查手机号是否已经注册
-        User registeredUser = userMapper.selectByMobile(user.getMobile());
-        if ( registeredUser != null)
-            return MyString.MOBILE_EXIST;
+        User registeredUser;
+        try{
+            registeredUser = userMapper.selectByMobile(user.getMobile());
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+
+        if ( registeredUser != null){
+            log.info("手机号={}，已经注册", registeredUser.getMobile());
+            throw new MyException("手机号已经注册过了");
+        }
 
         //没有注册则对密码进行加密，执行插入
         String encodedPassword = PasswordEncoder.encode(user.getPassword());
-        user.setPassword( encodedPassword );
-        return userMapper.create(user) == 0
-                ? MyString.REGISTER_ERROR
-                : user;
+        user.setPassword(encodedPassword);
+        try{
+            int result = userMapper.create(user);
+            if (result == 1){
+                User select = userMapper.selectByMobile(user.getMobile());
+                redisUtil.set(key, select.setPassword("******"), cacheTTL);
+                log.info("key={}已经在注册成功后放入缓存", key);
+            }
+            return result;
+        }catch (Exception e){
+            log.error("创建用户异常，msg={}", e.getMessage());
+            throw new MyException("创建用户异常");
+        }
     }
 
 
     /**
      * 用户注销
-     * @param user 传来的用户信息
+     * @param mobile 传来的用户手机号
      * @return  注销结果
      */
+    @Transactional
     @Override
-    public Object delete(User user) {
-        //添加时间和逻辑删除的值
-        Date now = new Date();
-        user.setUpdateTime(now)
-                .setIsDeleted(1);
-
-        return userMapper.delete(user) == 0
-                ? MyString.DELETE_ERROR
-                : MyString.DELETE_SUCCESS;
+    public int deleteByMobile(String mobile) throws MyException{
+        //先检查手机号是否已经注册
+        checkRegister(mobile);
+        //删除所有用户相关内容
+        String key = commonKey + mobile;
+        try{
+            int result = userMapper.deleteByMobile(mobile);
+            if (result == 1){
+                redisUtil.del(key);
+                log.info("删除了key={}的缓存信息", key);
+            }
+            return result;
+        }catch (Exception e){
+            log.error("手机号删除用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号删除用户出现异常");
+        }
     }
 
 
@@ -68,14 +105,24 @@ public class UserServiceImpl implements UserService {
      * @param user 传来的用户信息json
      * @return  更新的用户信息结果
      */
+    @Transactional
     @Override
-    public Object update(User user) {
-        //添加时间
-        Date now = new Date();
-        user.setUpdateTime(now);
-        return userMapper.update(user) == 0
-                ? MyString.UPDATE_ERROR
-                : MyString.UPDATE_SUCCESS;
+    public int update(User user) throws MyException{
+        //先检查手机号是否已经注册
+        String key = commonKey + user.getMobile();
+        checkRegister(user.getMobile());
+        try{
+            int result = userMapper.update(user);
+            if (result == 1){
+                User select = userMapper.selectByMobile(user.getMobile());
+                redisUtil.set(key, select.setPassword("******"), cacheTTL);
+                log.info("用户信息key={}更新，重新设置了缓存中的信息", key);
+            }
+            return result;
+        }catch (Exception e){
+            log.error("手机号更新用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号更新用户出现异常");
+        }
     }
 
 
@@ -85,11 +132,27 @@ public class UserServiceImpl implements UserService {
      * @return  查询结果
      */
     @Override
-    public Object selectByMobile(String mobile) {
-        User user =  userMapper.selectByMobile(mobile);
-        return user == null
-                ? MyString.FIND_ERROR
-                : user.setPassword("**********");
+    public User selectByMobile(String mobile) throws MyException{
+        String key = commonKey + mobile;
+        Object tempUser = redisUtil.get(key);
+        if (tempUser != null){
+            return (User) tempUser;
+        }
+
+        User user;
+        try{
+            user = userMapper.selectByMobile(mobile);
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+
+        if (user == null){
+            log.info("手机号={}，未注册", mobile);
+            throw new MyException("该手机号未注册");
+        }
+        redisUtil.set(key, user, cacheTTL);
+        return user;
     }
 
 
@@ -99,58 +162,76 @@ public class UserServiceImpl implements UserService {
      * @return  登录结果
      */
     @Override
-    public Object login(User user) {
-        User resultUser = userMapper.selectByMobile( user.getMobile() );
-        if (resultUser == null) return MyString.ACCOUNT_ERROR;
-
+    public boolean login(User user) throws MyException {
+        String key = commonKey + user.getMobile();
+        User resultUser = checkRegister(user.getMobile());
         //匹配密码
         String inputPassword = user.getPassword();
         String encodedPassword = resultUser.getPassword();
-        return PasswordEncoder.matches(inputPassword, encodedPassword)
-                ? resultUser.setPassword("**************")
-                : MyString.PASSWORD_ERROR;
+        boolean matches = PasswordEncoder.matches(inputPassword, encodedPassword);
+        if (matches){
+            User select = userMapper.selectByMobile(user.getMobile());
+            redisUtil.set(key, select.setPassword("******"), cacheTTL);
+            log.info("用户登录成功，设置key={}至缓存中", key);
+        }
+        return matches;
     }
 
 
     /**
      * 更新用户密码
-     * @param user 传来的用户
-     * @param newPassword 新密码
+     * @param mobile 传来的用户手机号
+     * @param inputOldPassword 用户输入的旧的明文密码
+     * @param newPassword 用户输入的新的明文密码密码
      * @return 修改结果
      */
+    @Transactional
     @Override
-    public Object updatePassword(User user,String newPassword) {
-        String inputOldPassword = user.getPassword();
-        User resultUser = userMapper.selectById(user.getId());
-        if (resultUser == null)
-            return MyString.ACCOUNT_ERROR;
+    public int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException {
+        User resultUser = checkRegister(mobile);
 
         String encodedOldPassword = resultUser.getPassword();
         boolean matches = PasswordEncoder.matches(inputOldPassword, encodedOldPassword);
-        if (matches){
-            Date now = new Date();
-            user.setUpdateTime(now);
-            newPassword = PasswordEncoder.encode(newPassword);
-            user.setPassword(newPassword);
-            return userMapper.update(user) == 0
-                    ?  MyString.UPDATE_ERROR
-                    :  MyString.UPDATE_SUCCESS;
+        if (!matches){
+            log.warn("手机号={}，原密码输入错误", mobile);
+            throw new MyException("旧密码输入错误");
         }
-        return MyString.PASSWORD_ERROR;
+        //加密新密码
+        String newEncodedPassword = PasswordEncoder.encode(newPassword);
+        try{
+            return userMapper.update(new User().setMobile(mobile).setPassword(newEncodedPassword));
+        }catch (Exception e){
+            log.error("手机号修改用户密码异常，msg={}", e.getMessage());
+            throw new MyException("修改用户密码异常");
+        }
     }
 
 
     /**
-     * 通过id查找用户
-     * @param id    传来的用户id
-     * @return  查找结果
+     * 通用方法，检查手机号是否注册
+     * @param mobile 传来的手机号
+     * @return 查询到的手机号
      */
-    @Override
-    public Object selectById(Integer id) {
-        User user = userMapper.selectById(id);
-        return user == null
-                ? MyString.FIND_ERROR
-                : user.setPassword("***********");
+    private User checkRegister(String mobile) throws MyException {
+        String key = commonKey + mobile;
+        Object tempUser = redisUtil.get(key);
+        if (tempUser != null)
+            return (User) tempUser;
+
+        User registeredUser;
+        try{
+            registeredUser = userMapper.selectByMobile(mobile);
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+
+        if (registeredUser == null){
+            log.info("手机号={}，未注册", mobile);
+            throw new MyException("该手机号未注册");
+        }
+        redisUtil.set(key, registeredUser, cacheTTL);
+        return registeredUser;
     }
 
 }

@@ -35,6 +35,7 @@
     </properties>
 
 
+
     <!--子模块继承之后，提供作用，锁定版本+子模块不用写groupId 和 Version-->
     <!--只是声明，没有作用，并不实现引入-->
     <dependencyManagement>

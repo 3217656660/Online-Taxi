@@ -346,13 +346,12 @@ public interface CacheUtil {
 
 
     /**
-     * 查找
-     *
+     * 查找相距位置小于等于 radius（米）的地理位置列表, 其中附带距离以及按从短到长排序
      * @param key       地理位置集合键值
      * @param longitude 经度
      * @param latitude  纬度
-     * @param radius    以上述经纬度的地理位置为中心，相距radius（米）
-     * @return 相距radius（米）的地理位置列表
+     * @param radius    半径（米）
+     * @return 相距位置小于等于 radius（米）的地理位置列表
      */
     List<GeoResult<RedisGeoCommands.GeoLocation<Object>>> georadius(String key, double longitude, double latitude, double radius);
 

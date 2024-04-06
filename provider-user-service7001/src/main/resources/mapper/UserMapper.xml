@@ -17,14 +17,14 @@
     </resultMap>
 
     <insert id="create" parameterType="User" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.user(id,username,password,mobile,email,create_time,update_time,is_deleted)
-        values(#{id},#{username},#{password},#{mobile},#{email},#{createTime},#{updateTime},#{isDeleted});
+        insert into online_taxi.user(username,password,mobile,email)
+        values(#{username},#{password},#{mobile},#{email});
     </insert>
 
-    <update id="delete" parameterType="User">
+    <update id="deleteByMobile" parameterType="String">
         UPDATE online_taxi.user
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE is_deleted = 0 AND id = #{id}
+        SET is_deleted = 1
+        WHERE is_deleted = 0 AND mobile = #{mobile}
     </update>
 
     <update id="update" parameterType="User">
@@ -33,17 +33,11 @@
             <if test="username != null">username = #{username},</if>
             <if test="password != null">password = #{password},</if>
             <if test="email != null">email = #{email},</if>
-            update_time = #{updateTime}
         </set>
-        WHERE is_deleted = 0 AND id = #{id}
+        WHERE is_deleted = 0 AND mobile = #{mobile}
     </update>
 
     <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.user WHERE is_deleted = 0 AND mobile = #{mobile}
+        SELECT id,username,password,mobile,email,create_time,update_time FROM online_taxi.user WHERE is_deleted = 0 AND mobile = #{mobile}
     </select>
-
-    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.user WHERE is_deleted = 0 AND id = #{id}
-    </select>
-
 </mapper>

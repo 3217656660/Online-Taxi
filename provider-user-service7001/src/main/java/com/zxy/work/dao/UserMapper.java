@@ -10,12 +10,9 @@ public interface UserMapper {
 
     int create(User user);
 
-    int delete(User user);
+    int deleteByMobile(@Param("mobile")String mobile);
 
     int update(User user);
 
     User selectByMobile(@Param("mobile")String mobile);
-
-    User selectById(@Param("id")Integer id);
-
 }

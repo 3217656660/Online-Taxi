@@ -114,4 +114,17 @@ public class OrderServiceImpl implements OrderService {
                 : order;
     }
 
+
+    /**
+     * 查询乘客为解决的订单
+     * @param userId 乘客id
+     * @return 查询结果
+     */
+    @Override
+    public Object selectNotSolve(Integer userId) {
+        return orderMapper.selectNotSolve(userId);
+    }
+
+
+
 }

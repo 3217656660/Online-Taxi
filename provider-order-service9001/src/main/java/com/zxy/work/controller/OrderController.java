@@ -88,4 +88,16 @@ public class OrderController {
         return ResponseEntity.ok( orderService.selectByDriverId(driverId) );
     }
 
+
+    /**
+     * 检查未解决的订单
+     * @param userId 传来的乘客id
+     * @return 处理结果
+     */
+    @GetMapping("/checkOrder/{userId}")
+    public ResponseEntity<Object> checkOrder(@PathVariable("userId") Integer userId){
+        log.info("检查是否有未解决的订单userId={}", userId);
+        return ResponseEntity.ok( orderService.selectNotSolve(userId) );
+    }
+
 }

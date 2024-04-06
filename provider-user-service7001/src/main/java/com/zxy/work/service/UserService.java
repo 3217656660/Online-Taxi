@@ -1,21 +1,20 @@
 package com.zxy.work.service;
 
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.User;
 
 public interface UserService {
 
-    Object create(User user);
+    int create(User user) throws MyException;
 
-    Object delete(User user);
+    int deleteByMobile(String mobile) throws MyException;
 
-    Object update(User user);
+    int update(User user) throws MyException;
 
-    Object selectByMobile(String mobile);
+    User selectByMobile(String mobile) throws MyException;
 
-    Object login(User user);
+    boolean login(User user) throws MyException;
 
-    Object updatePassword(User user,String newPassword);
-
-    Object selectById(Integer id);
+    int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException;
 
 }

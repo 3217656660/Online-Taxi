@@ -9,6 +9,8 @@ spring:
     host: ${host}
     port: ${redis.port}
     password: ${redis.password}
+    timeout: 10s
+    database: 0
 
   config:
     import: classpath:/config/application.yml

@@ -17,4 +17,6 @@ public interface OrderService {
 
     Object selectByOrderId(Integer id);
 
+    Object selectNotSolve(Integer userId);
+
 }

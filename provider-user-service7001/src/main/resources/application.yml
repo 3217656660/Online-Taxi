@@ -9,6 +9,18 @@ spring:
     host: ${host}
     port: ${redis.port}
     password: ${redis.password}
+    timeout: 10s
+    database: 0
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 20
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池中的最小空闲连接
+        min-idle: 0
 
   config:
     import: classpath:/config/application.yml
@@ -38,3 +50,11 @@ mybatis:
 logging:
   level:
     root: info
+
+# 配置 sa-token
+sa-token:
+  token-style: uuid
+  token-name: X-Token
+  is-read-cookie: false
+  is-read-header: true
+  is-log: true

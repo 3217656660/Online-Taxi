@@ -1,5 +1,6 @@
 package com.zxy.work.service;
 
+import com.zxy.work.entities.ApiResponse;
 import com.zxy.work.entities.Driver;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -10,22 +11,18 @@ public interface DriverServiceClient {
 
 
     @PostMapping("/driver/update/register")
-    ResponseEntity<String> register(@RequestBody Driver driver);
+    ApiResponse<String> register(@RequestBody Driver driver);
 
 
     @DeleteMapping("/driver/update/delete")
-    ResponseEntity<String> delete(@RequestBody Driver driver);
-
-
-    @GetMapping("/driver/getByMobile/{mobile}")
-    ResponseEntity<String> getByMobile(@PathVariable("mobile")String mobile);
+    ApiResponse<String> delete(@RequestParam("mobile") String mobile);
 
 
     @PutMapping("/driver/update/message")
-    ResponseEntity<String> update(@RequestBody Driver driver);
+    ApiResponse<String> update(@RequestBody Driver driver);
 
 
-    @GetMapping("/driver/getById/{id}")
-    ResponseEntity<String> getById(@PathVariable("id") Integer id);
+    @GetMapping("/driver/getByMobile")
+    ApiResponse<Object> getByMobile(@RequestParam("mobile") String mobile);
 
 }

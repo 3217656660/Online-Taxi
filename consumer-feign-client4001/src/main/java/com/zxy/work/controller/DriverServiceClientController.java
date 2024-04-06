@@ -1,7 +1,9 @@
 package com.zxy.work.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.zxy.work.entities.ApiResponse;
 import com.zxy.work.entities.Driver;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.service.DriverServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,33 +29,29 @@ public class DriverServiceClientController {
      * @return 认证结果
      */
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody Driver driver){
+    public ApiResponse<String> register(@RequestBody Driver driver){
         log.info("注册成为司机：" + driver.getMobile());
-        return driverServiceClient.register(driver);
+        try{
+            return driverServiceClient.register(driver);
+        }catch (Exception e){
+            return ApiResponse.error(600, e.getMessage());
+        }
     }
 
 
     /**
      * 逻辑删除司机信息，一般用于账号注销时将对应司机信息也删除
-     * @param driver 传来的司机json
+     * @param mobile 传来的司机手机号
      * @return 删除结果
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestBody Driver driver){
-        log.info("注销司机：" + driver.getId());
-        return driverServiceClient.delete(driver);
-    }
-
-
-    /**
-     * 通过司机电话获取司机专属信息
-     * @param mobile 传来的司机电话
-     * @return  查询结果
-     */
-    @GetMapping("/getByMobile/{mobile}")
-    public ResponseEntity<String> getByMobile(@PathVariable("mobile")String mobile){
-        log.info("通过电话获取司机：" + mobile);
-        return driverServiceClient.getByMobile(mobile);
+    public ApiResponse<String> delete(@RequestParam("mobile") String mobile){
+        log.info("注销司机：" + mobile);
+        try{
+            return driverServiceClient.delete(mobile);
+        }catch (Exception e){
+            return ApiResponse.error(600, e.getMessage());
+        }
     }
 
 
@@ -63,22 +61,28 @@ public class DriverServiceClientController {
      * @return 更新结果：成功时会将更新的司机对象也返回
      */
     @PutMapping("/message")
-    public ResponseEntity<String> updateMessage(@RequestBody Driver driver){
+    public ApiResponse<String> updateMessage(@RequestBody Driver driver){
         log.info("更新司机信息：" + driver);
-        return driverServiceClient.update(driver);
+        try{
+            return driverServiceClient.update(driver);
+        }catch (Exception e){
+            return ApiResponse.error(600, e.getMessage());
+        }
     }
 
 
     /**
-     * 通过id查找司机
-     * @param id 司机id
-     * @return  查找结果
+     * 通过司机电话获取司机专属信息
+     * @param mobile 传来的司机电话
+     * @return  查询结果
      */
-    @GetMapping("/getById/{id}")
-    ResponseEntity<String> getById(@PathVariable Integer id){
-        log.info("通过id获取司机：" + id);
-        return driverServiceClient.getById(id);
+    @GetMapping("/getByMobile")
+    public ApiResponse<Object> getByMobile(@RequestParam("mobile")String mobile){
+        log.info("通过电话获取司机：" + mobile);
+        try{
+            return driverServiceClient.getByMobile(mobile);
+        }catch (Exception e){
+            return ApiResponse.error(600, e.getMessage());
+        }
     }
-
-
 }

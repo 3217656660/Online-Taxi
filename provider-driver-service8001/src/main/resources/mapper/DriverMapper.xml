@@ -17,12 +17,12 @@
     </resultMap>
 
     <insert id="create" parameterType="Driver" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.driver(ID,NAME,MOBILE,CAR_TYPE,CAR_NUMBER,create_time,update_time,is_deleted)
-        values(#{id},#{name},#{mobile},#{carType},#{carNumber},#{createTime},#{updateTime},#{isDeleted});
+        insert into online_taxi.driver(NAME,MOBILE,CAR_TYPE,CAR_NUMBER)
+        values(#{name},#{mobile},#{carType},#{carNumber});
     </insert>
 
     <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
+        SELECT ID,NAME,MOBILE,CAR_TYPE,CAR_NUMBER,CREATE_TIME,UPDATE_TIME FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
     </select>
 
     <update id="update" parameterType="Driver">
@@ -31,19 +31,14 @@
             <if test="name != null">name = #{name},</if>
             <if test="carType != null">car_type = #{carType},</if>
             <if test="carNumber != null">car_number = #{carNumber},</if>
-            update_time = #{updateTime}
         </set>
-        WHERE is_deleted = 0 AND id = #{id}
+        WHERE is_deleted = 0 AND mobile = #{mobile}
     </update>
 
-    <update id="delete" parameterType="Driver">
+    <update id="delete" parameterType="String">
         UPDATE online_taxi.driver
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE is_deleted = 0 AND id = #{id}
+        SET is_deleted = 1
+        WHERE is_deleted = 0 AND mobile = #{mobile}
     </update>
-
-    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.driver WHERE is_deleted = 0 AND id = #{id}
-    </select>
 
 </mapper>

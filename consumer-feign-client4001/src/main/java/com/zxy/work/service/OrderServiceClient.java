@@ -31,4 +31,8 @@ public interface OrderServiceClient {
     @GetMapping("/order/get/driver/history/{driverId}")
     ResponseEntity<String> getByDriverId(@PathVariable("driverId")Integer driverId);
 
+
+    @GetMapping("/order/checkOrder/{userId}")
+    ResponseEntity<String> checkOrder(@PathVariable("userId") Integer userId);
+
 }

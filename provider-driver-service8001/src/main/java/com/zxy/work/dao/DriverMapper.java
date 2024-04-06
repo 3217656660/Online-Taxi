@@ -9,12 +9,10 @@ public interface DriverMapper {
 
     int create(Driver driver);
 
-    int delete(Driver driver);
+    int delete(@Param("mobile") String mobile);
 
     int update(Driver driver);
 
     Driver selectByMobile(@Param("mobile") String mobile);
-
-    Driver selectById(@Param("id") Integer id);
 
 }

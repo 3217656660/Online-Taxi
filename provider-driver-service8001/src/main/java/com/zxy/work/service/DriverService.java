@@ -2,18 +2,17 @@ package com.zxy.work.service;
 
 
 import com.zxy.work.entities.Driver;
+import com.zxy.work.entities.MyException;
 
 
 public interface DriverService {
 
-    Object create(Driver driver);
+    int create(Driver driver) throws MyException;
 
-    Object delete(Driver driver);
+    int delete(String mobile) throws MyException;
 
-    Object update(Driver driver);
+    int update(Driver driver) throws MyException;
 
-    Object selectByMobile(String mobile);
-
-    Object selectById(Integer id);
+    Driver selectByMobile(String mobile) throws MyException;
 
 }
