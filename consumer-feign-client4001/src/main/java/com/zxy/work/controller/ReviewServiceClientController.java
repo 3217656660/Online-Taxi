@@ -1,19 +1,17 @@
 package com.zxy.work.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.zxy.work.entities.ApiResponse;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Review;
 import com.zxy.work.service.ReviewServiceClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 
 @RestController
 @Slf4j
 @RequestMapping("/taxi/review")
-@SaCheckLogin
 public class ReviewServiceClientController {
 
     @Resource
@@ -25,21 +23,29 @@ public class ReviewServiceClientController {
      * @return  评论结果
      */
     @PostMapping("/create")
-    public ResponseEntity<String> create(@Valid @RequestBody Review review){
+    public ApiResponse<String> create(@RequestBody Review review) throws MyException {
         log.info("创建评论：" + review);
-        return reviewServiceClient.create(review);
+        try{
+            return reviewServiceClient.create(review);
+        }catch (Exception e){
+            throw new MyException(e.getMessage());
+        }
     }
 
 
     /**
      * 删除评论
-     * @param review    评论信息
+     * @param   id 评论id
      * @return  评论删除结果
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@Valid @RequestBody Review review){
-        log.info("删除评论：" + review.getId());
-        return reviewServiceClient.delete(review);
+    public ApiResponse<String> delete(@RequestParam("id") Integer id) throws MyException {
+        log.info("删除评论：" + id);
+        try{
+            return reviewServiceClient.delete(id);
+        }catch (Exception e){
+            throw new MyException(e.getMessage());
+        }
     }
 
 
@@ -48,23 +54,14 @@ public class ReviewServiceClientController {
      * @param orderId   传来的订单id
      * @return  查询结果
      */
-    @GetMapping("/getByOrderId/{orderId}")
-    public ResponseEntity<String> getByOrderId(@PathVariable("orderId") Integer orderId){
+    @GetMapping("/getByOrderId")
+    public ApiResponse<Object> getByOrderId(@RequestParam("orderId") Integer orderId) throws MyException {
         log.info("通过订单id获得评论：" + orderId);
-        return reviewServiceClient.getByOrderId(orderId);
+        try{
+            return reviewServiceClient.getByOrderId(orderId);
+        }catch (Exception e){
+            throw new MyException(e.getMessage());
+        }
     }
-
-
-    /**
-     * 通过id查询评论
-     * @param id    评论id
-     * @return  查询结果
-     */
-    @GetMapping("/getById/{id}")
-    ResponseEntity<String> getById(@PathVariable("id") Integer id){
-        log.info("通过id查询评论：" + id);
-        return reviewServiceClient.getById(id);
-    }
-
 
 }

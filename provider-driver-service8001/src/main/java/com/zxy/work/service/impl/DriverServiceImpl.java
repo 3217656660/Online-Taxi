@@ -3,16 +3,13 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.DriverMapper;
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
-import com.zxy.work.entities.User;
 import com.zxy.work.service.DriverService;
-import com.zxy.work.util.MyString;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 @Service
 @Slf4j
@@ -74,7 +71,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public int delete(String mobile) throws MyException{
         String key = commonKey + mobile;
-        checkRegister(mobile);
+        selectByMobile(mobile);
 
         try{
             int result = driverMapper.delete(mobile);
@@ -99,7 +96,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public int update(Driver driver) throws MyException{
         String key = commonKey + driver.getMobile();
-        checkRegister(driver.getMobile());
+        selectByMobile(driver.getMobile());
 
         try{
             int result = driverMapper.update(driver);
@@ -125,8 +122,10 @@ public class DriverServiceImpl implements DriverService {
     public Driver selectByMobile(String mobile) throws MyException{
         String key = commonKey + mobile;
         Object tempDriver = redisUtil.get(key);
-        if (tempDriver != null)
+        if (tempDriver != null){
+            redisUtil.set(key, tempDriver, cacheTTL);
             return (Driver) tempDriver;
+        }
 
         Driver driver;
         try{
@@ -144,30 +143,4 @@ public class DriverServiceImpl implements DriverService {
         return driver;
     }
 
-    /**
-     * 通用方法：用于检查司机是否已经注册
-     * @param mobile 手机号
-     * @return 司机信息
-     */
-    private Driver checkRegister(String mobile) throws MyException{
-        String key = commonKey + mobile;
-        Object tempDriver = redisUtil.get(key);
-        if (tempDriver != null)
-            return (Driver) tempDriver;
-
-        Driver registeredDriver;
-        try{
-            registeredDriver = driverMapper.selectByMobile(mobile);
-        }catch (Exception e){
-            log.error("查询司机异常，msg={}", e.getMessage());
-            throw new MyException("查询司机出现异常");
-        }
-
-        if (registeredDriver == null){
-            log.info("手机号={}，未注册", mobile);
-            throw new MyException("该手机号未注册成司机");
-        }
-        redisUtil.set(key, registeredDriver, cacheTTL);
-        return registeredDriver;
-    }
 }

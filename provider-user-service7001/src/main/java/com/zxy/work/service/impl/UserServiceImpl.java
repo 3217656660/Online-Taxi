@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public int deleteByMobile(String mobile) throws MyException{
         //先检查手机号是否已经注册
-        checkRegister(mobile);
+        selectByMobile(mobile);
         //删除所有用户相关内容
         String key = commonKey + mobile;
         try{
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
     public int update(User user) throws MyException{
         //先检查手机号是否已经注册
         String key = commonKey + user.getMobile();
-        checkRegister(user.getMobile());
+        selectByMobile(user.getMobile());
         try{
             int result = userMapper.update(user);
             if (result == 1){
@@ -136,6 +136,7 @@ public class UserServiceImpl implements UserService {
         String key = commonKey + mobile;
         Object tempUser = redisUtil.get(key);
         if (tempUser != null){
+            redisUtil.set(key, tempUser, cacheTTL);
             return (User) tempUser;
         }
 
@@ -164,7 +165,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean login(User user) throws MyException {
         String key = commonKey + user.getMobile();
-        User resultUser = checkRegister(user.getMobile());
+        User resultUser = selectByMobile(user.getMobile());
         //匹配密码
         String inputPassword = user.getPassword();
         String encodedPassword = resultUser.getPassword();
@@ -188,7 +189,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException {
-        User resultUser = checkRegister(mobile);
+        User resultUser = selectByMobile(mobile);
 
         String encodedOldPassword = resultUser.getPassword();
         boolean matches = PasswordEncoder.matches(inputOldPassword, encodedOldPassword);
@@ -204,34 +205,6 @@ public class UserServiceImpl implements UserService {
             log.error("手机号修改用户密码异常，msg={}", e.getMessage());
             throw new MyException("修改用户密码异常");
         }
-    }
-
-
-    /**
-     * 通用方法，检查手机号是否注册
-     * @param mobile 传来的手机号
-     * @return 查询到的手机号
-     */
-    private User checkRegister(String mobile) throws MyException {
-        String key = commonKey + mobile;
-        Object tempUser = redisUtil.get(key);
-        if (tempUser != null)
-            return (User) tempUser;
-
-        User registeredUser;
-        try{
-            registeredUser = userMapper.selectByMobile(mobile);
-        }catch (Exception e){
-            log.error("手机号查询用户异常，msg={}", e.getMessage());
-            throw new MyException("手机号查询用户出现异常");
-        }
-
-        if (registeredUser == null){
-            log.info("手机号={}，未注册", mobile);
-            throw new MyException("该手机号未注册");
-        }
-        redisUtil.set(key, registeredUser, cacheTTL);
-        return registeredUser;
     }
 
 }

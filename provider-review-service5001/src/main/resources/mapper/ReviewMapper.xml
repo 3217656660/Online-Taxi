@@ -16,23 +16,18 @@
     </resultMap>
 
     <insert id="create" parameterType="Review" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.review(ID,ORDER_ID,RATING,COMMENT,CREATE_TIME,UPDATE_TIME,IS_DELETED)
-        values(#{id},#{orderId},#{rating},#{comment},#{createTime},#{updateTime},#{isDeleted});
+        insert into online_taxi.review(ORDER_ID,RATING,COMMENT)
+        values(#{orderId},#{rating},#{comment});
     </insert>
 
     <update id="delete" parameterType="Review" keyProperty="id">
         UPDATE online_taxi.review
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE id = #{id}
+        SET is_deleted = 1
+        WHERE order_id = #{orderId}
     </update>
 
     <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.review WHERE is_deleted = 0 AND order_id = #{orderId}
+        SELECT ID,ORDER_ID,RATING,COMMENT,CREATE_TIME,UPDATE_TIME FROM online_taxi.review WHERE is_deleted = 0 AND order_id = #{orderId}
     </select>
-
-    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.review WHERE is_deleted = 0 AND id = #{id}
-    </select>
-
 
 </mapper>

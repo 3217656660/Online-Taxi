@@ -1,14 +1,16 @@
 package com.zxy.work.service.impl;
 
 import com.zxy.work.dao.ReviewMapper;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Review;
 import com.zxy.work.service.ReviewService;
-import com.zxy.work.util.MyString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
+@Slf4j
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
@@ -16,48 +18,62 @@ public class ReviewServiceImpl implements ReviewService {
     private ReviewMapper reviewMapper;
 
 
+    /**
+     * 创建评论
+     * @param review 传来的评论信息
+     * @return 创建结果
+     */
+    @Transactional
     @Override
-    public Object create(Review review) {
-        if ( reviewMapper.selectByOrderId(review.getOrderId()) != null )
-            return MyString.REVIEW_ERROR;
+    public int create(Review review) throws MyException {
+        Review select;
+        try{
+            select = reviewMapper.selectByOrderId(review.getOrderId());
+        }catch (Exception e){
+            log.error("查询评论出现异常，id={},orderId={}", review.getId(), review.getOrderId());
+            throw new MyException("查询评论出现异常");
+        }
+        if (select != null)
+            throw new MyException("您已经评价过了");
 
-        Date now = new Date();
-        review.setCreateTime(now)
-                .setUpdateTime(now)
-                .setIsDeleted(0);
-        return reviewMapper.create(review) == 0
-                ? MyString.REVIEW_ERROR
-                : review;
+        try{
+            return reviewMapper.create(review);
+        }catch (Exception e){
+            log.error("创建评论出现异常,orderId={}", review.getOrderId());
+            throw new MyException("创建评论出现异常");
+        }
+    }
+
+    /**
+     * 删除评论
+     * @param id 评论id
+     * @return 删除结果
+     */
+    @Transactional
+    @Override
+    public int delete(Integer id) throws MyException {
+        try{
+            return reviewMapper.delete(id);
+        }catch (Exception e){
+            log.error("删除评论出现异常,id={}", id);
+            throw new MyException("删除评论出现异常");
+        }
     }
 
 
+    /**
+     * 根据订单id查询评价
+     * @param orderId 订单id
+     * @return 查询结果
+     */
     @Override
-    public Object delete(Review review) {
-        Date now = new Date();
-        review.setUpdateTime(now)
-                .setIsDeleted(1);
-        return reviewMapper.delete(review) == 0
-                ? MyString.DELETE_ERROR
-                :MyString.DELETE_SUCCESS;
+    public Review selectByOrderId(Integer orderId) throws MyException {
+        try{
+            return  reviewMapper.selectByOrderId(orderId);
+        }catch (Exception e){
+            log.error("查询评论出现异常,orderId={}", orderId);
+            throw new MyException("查询评论出现异常");
+        }
     }
-
-
-    @Override
-    public Object selectByOrderId(Integer orderId) {
-        Review review = reviewMapper.selectByOrderId(orderId);
-        return review == null
-                ? MyString.FIND_ERROR
-                : review;
-    }
-
-
-    @Override
-    public Object selectById(Integer id) {
-        Review review = reviewMapper.selectById(id);
-        return review == null
-                ? MyString.FIND_ERROR
-                : review;
-    }
-
 
 }

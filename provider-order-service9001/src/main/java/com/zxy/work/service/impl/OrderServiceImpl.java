@@ -1,15 +1,17 @@
 package com.zxy.work.service.impl;
 
 import com.zxy.work.dao.OrderMapper;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
 import com.zxy.work.service.OrderService;
-import com.zxy.work.util.MyString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -22,39 +24,45 @@ public class OrderServiceImpl implements OrderService {
      * @param order 传来的用户信息json
      * @return 创建结果
      */
+    @Transactional
     @Override
-    public Object create(Order order) {
-        Date now = new Date();
-        order.setCreateTime(now)
-                .setUpdateTime(now)
-                .setIsDeleted(0)
-                .setStatus(0);
+    public int create(Order order) throws MyException {
         //1.查询数据库中是否还有待处理的订单
         //2.如果有待处理的订单，那么让用户去处理该订单
         //3.如果没有，则重新创建一个订单
-        Order notSolve = orderMapper.selectNotSolve(order.getUserId());
-        if (notSolve != null) return notSolve;
+        Order notSolve;
+        try{
+            notSolve = orderMapper.selectNotSolve(order.getUserId());
+        }catch (Exception e){
+            log.error("订单查询异常,msg={}", e.getMessage());
+            throw new MyException("未处理的订单查询异常");
+        }
+        if (notSolve != null)
+            throw new MyException("您还有未处理的订单");
 
-        return orderMapper.create(order) == 0
-                ? MyString.ORDER_CREATE_ERROR
-                : order;
+        try{
+            return orderMapper.create(order);
+        }catch (Exception e){
+            log.error("订单创建异常,msg={}", e.getMessage());
+            throw new MyException("订单创建异常");
+        }
     }
 
 
     /**
      * 取消订单
-     * @param order 传来的订单json
+     * @param id 传来的订单id
      * @return 取消结果
      */
+    @Transactional
     @Override
-    public Object delete(Order order) {
-        Date now = new Date();
-        order.setUpdateTime(now)
-                .setStatus(5)//已取消
-                .setIsDeleted(1);
-        return orderMapper.delete(order) == 0
-                ? MyString.ORDER_CANCEL_ERROR
-                : MyString.ORDER_CANCEL_SUCCESS;
+    public int delete(Integer id) throws MyException{
+        try{
+            return orderMapper.delete(id);
+        }catch (Exception e){
+            log.error("订单取消异常,msg={}", e.getMessage());
+            throw new MyException("订单取消异常");
+        }
     }
 
 
@@ -63,13 +71,15 @@ public class OrderServiceImpl implements OrderService {
      * @param order 传来的订单json
      * @return  更新结果
      */
+    @Transactional
     @Override
-    public Object update(Order order) {
-        Date now = new Date();
-        order.setUpdateTime(now);
-        return orderMapper.update(order) == 0
-                ? MyString.UPDATE_ERROR
-                : order;
+    public int update(Order order) throws MyException{
+        try{
+            return orderMapper.update(order);
+        }catch (Exception e){
+            log.error("订单更新异常,msg={}", e.getMessage());
+            throw new MyException("订单更新异常");
+        }
     }
 
 
@@ -79,11 +89,18 @@ public class OrderServiceImpl implements OrderService {
      * @return 历史订单
      */
     @Override
-    public Object selectByUserId(Integer userId) {
-        List<Order> orderList = orderMapper.selectByUserId(userId);
-        return orderList == null
-                ? MyString.FIND_ERROR
-                : orderList;
+    public List<Order> selectByUserId(Integer userId) throws MyException{
+        List<Order> orderList;
+        try{
+            orderList = orderMapper.selectByUserId(userId);
+        }catch (Exception e){
+            log.error("通过用户id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("通过用户id的订单查询异常");
+        }
+        if (orderList == null)
+            throw new MyException("您还未有过订单");
+
+        return orderList;
     }
 
 
@@ -93,11 +110,18 @@ public class OrderServiceImpl implements OrderService {
      * @return 历史订单
      */
     @Override
-    public Object selectByDriverId(Integer driverId) {
-        List<Order> orderList = orderMapper.selectByDriverId(driverId);
-        return orderList == null
-                ? MyString.FIND_ERROR
-                : orderList;
+    public List<Order> selectByDriverId(Integer driverId) throws MyException{
+        List<Order> orderList;
+        try{
+            orderList = orderMapper.selectByDriverId(driverId);
+        }catch (Exception e){
+            log.error("通过司机id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("通过司机id的订单查询异常");
+        }
+        if (orderList == null)
+            throw new MyException("您还未有过订单");
+
+        return orderList;
     }
 
 
@@ -107,11 +131,13 @@ public class OrderServiceImpl implements OrderService {
      * @return 订单对象
      */
     @Override
-    public Object selectByOrderId(Integer id) {
-        Order order = orderMapper.selectByOrderId(id);
-        return order == null
-                ? MyString.FIND_ERROR
-                : order;
+    public Order selectByOrderId(Integer id) throws MyException{
+        try{
+            return orderMapper.selectByOrderId(id);
+        }catch (Exception e){
+            log.error("通过订单id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("通过订单id的订单查询异常");
+        }
     }
 
 
@@ -121,10 +147,13 @@ public class OrderServiceImpl implements OrderService {
      * @return 查询结果
      */
     @Override
-    public Object selectNotSolve(Integer userId) {
-        return orderMapper.selectNotSolve(userId);
+    public Order selectNotSolve(Integer userId) throws MyException{
+        try{
+            return orderMapper.selectNotSolve(userId);
+        }catch (Exception e){
+            log.error("通过订单id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("通过订单id的订单查询异常");
+        }
     }
-
-
 
 }

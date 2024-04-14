@@ -1,22 +1,25 @@
 package com.zxy.work.service;
 
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
+
+import java.util.List;
 
 
 public interface OrderService {
 
-    Object create(Order order);
+    int create(Order order) throws MyException;
 
-    Object delete(Order order);
+    int delete(Integer id) throws MyException;
 
-    Object update(Order order);
+    int update(Order order) throws MyException;
 
-    Object selectByUserId(Integer userId);
+    List<Order> selectByUserId(Integer userId) throws MyException;
 
-    Object selectByDriverId(Integer driverId);
+    List<Order> selectByDriverId(Integer driverId) throws MyException;
 
-    Object selectByOrderId(Integer id);
+    Order selectByOrderId(Integer id) throws MyException;
 
-    Object selectNotSolve(Integer userId);
+    Order selectNotSolve(Integer userId) throws MyException;
 
 }

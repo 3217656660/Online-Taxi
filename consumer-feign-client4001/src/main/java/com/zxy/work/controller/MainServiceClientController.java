@@ -2,30 +2,24 @@ package com.zxy.work.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zxy.work.entities.NotificationMessage;
 import com.zxy.work.entities.Order;
-import com.zxy.work.entities.Payment;
 import com.zxy.work.service.*;
 import com.zxy.work.util.MyNotify;
 import com.zxy.work.util.MyString;
 import com.zxy.work.util.cache.CacheUtil;
-import com.zxy.work.vo.DriverActionTakeOrderVo;
-import com.zxy.work.vo.UserCreateOrderVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.GeoResult;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 主要操作控制器，用于用户、订单、司机、支付、评价，协同通信，完成业复杂业务等
@@ -68,11 +62,11 @@ public class MainServiceClientController {
     }
 
 
-    /**
+/*    *//**
      * 检查乘客是否有未解决的订单
      * @param userId 传来的乘客id
      * @return 检查结果
-     */
+     *//*
     @GetMapping("/checkOrder/{userId}")
     public ResponseEntity<Object> checkOrder(@PathVariable Integer userId){
         String checkJson = orderServiceClient.checkOrder(userId).getBody();
@@ -96,14 +90,17 @@ public class MainServiceClientController {
         } catch (JsonProcessingException e) {
             return ResponseEntity.ok(MyString.SERVE_ERROR);
         }
-    }
+    }*/
 
 
-    /**
+/*
+    */
+/**
      * 创建订单，并放到缓存里
      * @param userCreateOrderVo 传来的要保存的信息
      * @return  创建结果
-     */
+     *//*
+
     @PostMapping("/createOrder")
     public ResponseEntity<Object> createOrder(@RequestBody UserCreateOrderVo userCreateOrderVo){
         //1.添加必要字段,检查用户的订单，如果有订单未处理，让用户处理该订单，不返回订单详情
@@ -138,13 +135,14 @@ public class MainServiceClientController {
                 ? ResponseEntity.ok(tempOrder)
                 : ResponseEntity.ok(MyString.ORDER_CREATE_ERROR);
     }
+*/
 
 
-    /**
+/*    *//**
      * 获取订单剩余时间
      * @param id 订单id
      * @return 查询结果
-     */
+     *//*
     @GetMapping("/getOrderTime/{id}")
     public ResponseEntity<Object> getOrderTime(@PathVariable("id") Integer id){
         String noAcceptedKey = "order:noAccepted:" + id;
@@ -152,14 +150,14 @@ public class MainServiceClientController {
         log.info("查询过期时间,id={},expire={}", id, expire);
         if (expire == -2)    orderServiceClient.delete(new Order().setId(id));
         return ResponseEntity.ok(expire);
-    }
+    }*/
 
 
-    /**
+/*    *//**
      * 用户取消订单
      * @param order 传来的订单信息
      * @return  取消结果
-     */
+     *//*
     @PostMapping("/cancelOrder")
     @MyNotify("待改善：1.")
     public ResponseEntity<String> cancelOrder(@RequestBody Order order){
@@ -192,7 +190,7 @@ public class MainServiceClientController {
         redisUtil.del(noAcceptedKey, acceptedKey);
         redisUtil.geodelete("position", key);
         return ResponseEntity.ok(MyString.ORDER_CANCEL_SUCCESS);
-    }
+    }*/
 
 
     /**
@@ -231,11 +229,11 @@ public class MainServiceClientController {
     }
 
 
-    /**
+/*    *//**
      * 司机接单
      * @param driverActionTakeOrderVo 传来的信息
      * @return  接单结果
-     */
+     *//*
     @PostMapping("/takeOrder")
     @MyNotify("待改善：1.")
     public ResponseEntity<String> takeOrder(@RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
@@ -269,14 +267,17 @@ public class MainServiceClientController {
                 message
         );
         return ResponseEntity.ok(MyString.ORDER_TAKE_SUCCESS);
-    }
+    }*/
 
 
-    /**
+/*
+    */
+/**
      * 司机到达指定开始地点
      * @param driverActionTakeOrderVo 司机传来的信息
      * @return  订单信息
-     */
+     *//*
+
     @PostMapping("/arriveStartAddress")
     @MyNotify("待改善：1.")
     public ResponseEntity<Object> arriveStartAddress(@Valid @RequestBody DriverActionTakeOrderVo driverActionTakeOrderVo){
@@ -303,13 +304,14 @@ public class MainServiceClientController {
         //乘客客户端推送终点坐标
         return ResponseEntity.ok(redisOrder);
     }
+*/
 
 
-    /**
+/*    *//**
      * 司机到达终点后，发起收款请求，并创建支付信息表，以及放到缓存中
      * @param order 传来的订单信息
      * @return  处理结果
-     */
+     *//*
     @PostMapping("/requestPayment")
     @MyNotify("待改善：1.司机到达目的地后，提交订单发起收款后，系统推送消息给用户，提醒用户支付")
     public ResponseEntity<Object> requestPayment(@RequestBody Order order){
@@ -349,7 +351,7 @@ public class MainServiceClientController {
                 message
         );
         return ResponseEntity.ok(MyString.REQUEST_PAYMENT_SUCCESS);
-    }
+    }*/
 
     //进行支付
     //完成支付

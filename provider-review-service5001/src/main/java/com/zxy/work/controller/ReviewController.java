@@ -1,9 +1,13 @@
 package com.zxy.work.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaMode;
+import com.zxy.work.entities.ApiResponse;
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Review;
 import com.zxy.work.service.ReviewService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -11,6 +15,7 @@ import javax.annotation.Resource;
 @RestController
 @Slf4j
 @RequestMapping("/review")
+@SaCheckLogin
 public class ReviewController {
 
     @Resource
@@ -21,22 +26,28 @@ public class ReviewController {
      * @param review 评论信息
      * @return  创建结果
      */
+    @SaCheckRole(value = "user")
     @PostMapping("/update/create")
-    public ResponseEntity<Object> createReview(@RequestBody Review review){
+    public ApiResponse<String> createReview(@RequestBody Review review) throws MyException {
         log.info("创建评论服务提供者：" + review);
-        return ResponseEntity.ok( reviewService.create(review) );
+        return reviewService.create(review) == 1
+                ? ApiResponse.success("评价成功")
+                : ApiResponse.error(600, "评价失败");
     }
 
 
     /**
      * 删除评论
-     * @param review    评论信息
+     * @param   id 评论id
      * @return  评论删除结果
      */
+    @SaCheckRole(value = {"user", "admin"}, mode = SaMode.OR)
     @DeleteMapping("/update/delete")
-    public ResponseEntity<Object> deleteReview(@RequestBody Review review){
-        log.info("删除评论服务提供者：" + review.getId());
-        return ResponseEntity.ok( reviewService.delete(review) );
+    public ApiResponse<String> deleteReview(@RequestParam("id") Integer id) throws MyException {
+        log.info("删除评论服务提供者：" + id);
+        return reviewService.delete(id) == 1
+                ? ApiResponse.success("评价删除成功")
+                : ApiResponse.error(600, "评价删除失败");
     }
 
 
@@ -45,24 +56,13 @@ public class ReviewController {
      * @param orderId   传来的订单id
      * @return  查询结果
      */
-    @GetMapping("/getByOrderId/{orderId}")
-    public ResponseEntity<Object> getReviewByOrderId(@PathVariable("orderId") Integer orderId){
+    @GetMapping("/getByOrderId")
+    public ApiResponse<Object> getReviewByOrderId(@RequestParam("orderId") Integer orderId) throws MyException {
         log.info("通过订单id获得评论服务提供者：" + orderId);
-        return ResponseEntity.ok( reviewService.selectByOrderId(orderId) );
+        Review review = reviewService.selectByOrderId(orderId);
+        return review != null
+                ? ApiResponse.success(review)
+                : ApiResponse.error(600, "根据订单id查询评价失败");
     }
-
-
-    /**
-     * 通过id查询评论
-     * @param id    评论id
-     * @return  查询结果
-     */
-    @GetMapping("/getById/{id}")
-    public ResponseEntity<Object> getById(@PathVariable("id") Integer id){
-        log.info("通过id查询评论服务提供者：" + id);
-        return ResponseEntity.ok( reviewService.selectById(id) );
-    }
-
-
 
 }

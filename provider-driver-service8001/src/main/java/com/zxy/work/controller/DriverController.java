@@ -5,7 +5,6 @@ import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

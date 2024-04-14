@@ -2,7 +2,6 @@ package com.zxy.work.service;
 
 
 import com.zxy.work.entities.ApiResponse;
-import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,7 @@ public interface UserServiceClient {
 
 
     @PostMapping("/user/update/register")
-    ApiResponse<String> register(@RequestBody User user) throws MyException;
+    ApiResponse<String> register(@RequestBody User user);
 
     @GetMapping("/user/get")
     ApiResponse<Object> getByMobile(@RequestParam("mobile") String mobile);

@@ -10,11 +10,8 @@ public interface ReviewMapper {
 
     int create(Review review);
 
-    int delete(Review review);
+    int delete(@Param("orderId") Integer orderId);
 
     Review selectByOrderId(@Param("orderId") Integer orderId);
-
-    Review selectById(@Param("id") Integer id);
-
 
 }

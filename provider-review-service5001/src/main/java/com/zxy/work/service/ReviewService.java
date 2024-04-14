@@ -1,15 +1,14 @@
 package com.zxy.work.service;
 
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Review;
 
 public interface ReviewService {
 
-    Object create(Review review);
+    int create(Review review) throws MyException;
 
-    Object delete(Review review);
+    int delete(Integer id) throws MyException;
 
-    Object selectByOrderId(Integer orderId);
-
-    Object selectById(Integer id);
+    Review selectByOrderId(Integer orderId) throws MyException;
 
 }

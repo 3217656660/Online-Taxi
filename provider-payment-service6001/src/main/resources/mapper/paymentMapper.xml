@@ -16,32 +16,26 @@
     </resultMap>
 
     <insert id="create" parameterType="Payment" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.payment(ID,ORDER_ID,PAYMENT_METHOD,AMOUNT,create_time,update_time,is_deleted)
-        values(#{id},#{orderId},#{paymentMethod},#{amount},#{createTime},#{updateTime},#{isDeleted});
+        insert into online_taxi.payment(ORDER_ID,PAYMENT_METHOD,AMOUNT)
+        values(#{orderId},#{paymentMethod},#{amount});
     </insert>
 
-    <update id="delete" parameterType="Payment">
+    <update id="delete" parameterType="Integer">
         UPDATE online_taxi.payment
-        SET update_time = #{updateTime} , is_deleted = #{isDeleted}
-        WHERE id = #{id} AND amount > 0
+        SET is_deleted = 1
+        WHERE is_deleted = 0 AND order_id = #{orderId} AND amount > 0
     </update>
-
-    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.payment WHERE is_deleted = 0 AND order_id = #{orderId}
-    </select>
-
-    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT * FROM online_taxi.payment WHERE is_deleted = 0 AND id = #{id}
-    </select>
 
     <update id="update" parameterType="Payment">
         UPDATE online_taxi.payment
         <set>
             <if test="paymentMethod != null">payment_method = #{paymentMethod},</if>
             <if test="amount != null">amount = #{amount},</if>
-            update_time = #{updateTime}
         </set>
-        WHERE id = #{id} AND is_deleted = 0
+        WHERE order_id = #{orderId} AND is_deleted = 0
     </update>
 
+    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT ID,ORDER_ID,PAYMENT_METHOD,AMOUNT,CREATE_TIME,UPDATE_TIME FROM online_taxi.payment WHERE is_deleted = 0 AND order_id = #{orderId}
+    </select>
 </mapper>

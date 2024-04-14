@@ -1,17 +1,16 @@
 package com.zxy.work.service;
 
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Payment;
 
 public interface PaymentService {
 
-    Object create(Payment payment);
+    int create(Payment payment) throws MyException;
 
-    Object delete(Payment payment);
+    int delete(Integer orderId) throws MyException;
 
-    Object selectByOrderId(Integer orderId);
+    int update(Payment payment) throws MyException;
 
-    Object selectById(Integer id);
-
-    Object update(Payment payment);
+    Payment selectByOrderId(Integer orderId) throws MyException;
 
 }

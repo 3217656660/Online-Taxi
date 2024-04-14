@@ -1,38 +1,34 @@
 package com.zxy.work.service;
 
+import com.zxy.work.entities.ApiResponse;
 import com.zxy.work.entities.Order;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(name = "provider-order-service")
 public interface OrderServiceClient {
 
     @PostMapping("/order/update/create")
-    ResponseEntity<String> create(@RequestBody Order order);
-
+    ApiResponse<String> create(@RequestBody Order order);
 
     @DeleteMapping("/order/update/delete")
-    ResponseEntity<String> delete(@RequestBody Order order);
-
+    ApiResponse<String> delete(@RequestParam("id") Integer id);
 
     @PutMapping("/order/update/message")
-    ResponseEntity<String> update(@RequestBody Order order);
+    ApiResponse<String> update(@RequestBody Order order);
 
+    @GetMapping("/order/getById")
+    ApiResponse<Object> getById(@RequestParam("id") Integer id);
 
-    @GetMapping("/order/get/{id}")
-    ResponseEntity<String> getById(@PathVariable("id")Integer id);
+    @GetMapping("/order/get/user/history")
+    ApiResponse< List<Order> > getByUserId(@RequestParam("userId")Integer userId);
 
+    @GetMapping("/order/get/driver/history")
+    ApiResponse< List<Order> > getByDriverId(@RequestParam("driverId")Integer driverId);
 
-    @GetMapping("/order/get/user/history/{userId}")
-    ResponseEntity<String> getByUserId(@PathVariable("userId")Integer userId);
-
-
-    @GetMapping("/order/get/driver/history/{driverId}")
-    ResponseEntity<String> getByDriverId(@PathVariable("driverId")Integer driverId);
-
-
-    @GetMapping("/order/checkOrder/{userId}")
-    ResponseEntity<String> checkOrder(@PathVariable("userId") Integer userId);
+    @GetMapping("/order/checkOrder")
+    ApiResponse<Order> checkOrder(@RequestParam("userId") Integer userId);
 
 }
