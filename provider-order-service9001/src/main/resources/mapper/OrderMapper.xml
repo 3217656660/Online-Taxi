@@ -22,12 +22,12 @@
 
     <insert id="create" parameterType="Order" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
         insert into online_taxi.order(USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,DISTANCE)
-        values(#{userId},#{driverId},#{startAddress},#{endAddress},#{status},#{distance});
+        values(#{userId},#{driverId},#{startAddress},#{endAddress},0,#{distance});
     </insert>
 
     <update id="delete" parameterType="Integer">
         UPDATE online_taxi.order
-        SET is_deleted = 1
+        SET is_deleted = 1, status = 5
         WHERE id = #{id} AND is_deleted = 0
     </update>
 
