@@ -7,10 +7,10 @@ public interface PaymentService {
 
     int create(Payment payment) throws MyException;
 
-    int delete(Integer orderId) throws MyException;
+    int delete(long orderId) throws MyException;
 
     int update(Payment payment) throws MyException;
 
-    Payment selectByOrderId(Integer orderId) throws MyException;
+    Payment selectByOrderId(long orderId) throws MyException;
 
 }

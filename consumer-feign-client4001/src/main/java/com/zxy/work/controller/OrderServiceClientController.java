@@ -36,21 +36,6 @@ public class OrderServiceClientController {
     }
 
 
-    /**
-     * 取消订单，逻辑删除
-     * @param id 传来的订单id
-     * @return  取消结果
-     */
-    @DeleteMapping("/delete")
-    public ApiResponse<String> delete(@RequestParam("id") Integer id) throws MyException {
-        log.info("取消订单:" + "取消id=" + id);
-        try{
-            return orderServiceClient.delete(id);
-        }catch (Exception e){
-            log.info("msg={}", e.getMessage());
-            throw new MyException(e.getMessage());
-        }
-    }
 
 
     /**
@@ -76,7 +61,7 @@ public class OrderServiceClientController {
      * @return  获取的结果以及数据
      */
     @GetMapping("/getById")
-    public ApiResponse<Object> getById(@RequestParam("id")Integer id) throws MyException {
+    public ApiResponse<Object> getById(@RequestParam("id")long id) throws MyException {
         log.info("通过id获取订单:" + id);
         try{
             return orderServiceClient.getById(id);
@@ -93,7 +78,7 @@ public class OrderServiceClientController {
      * @return  获取的结果以及数据
      */
     @GetMapping("/getByUserId")
-    public ApiResponse<List<Order>>  getByUserId(@RequestParam("userId")Integer userId) throws MyException {
+    public ApiResponse<List<Order>>  getByUserId(@RequestParam("userId")long userId) throws MyException {
         log.info("根据用户Id获取历史订单:" + userId);
         try{
             return orderServiceClient.getByUserId(userId);
@@ -110,7 +95,7 @@ public class OrderServiceClientController {
      * @return  获取的结果以及数据
      */
     @GetMapping("/getByDriverId")
-    public ApiResponse< List<Order> >  getByDriverId(@RequestParam("driverId")Integer driverId) throws MyException {
+    public ApiResponse< List<Order> >  getByDriverId(@RequestParam("driverId")long driverId) throws MyException {
         log.info("根据司机Id获取历史订单:" + driverId);
         try{
             return orderServiceClient.getByDriverId(driverId);

@@ -13,22 +13,19 @@ public interface OrderServiceClient {
     @PostMapping("/order/update/create")
     ApiResponse<String> create(@RequestBody Order order);
 
-    @DeleteMapping("/order/update/delete")
-    ApiResponse<String> delete(@RequestParam("id") Integer id);
-
     @PutMapping("/order/update/message")
     ApiResponse<String> update(@RequestBody Order order);
 
     @GetMapping("/order/getById")
-    ApiResponse<Object> getById(@RequestParam("id") Integer id);
+    ApiResponse<Object> getById(@RequestParam("id") long id);
 
     @GetMapping("/order/get/user/history")
-    ApiResponse< List<Order> > getByUserId(@RequestParam("userId")Integer userId);
+    ApiResponse< List<Order> > getByUserId(@RequestParam("userId")long userId);
 
     @GetMapping("/order/get/driver/history")
-    ApiResponse< List<Order> > getByDriverId(@RequestParam("driverId")Integer driverId);
+    ApiResponse< List<Order> > getByDriverId(@RequestParam("driverId")long driverId);
 
     @GetMapping("/order/checkOrder")
-    ApiResponse<Order> checkOrder(@RequestParam("userId") Integer userId);
+    ApiResponse<Order> checkOrder(@RequestParam("userId") long userId);
 
 }

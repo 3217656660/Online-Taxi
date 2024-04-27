@@ -6,9 +6,9 @@
 <mapper namespace="com.zxy.work.dao.OrderMapper">
 
     <resultMap id="BaseResultMap" type="com.zxy.work.entities.Order">
-        <id column="ID" property="id" jdbcType="INTEGER"/>
-        <result column="USER_ID" property="userId" jdbcType="INTEGER"/>
-        <result column="DRIVER_ID" property="driverId" jdbcType="INTEGER"/>
+        <id column="ID" property="id" jdbcType="NUMERIC"/>
+        <result column="USER_ID" property="userId" jdbcType="NUMERIC"/>
+        <result column="DRIVER_ID" property="driverId" jdbcType="NUMERIC"/>
         <result column="START_ADDRESS" property="startAddress" jdbcType="VARCHAR"/>
         <result column="END_ADDRESS" property="endAddress" jdbcType="VARCHAR"/>
         <result column="STATUS" property="status" jdbcType="INTEGER"/>
@@ -17,7 +17,9 @@
         <result column="END_TIME" property="endTime" jdbcType="DATE"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
         <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
-        <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="VERSION" property="version" jdbcType="NUMERIC"/>
+        <result column="USER_DELETED" property="userDeleted" jdbcType="TINYINT"/>
+        <result column="DRIVER_DELETED" property="driverDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
     <insert id="create" parameterType="Order" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
@@ -25,40 +27,61 @@
         values(#{userId},#{driverId},#{startAddress},#{endAddress},0,#{distance});
     </insert>
 
-    <update id="delete" parameterType="Integer">
+    <update id="deleteByUser" parameterType="Long">
         UPDATE online_taxi.order
-        SET is_deleted = 1, status = 5
-        WHERE id = #{id} AND is_deleted = 0
+        SET user_deleted = 1
+        WHERE id = #{id} AND user_deleted = 0
     </update>
 
-    <update id="update" parameterType="Order" >
+    <update id="deleteByDriver" parameterType="Long">
+        UPDATE online_taxi.order
+        SET driver_deleted = 1
+        WHERE id = #{id} AND driver_deleted = 0
+    </update>
+
+    <update id="update" parameterType="Order">
         UPDATE online_taxi.order
         <set>
             <if test="driverId != null">driver_id = #{driverId},</if>
             <if test="price != null">price = #{price},</if>
             <if test="endTime != null">end_time = #{endTime},</if>
             <if test="status != null">status = #{status},</if>
+            version = #{version} + 1
         </set>
-        WHERE id = #{id} AND is_deleted = 0
+        WHERE id = #{id} AND version = #{version} AND user_deleted = 0 AND driver_deleted = 0
     </update>
 
-    <select id="selectByUserId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME FROM online_taxi.order WHERE is_deleted = 0 AND user_id = #{userId}
+    <select id="selectByUserId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED
+        FROM online_taxi.order WHERE user_deleted = 0 AND user_id = #{userId}
     </select>
 
-    <select id="selectByDriverId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME FROM online_taxi.order WHERE is_deleted = 0 AND driver_id = #{driverId}
+    <select id="selectByDriverId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,DRIVER_DELETED
+        FROM online_taxi.order WHERE driver_deleted = 0 AND driver_id = #{driverId}
     </select>
 
-    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME FROM online_taxi.order WHERE is_deleted = 0 AND id = #{id}
+    <select id="selectByOrderId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
+        FROM online_taxi.order WHERE (user_deleted + driver_deleted) &lt; 2 AND id = #{id}
+    </select>
+
+    <select id="selectByOrderIdWithUser" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
+        FROM online_taxi.order WHERE user_deleted = 0 AND id = #{id}
+    </select>
+
+    <select id="selectByOrderIdWithDriver" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
+        FROM online_taxi.order WHERE driver_deleted = 0 AND id = #{id}
     </select>
 
 <!--    &gt;	表示大于号-->
 <!--    &lt;	表示小于号-->
-    <select id="selectNotSolve" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME FROM online_taxi.order
-                 WHERE is_deleted = 0 AND user_id = #{userId} AND status &lt; 4
+    <select id="selectNotSolve" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION
+        FROM online_taxi.order
+                 WHERE user_deleted = 0 AND driver_deleted = 0 AND user_id = #{userId} AND status &lt; 4
     </select>
 
 </mapper>

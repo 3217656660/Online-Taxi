@@ -10,7 +10,7 @@ public interface UserMapper {
 
     int create(User user);
 
-    int deleteByMobile(@Param("mobile")String mobile);
+    int delete(@Param("id")Long id);
 
     int update(User user);
 

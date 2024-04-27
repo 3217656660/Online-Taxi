@@ -41,7 +41,7 @@ public class PaymentServiceClientController {
      * @return 支付删除结果
      */
     @DeleteMapping("/delete")
-    public ApiResponse<String> delete(@RequestParam("orderId") Integer orderId) throws MyException {
+    public ApiResponse<String> delete(@RequestParam("orderId") long orderId) throws MyException {
         log.info("删除支付：" + orderId);
         try{
             return paymentServiceClient.delete(orderId);
@@ -73,7 +73,7 @@ public class PaymentServiceClientController {
      * @return 查询结果
      */
     @GetMapping("/getByOrderId")
-    public ApiResponse<Object> getByOrderId(@RequestParam("orderId") Integer orderId) throws MyException {
+    public ApiResponse<Object> getByOrderId(@RequestParam("orderId") long orderId) throws MyException {
         log.info("通过订单id获取支付：" + orderId);
         try{
             return paymentServiceClient.getByOrderId(orderId);

@@ -11,16 +11,22 @@ public interface OrderMapper {
 
     int create(Order order);
 
-    int delete(@Param("id") Integer id);
+    int deleteByUser(@Param("id") long id);
+
+    int deleteByDriver(@Param("id") long id);
 
     int update(Order order);
 
-    List<Order> selectByUserId(@Param("userId") Integer userId);
+    List<Order> selectByUserId(@Param("userId") long userId);
 
-    List<Order> selectByDriverId(@Param("driverId") Integer driverId);
+    List<Order> selectByDriverId(@Param("driverId") long driverId);
 
-    Order selectByOrderId(@Param("id") Integer id);
+    Order selectByOrderId(@Param("id") long id);
 
-    Order selectNotSolve(@Param("userId")Integer userId);
+    Order selectByOrderIdWithUser(@Param("id") long id);
+
+    Order selectByOrderIdWithDriver(@Param("id") long id);
+
+    Order selectNotSolve(@Param("userId")long userId);
 
 }

@@ -51,6 +51,8 @@ public class UserController {
     @DeleteMapping("/update/delete")
     public ApiResponse<String> deleteUser(@RequestParam("mobile")String mobile) throws MyException {
         log.info( "用户注销服务提供者：,mobile={}", mobile );
+        //远程调用删除用户相关的所有信息
+
         return userService.deleteByMobile(mobile) == 1
                 ? ApiResponse.success("注销成功")
                 : ApiResponse.error(600, "注销失败");
@@ -114,6 +116,10 @@ public class UserController {
     public ApiResponse<String> logout(@RequestParam("mobile") String mobile){
         log.info( "用户退出登录服务提供者mobile={}", mobile );
         //退出登录需要的处理逻辑
+        //1.使token失效
+        StpUtil.logout(mobile);
+        //2.从redis中移除用户所有信息(消息队列)
+
         return ApiResponse.success("退出登录成功");
     }
 

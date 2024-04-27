@@ -35,14 +35,14 @@ public class ReviewServiceClientController {
 
     /**
      * 删除评论
-     * @param   id 评论id
+     * @param orderId   传来的订单id
      * @return  评论删除结果
      */
     @DeleteMapping("/delete")
-    public ApiResponse<String> delete(@RequestParam("id") Integer id) throws MyException {
-        log.info("删除评论：" + id);
+    public ApiResponse<String> delete(@RequestParam("orderId") Integer orderId) throws MyException {
+        log.info("删除评论：" + orderId);
         try{
-            return reviewServiceClient.delete(id);
+            return reviewServiceClient.delete(orderId);
         }catch (Exception e){
             throw new MyException(e.getMessage());
         }

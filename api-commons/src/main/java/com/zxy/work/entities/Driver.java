@@ -16,14 +16,18 @@ import java.util.Date;
 @Accessors(chain = true)
 public class Driver implements Serializable {
 
-    private Integer id;
+    private long id;
 
     //一个中文两位
     @Size(min = 2, max = 2*10, message = "名字应该在1-10位")
-    private String name;
+    private String username;
 
     @Pattern(regexp = "^1[3456789]\\d{9}$", message = "手机号格式错误")
     private String mobile;
+
+    private String password;
+
+    private String email;
 
     private String carType;
 
@@ -32,6 +36,8 @@ public class Driver implements Serializable {
     private Date createTime;
 
     private Date updateTime;
+
+    private long version;
 
     private Integer isDeleted;
 }

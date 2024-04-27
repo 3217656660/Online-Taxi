@@ -6,38 +6,53 @@
 <mapper namespace="com.zxy.work.dao.UserMapper">
 
     <resultMap id="BaseResultMap" type="com.zxy.work.entities.User">
-        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <id column="ID" property="id" jdbcType="NUMERIC"/>
         <result column="USERNAME" property="username" jdbcType="VARCHAR"/>
         <result column="PASSWORD" property="password" jdbcType="VARCHAR"/>
         <result column="MOBILE" property="mobile" jdbcType="VARCHAR"/>
         <result column="EMAIL" property="email" jdbcType="VARCHAR"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
         <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="VERSION" property="version" jdbcType="NUMERIC"/>
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
     <insert id="create" parameterType="User" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.user(username,password,mobile,email)
+        insert into online_taxi.user(username,`password`,mobile,email)
         values(#{username},#{password},#{mobile},#{email});
     </insert>
 
-    <update id="deleteByMobile" parameterType="String">
-        UPDATE online_taxi.user
+    <update id="delete" parameterType="Long">
+        UPDATE online_taxi.`user`
         SET is_deleted = 1
-        WHERE is_deleted = 0 AND mobile = #{mobile}
+        WHERE is_deleted = 0 AND id = #{id};
+
+        UPDATE online_taxi.`order`
+        SET user_deleted = 1
+        WHERE user_id = #{id};
+
+        UPDATE online_taxi.`payment`
+        SET is_deleted = 1
+        WHERE user_id = #{id};
+
+        UPDATE online_taxi.`review`
+        SET is_deleted = 1
+        WHERE user_id = #{id};
     </update>
 
     <update id="update" parameterType="User">
         UPDATE online_taxi.user
         <set>
             <if test="username != null">username = #{username},</if>
-            <if test="password != null">password = #{password},</if>
+            <if test="password != null">`password` = #{password},</if>
             <if test="email != null">email = #{email},</if>
+            version = #{version} + 1
         </set>
-        WHERE is_deleted = 0 AND mobile = #{mobile}
+        WHERE is_deleted = 0 AND mobile = #{mobile} AND version = #{version}
     </update>
 
     <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
-        SELECT id,username,password,mobile,email,create_time,update_time FROM online_taxi.user WHERE is_deleted = 0 AND mobile = #{mobile}
+        SELECT id,username,`password`,mobile,email,create_time,update_time,version FROM online_taxi.user WHERE is_deleted = 0 AND mobile = #{mobile}
     </select>
+
 </mapper>

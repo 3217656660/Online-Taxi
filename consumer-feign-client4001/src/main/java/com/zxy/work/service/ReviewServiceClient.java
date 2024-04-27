@@ -13,7 +13,7 @@ public interface ReviewServiceClient {
 
 
     @DeleteMapping("/review/update/delete")
-    ApiResponse<String> delete(@RequestParam("id") Integer id);
+    ApiResponse<String> delete(@RequestParam("orderId") Integer id);
 
 
     @GetMapping("/review/getByOrderId")

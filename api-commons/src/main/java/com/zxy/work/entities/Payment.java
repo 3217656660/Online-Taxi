@@ -14,9 +14,11 @@ import java.util.Date;
 @Accessors(chain = true)
 public class Payment implements Serializable {
 
-    private Integer id;
+    private long id;
 
-    private Integer orderId;
+    private long orderId;
+
+    private long userId;
 
     private String paymentMethod;
 
@@ -25,6 +27,8 @@ public class Payment implements Serializable {
     private Date createTime;
 
     private Date updateTime;
+
+    private long version;
 
     private Integer isDeleted;
 

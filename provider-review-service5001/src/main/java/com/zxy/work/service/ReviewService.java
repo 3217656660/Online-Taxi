@@ -7,8 +7,8 @@ public interface ReviewService {
 
     int create(Review review) throws MyException;
 
-    int delete(Integer id) throws MyException;
+    int delete(long orderId) throws MyException;
 
-    Review selectByOrderId(Integer orderId) throws MyException;
+    Review selectByOrderId(long orderId) throws MyException;
 
 }

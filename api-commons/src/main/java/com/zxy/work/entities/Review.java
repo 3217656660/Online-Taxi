@@ -17,9 +17,11 @@ import java.util.Date;
 @Accessors(chain = true)
 public class Review implements Serializable {
 
-    private Integer id;
+    private long id;
 
-    private Integer orderId;
+    private long orderId;
+
+    private long userId;
 
     @Min(value = 1, message = "最低1分")
     @Max(value = 5, message = "最高5分")

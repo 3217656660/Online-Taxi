@@ -6,39 +6,48 @@
 <mapper namespace="com.zxy.work.dao.DriverMapper">
 
     <resultMap id="BaseResultMap" type="com.zxy.work.entities.Driver">
-        <id column="ID" property="id" jdbcType="INTEGER"/>
-        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <id column="ID" property="id" jdbcType="NUMERIC"/>
+        <result column="USERNAME" property="username" jdbcType="VARCHAR"/>
+        <result column="PASSWORD" property="password" jdbcType="VARCHAR"/>
         <result column="MOBILE" property="mobile" jdbcType="VARCHAR"/>
+        <result column="EMAIL" property="email" jdbcType="VARCHAR"/>
         <result column="CAR_TYPE" property="carType" jdbcType="VARCHAR"/>
         <result column="CAR_NUMBER" property="carNumber" jdbcType="VARCHAR"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
         <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="VERSION" property="version" jdbcType="NUMERIC"/>
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
     <insert id="create" parameterType="Driver" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.driver(NAME,MOBILE,CAR_TYPE,CAR_NUMBER)
-        values(#{name},#{mobile},#{carType},#{carNumber});
+        insert into online_taxi.driver(USERNAME,PASSWORD,MOBILE,EMAIL,CAR_TYPE,CAR_NUMBER)
+        values(#{username},#{password},#{mobile},#{email},#{carType},#{carNumber});
     </insert>
 
-    <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
-        SELECT ID,NAME,MOBILE,CAR_TYPE,CAR_NUMBER,CREATE_TIME,UPDATE_TIME FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
-    </select>
+    <update id="delete" parameterType="Long">
+        UPDATE online_taxi.`driver`
+        SET is_deleted = 1
+        WHERE is_deleted = 0 AND id = #{id};
+
+        UPDATE online_taxi.`order`
+        SET driver_deleted = 1
+        WHERE driver_id = #{id};
+    </update>
 
     <update id="update" parameterType="Driver">
         UPDATE online_taxi.driver
         <set>
-            <if test="name != null">name = #{name},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
             <if test="carType != null">car_type = #{carType},</if>
             <if test="carNumber != null">car_number = #{carNumber},</if>
+            version = #{version} + 1
         </set>
-        WHERE is_deleted = 0 AND mobile = #{mobile}
+        WHERE is_deleted = 0 AND mobile = #{mobile} AND version = #{version}
     </update>
 
-    <update id="delete" parameterType="String">
-        UPDATE online_taxi.driver
-        SET is_deleted = 1
-        WHERE is_deleted = 0 AND mobile = #{mobile}
-    </update>
+    <select id="selectByMobile" parameterType="String" resultMap="BaseResultMap">
+        SELECT ID,USERNAME,MOBILE,PASSWORD,EMAIL,CAR_TYPE,CAR_NUMBER,CREATE_TIME,UPDATE_TIME,VERSION FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
+    </select>
 
 </mapper>

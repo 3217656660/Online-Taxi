@@ -6,21 +6,23 @@
 <mapper namespace="com.zxy.work.dao.PaymentMapper">
 
     <resultMap id="BaseResultMap" type="com.zxy.work.entities.Payment">
-        <id column="ID" property="id" jdbcType="INTEGER"/>
-        <result column="ORDER_ID" property="orderId" jdbcType="INTEGER"/>
+        <id column="ID" property="id" jdbcType="NUMERIC"/>
+        <result column="ORDER_ID" property="orderId" jdbcType="NUMERIC"/>
+        <result column="USER_ID" property="userId" jdbcType="NUMERIC"/>
         <result column="PAYMENT_METHOD" property="paymentMethod" jdbcType="VARCHAR"/>
         <result column="AMOUNT" property="amount" jdbcType="FLOAT"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
         <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <result column="VERSION" property="version" jdbcType="NUMERIC"/>
         <result column="IS_DELETED" property="isDeleted" jdbcType="TINYINT"/>
     </resultMap>
 
     <insert id="create" parameterType="Payment" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.payment(ORDER_ID,PAYMENT_METHOD,AMOUNT)
-        values(#{orderId},#{paymentMethod},#{amount});
+        insert into online_taxi.payment(ORDER_ID,USER_ID,PAYMENT_METHOD,AMOUNT)
+        values(#{orderId},#{userId},#{paymentMethod},#{amount});
     </insert>
 
-    <update id="delete" parameterType="Integer">
+    <update id="delete" parameterType="Long">
         UPDATE online_taxi.payment
         SET is_deleted = 1
         WHERE is_deleted = 0 AND order_id = #{orderId} AND amount > 0
@@ -31,11 +33,12 @@
         <set>
             <if test="paymentMethod != null">payment_method = #{paymentMethod},</if>
             <if test="amount != null">amount = #{amount},</if>
+            version = #{version} + 1
         </set>
-        WHERE order_id = #{orderId} AND is_deleted = 0
+        WHERE order_id = #{orderId} AND is_deleted = 0 AND version = #{version}
     </update>
 
-    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT ID,ORDER_ID,PAYMENT_METHOD,AMOUNT,CREATE_TIME,UPDATE_TIME FROM online_taxi.payment WHERE is_deleted = 0 AND order_id = #{orderId}
+    <select id="selectByOrderId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,ORDER_ID,USER_ID,PAYMENT_METHOD,AMOUNT,CREATE_TIME,UPDATE_TIME,VERSION FROM online_taxi.payment WHERE is_deleted = 0 AND order_id = #{orderId}
     </select>
 </mapper>

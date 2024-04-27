@@ -8,10 +8,16 @@ import com.zxy.work.service.UserService;
 import com.zxy.work.util.cache.CacheUtil;
 import com.zxy.work.util.encode.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -22,6 +28,10 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private CacheUtil redisUtil;
+
+    @Resource
+    private KafkaTemplate<String, String> kafkaTemplate;
+
 
     /**
      * 设置通用缓存TTL(30分钟)
@@ -34,6 +44,27 @@ public class UserServiceImpl implements UserService {
     private static final String commonKey = "user:mobile:";
 
     /**
+     * kafka topic name
+     */
+    private static final String TOPIC_NAME = "users";
+
+    /**
+     * 设置缓存消息key
+     */
+    private static final String MQ_SET_CACHE_KEY = "setCache";
+
+    /**
+     * 移除缓存消息key
+     */
+    private static final String MQ_REMOVE_CACHE_KEY = "removeCache";
+
+    /**
+     * 用于不需要指定顺序的消息随机分区
+     */
+    private static final Random random = new Random();
+
+
+    /**
      * 用户注册
      * @param user 传来的用户信息
      * @return  注册结果
@@ -41,7 +72,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public int create(User user) throws MyException {
-        String key = commonKey + user.getMobile();
         //先检查手机号是否已经注册
         User registeredUser;
         try{
@@ -50,8 +80,7 @@ public class UserServiceImpl implements UserService {
             log.error("手机号查询用户异常，msg={}", e.getMessage());
             throw new MyException("手机号查询用户出现异常");
         }
-
-        if ( registeredUser != null){
+        if (registeredUser != null){
             log.info("手机号={}，已经注册", registeredUser.getMobile());
             throw new MyException("手机号已经注册过了");
         }
@@ -61,10 +90,9 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodedPassword);
         try{
             int result = userMapper.create(user);
-            if (result == 1){
-                User select = userMapper.selectByMobile(user.getMobile());
-                redisUtil.set(key, select.setPassword("******"), cacheTTL);
-                log.info("key={}已经在注册成功后放入缓存", key);
+            if (result == 1) {
+                //随机分发到0-2分区
+                kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, user.getMobile());
             }
             return result;
         }catch (Exception e){
@@ -83,14 +111,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public int deleteByMobile(String mobile) throws MyException{
         //先检查手机号是否已经注册
-        selectByMobile(mobile);
-        //删除所有用户相关内容
-        String key = commonKey + mobile;
+        User registeredUser;
         try{
-            int result = userMapper.deleteByMobile(mobile);
-            if (result == 1){
-                redisUtil.del(key);
-                log.info("删除了key={}的缓存信息", key);
+            registeredUser = userMapper.selectByMobile(mobile);
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+        if (registeredUser == null){
+            log.info("手机号={}，未注册", mobile);
+            throw new MyException("手机号未注册");
+        }
+
+        try{
+            int result = userMapper.delete(registeredUser.getId());
+            if (result > 0){
+                kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_REMOVE_CACHE_KEY, mobile);
             }
             return result;
         }catch (Exception e){
@@ -109,14 +145,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public int update(User user) throws MyException{
         //先检查手机号是否已经注册
-        String key = commonKey + user.getMobile();
-        selectByMobile(user.getMobile());
+        User registeredUser;
         try{
-            int result = userMapper.update(user);
+            registeredUser = userMapper.selectByMobile(user.getMobile());
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+        if (registeredUser == null){
+            log.info("手机号={}，未注册", user.getMobile());
+            throw new MyException("手机号未注册");
+        }
+
+        try{//注意此方法不允许用户修改密码
+            int result = userMapper.update(user.setPassword(null).setVersion(registeredUser.getVersion()));
             if (result == 1){
-                User select = userMapper.selectByMobile(user.getMobile());
-                redisUtil.set(key, select.setPassword("******"), cacheTTL);
-                log.info("用户信息key={}更新，重新设置了缓存中的信息", key);
+                kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, user.getMobile());
             }
             return result;
         }catch (Exception e){
@@ -131,15 +175,17 @@ public class UserServiceImpl implements UserService {
      * @param mobile 传来的电话号
      * @return  查询结果
      */
+    @Transactional(readOnly = true)
     @Override
     public User selectByMobile(String mobile) throws MyException{
+        //查缓存
         String key = commonKey + mobile;
         Object tempUser = redisUtil.get(key);
         if (tempUser != null){
-            redisUtil.set(key, tempUser, cacheTTL);
+            kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, mobile);
             return (User) tempUser;
         }
-
+        //查数据库
         User user;
         try{
             user = userMapper.selectByMobile(mobile);
@@ -152,7 +198,7 @@ public class UserServiceImpl implements UserService {
             log.info("手机号={}，未注册", mobile);
             throw new MyException("该手机号未注册");
         }
-        redisUtil.set(key, user, cacheTTL);
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, mobile);
         return user;
     }
 
@@ -162,19 +208,27 @@ public class UserServiceImpl implements UserService {
      * @param user 传来的用户数据
      * @return  登录结果
      */
+    @Transactional(readOnly = true)
     @Override
     public boolean login(User user) throws MyException {
-        String key = commonKey + user.getMobile();
-        User resultUser = selectByMobile(user.getMobile());
+        User resultUser;
+        try{
+            resultUser = userMapper.selectByMobile(user.getMobile());
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+        if (resultUser == null){
+            log.info("手机号={}，未注册", user.getMobile());
+            throw new MyException("该手机号未注册");
+        }
+
         //匹配密码
         String inputPassword = user.getPassword();
         String encodedPassword = resultUser.getPassword();
         boolean matches = PasswordEncoder.matches(inputPassword, encodedPassword);
-        if (matches){
-            User select = userMapper.selectByMobile(user.getMobile());
-            redisUtil.set(key, select.setPassword("******"), cacheTTL);
-            log.info("用户登录成功，设置key={}至缓存中", key);
-        }
+        if (matches)
+            kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, user.getMobile());
         return matches;
     }
 
@@ -189,7 +243,17 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException {
-        User resultUser = selectByMobile(mobile);
+        User resultUser;
+        try{
+            resultUser = userMapper.selectByMobile(mobile);
+        }catch (Exception e){
+            log.error("手机号查询用户异常，msg={}", e.getMessage());
+            throw new MyException("手机号查询用户出现异常");
+        }
+        if (resultUser == null){
+            log.info("手机号={}，未注册", mobile);
+            throw new MyException("该手机号未注册");
+        }
 
         String encodedOldPassword = resultUser.getPassword();
         boolean matches = PasswordEncoder.matches(inputOldPassword, encodedOldPassword);
@@ -200,11 +264,42 @@ public class UserServiceImpl implements UserService {
         //加密新密码
         String newEncodedPassword = PasswordEncoder.encode(newPassword);
         try{
-            return userMapper.update(new User().setMobile(mobile).setPassword(newEncodedPassword));
+            return userMapper.update(
+                    new User()
+                            .setMobile(mobile)
+                            .setPassword(newEncodedPassword)
+                            .setVersion(resultUser.getVersion())
+            );
         }catch (Exception e){
             log.error("手机号修改用户密码异常，msg={}", e.getMessage());
             throw new MyException("修改用户密码异常");
         }
+    }
+
+
+    /**
+     * 消费者监听器
+     * @param record 生产者传来的数据
+     * @param ack 回复
+     */
+    @KafkaListener(topics = TOPIC_NAME, groupId = "myGroup")
+    public void listen(ConsumerRecord<String, String> record, Acknowledgment ack){
+        //消息分类
+        if (Objects.equals(record.key(), MQ_SET_CACHE_KEY)){//设置缓存
+            String mobile = record.value();
+            String key = commonKey + mobile;
+            User user = userMapper.selectByMobile(mobile);
+            redisUtil.set(key, user.setPassword("******"), cacheTTL);
+            log.info("key={}已经放入缓存", key);
+        }else if (Objects.equals(record.key(), MQ_REMOVE_CACHE_KEY)){//移除缓存
+            String mobile = record.value();
+            String key = commonKey + mobile;
+            redisUtil.del(key);
+            log.info("key={}已经移除缓存", key);
+        }
+        //手动提交
+        ack.acknowledge();
+        log.info("offset={}手动提交成功", record.offset());
     }
 
 }

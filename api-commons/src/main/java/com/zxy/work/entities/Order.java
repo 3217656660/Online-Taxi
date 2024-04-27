@@ -14,11 +14,11 @@ import java.util.Date;
 @Accessors(chain = true)
 public class Order implements Serializable {
 
-    private Integer id;
+    private long id;
 
-    private Integer userId;
+    private long userId;
 
-    private Integer driverId;
+    private long driverId;
 
     private String startAddress;
 
@@ -36,6 +36,10 @@ public class Order implements Serializable {
 
     private Date updateTime;
 
-    private Integer isDeleted;
+    private long version;
+
+    private Integer userDeleted;
+
+    private Integer driverDeleted;
 
 }

@@ -46,16 +46,16 @@ public class ReviewServiceImpl implements ReviewService {
 
     /**
      * 删除评论
-     * @param id 评论id
+     * @param orderId 评论的订单id
      * @return 删除结果
      */
     @Transactional
     @Override
-    public int delete(Integer id) throws MyException {
+    public int delete(long orderId) throws MyException {
         try{
-            return reviewMapper.delete(id);
+            return reviewMapper.delete(orderId);
         }catch (Exception e){
-            log.error("删除评论出现异常,id={}", id);
+            log.error("删除评论出现异常,id={}", orderId);
             throw new MyException("删除评论出现异常");
         }
     }
@@ -66,8 +66,9 @@ public class ReviewServiceImpl implements ReviewService {
      * @param orderId 订单id
      * @return 查询结果
      */
+    @Transactional(readOnly = true)
     @Override
-    public Review selectByOrderId(Integer orderId) throws MyException {
+    public Review selectByOrderId(long orderId) throws MyException {
         try{
             return  reviewMapper.selectByOrderId(orderId);
         }catch (Exception e){

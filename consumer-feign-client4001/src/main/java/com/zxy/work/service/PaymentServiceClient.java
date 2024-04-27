@@ -13,12 +13,12 @@ public interface PaymentServiceClient {
     ApiResponse<String> create(@RequestBody Payment payment);
 
     @DeleteMapping("/payment/update/delete")
-    ApiResponse<String> delete(@RequestParam("orderId") Integer orderId);
+    ApiResponse<String> delete(@RequestParam("orderId") long orderId);
 
     @PutMapping("/payment/update/message")
     ApiResponse<String> update(@RequestBody Payment payment);
 
     @GetMapping("/payment/getByOrderId")
-    ApiResponse<Object> getByOrderId(@RequestParam("orderId")Integer orderId);
+    ApiResponse<Object> getByOrderId(@RequestParam("orderId")long orderId);
 
 }

@@ -1,6 +1,9 @@
 package com.zxy.work.entities;
 
-public class MyException extends Exception{
+/**
+ * 自定义异常
+ */
+public class MyException extends RuntimeException{
     private final String errorMessage;
 
     public MyException(String errorMessage) {

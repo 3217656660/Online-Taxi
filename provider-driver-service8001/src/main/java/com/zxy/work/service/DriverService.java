@@ -3,6 +3,7 @@ package com.zxy.work.service;
 
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
+import com.zxy.work.entities.User;
 
 
 public interface DriverService {
@@ -14,5 +15,9 @@ public interface DriverService {
     int update(Driver driver) throws MyException;
 
     Driver selectByMobile(String mobile) throws MyException;
+
+    boolean login(Driver driver) throws MyException;
+
+    int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException;
 
 }

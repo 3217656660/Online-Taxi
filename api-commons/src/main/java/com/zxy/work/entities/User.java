@@ -17,7 +17,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class User implements Serializable {
 
-    private Integer id;
+    private long id;
 
     @Size(min = 6, max = 10, message = "用户名长度应在6-10位")
     private String username;
@@ -35,18 +35,8 @@ public class User implements Serializable {
 
     private Date updateTime;
 
+    private long version;
+
     private Integer isDeleted;
-
-
-    public User(Integer id, String password) {
-        this.id = id;
-        this.password = password;
-    }
-
-    public User(String mobile, String password){
-        this.mobile = mobile;
-        this.password = password;
-    }
-
 
 }

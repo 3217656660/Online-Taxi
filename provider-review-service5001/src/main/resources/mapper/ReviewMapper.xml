@@ -6,8 +6,9 @@
 <mapper namespace="com.zxy.work.dao.ReviewMapper">
 
     <resultMap id="BaseResultMap" type="com.zxy.work.entities.Review">
-        <id column="ID" property="id" jdbcType="INTEGER"/>
-        <result column="ORDER_ID" property="orderId" jdbcType="INTEGER"/>
+        <id column="ID" property="id" jdbcType="NUMERIC"/>
+        <result column="ORDER_ID" property="orderId" jdbcType="NUMERIC"/>
+        <result column="USER_ID" property="userId" jdbcType="NUMERIC"/>
         <result column="RATING" property="rating" jdbcType="INTEGER"/>
         <result column="COMMENT" property="comment" jdbcType="VARCHAR"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
@@ -16,8 +17,8 @@
     </resultMap>
 
     <insert id="create" parameterType="Review" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.review(ORDER_ID,RATING,COMMENT)
-        values(#{orderId},#{rating},#{comment});
+        insert into online_taxi.review(ORDER_ID,USER_ID,RATING,COMMENT)
+        values(#{orderId},#{userId},#{rating},#{comment});
     </insert>
 
     <update id="delete" parameterType="Review" keyProperty="id">
@@ -26,8 +27,8 @@
         WHERE order_id = #{orderId}
     </update>
 
-    <select id="selectByOrderId" parameterType="Integer" resultMap="BaseResultMap">
-        SELECT ID,ORDER_ID,RATING,COMMENT,CREATE_TIME,UPDATE_TIME FROM online_taxi.review WHERE is_deleted = 0 AND order_id = #{orderId}
+    <select id="selectByOrderId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,ORDER_ID,USER_ID,RATING,COMMENT,CREATE_TIME,UPDATE_TIME FROM online_taxi.review WHERE is_deleted = 0 AND order_id = #{orderId}
     </select>
 
 </mapper>

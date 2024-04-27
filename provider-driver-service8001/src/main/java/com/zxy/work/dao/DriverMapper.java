@@ -9,7 +9,7 @@ public interface DriverMapper {
 
     int create(Driver driver);
 
-    int delete(@Param("mobile") String mobile);
+    int delete(@Param("id")Long id);
 
     int update(Driver driver);
 

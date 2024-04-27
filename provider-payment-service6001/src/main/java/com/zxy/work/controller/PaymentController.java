@@ -37,7 +37,7 @@ public class PaymentController {
      * @return 支付删除结果
      */
     @DeleteMapping("/update/delete")
-    public ApiResponse<String> deletePayment(@RequestParam("orderId") Integer orderId) throws MyException {
+    public ApiResponse<String> deletePayment(@RequestParam("orderId") long orderId) throws MyException {
         log.info("删除支付服务提供者：" + orderId);
         return paymentService.delete(orderId) == 1
                 ? ApiResponse.success("支付删除成功")
@@ -63,7 +63,7 @@ public class PaymentController {
      * @return 查询结果
      */
     @GetMapping("/getByOrderId")
-    public ApiResponse<Object> getPaymentByOrderId(@RequestParam("orderId")Integer orderId) throws MyException {
+    public ApiResponse<Object> getPaymentByOrderId(@RequestParam("orderId")long orderId) throws MyException {
         log.info("通过订单id获取支付服务提供者：" + orderId);
         Payment payment = paymentService.selectByOrderId(orderId);
         return payment != null
