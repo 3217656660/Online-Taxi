@@ -20,5 +20,5 @@ public class NotificationMessage implements Serializable {
     // 消息内容
     private Object content;
     // 目标用户ID
-    private Integer userId;
+    private Long userId;
 }

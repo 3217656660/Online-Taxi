@@ -179,8 +179,19 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public int update(Order order) throws MyException{
+        Order dataBaseOrder;
         try{
-            int result = orderMapper.update(order);
+            dataBaseOrder = orderMapper.selectByOrderId(order.getId());
+        }catch (Exception e){
+            log.error("用户通过订单id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("用户通过订单id的订单查询异常");
+        }
+        if (dataBaseOrder == null){
+            throw new MyException("订单信息不存在");
+        }
+
+        try{
+            int result = orderMapper.update(order.setVersion(dataBaseOrder.getVersion()));
             if (result == 1){
                 kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, String.valueOf(order.getId()));
             }

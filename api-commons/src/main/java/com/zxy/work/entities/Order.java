@@ -22,7 +22,15 @@ public class Order implements Serializable {
 
     private String startAddress;
 
+    private Double startLatitude;
+
+    private Double startLongitude;
+
     private String endAddress;
+
+    private Double endLatitude;
+
+    private Double endLongitude;
 
     private Integer status;//订单状态（0-待接单；1-待出发；2-行驶中；3-待支付；4-已完成；5-已取消）
 

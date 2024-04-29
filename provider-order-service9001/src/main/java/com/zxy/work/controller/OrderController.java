@@ -1,15 +1,25 @@
 package com.zxy.work.controller;
 
 import com.zxy.work.entities.ApiResponse;
+import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
 import com.zxy.work.service.OrderService;
+import com.zxy.work.util.MyString;
+import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @Slf4j
@@ -19,12 +29,61 @@ public class OrderController {
     @Resource
     private OrderService orderService;
 
+    @Resource
+    private KafkaTemplate<String ,String> kafkaTemplate;
+
+    @Resource
+    private CacheUtil redisUtil;
+
+
+    /**
+     * kafka topic name
+     */
+    private static final String TOPIC_NAME = "main";
+
+    /**
+     * 创建订单后处理消息key
+     */
+    private static final String MQ_CREATE_ORDER_KEY = "createOrder";
+
+    /**
+     * 取消订单后处理消息key
+     */
+    private static final String MQ_CANCEL_ORDER_KEY = "cancelOrder";
+
+    /**
+     * 司机接单后处理消息key
+     */
+    private static final String MQ_ACCEPT_ORDER_KEY = "acceptOrder";
+
+    /**
+     * 司机到达指定开始地点后处理消息key
+     */
+    private static final String MQ_ARRIVE_START_ADDRESS_KEY = "arriverStartAddress";
+
+    /**
+     * 开始驾驶到终点后处理消息key
+     */
+    private static final String MQ_TO_END_ADDRESS_KEY = "toEndAddress";
+
+    /**
+     * 到终点后处理消息key
+     */
+    private static final String MQ_ARRIVE_END_ADDRESS_KEY = "arriveEndAddress";
+
+
+    /**
+     * 用于不需要指定顺序的消息随机分区
+     */
+    private static final Random random = new Random();
+
 
     /**
      * 创建订单
      * @param order 传来的用户信息json
      * @return 创建结果
      */
+    @Deprecated
     @PostMapping("/update/create")
     public ApiResponse<String> createOrder(@RequestBody Order order) throws MyException {
         log.info("创建订单服务提供者:" + order);
@@ -146,6 +205,129 @@ public class OrderController {
     public ApiResponse<Order> checkOrder(@RequestParam("userId") long userId) throws MyException {
         log.info("检查是否有未解决的订单userId={}", userId);
         return ApiResponse.success(orderService.selectNotSolve(userId));
+    }
+
+
+    //-------------------------------------------复杂业务-------------------------------------------
+    //用户下单：先创建订单、同时带着开始地经纬度和结束地经纬度放入缓存，并实现10分钟倒计数，倒计数结束未接单自动关闭订单并移除缓存，被接单时通知用户并停止倒计时
+    @PostMapping("/createOrderByUser")
+    public ApiResponse<String> createOrderByUser(@RequestBody Order order) throws MyException {
+        //1.创建订单
+        int creatResult = orderService.create(order);
+        if (creatResult == 0){
+            return ApiResponse.error(600, "订单创建失败");
+        }
+        //2.开始地经纬度放入缓存，并实现10分钟倒计数
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_CREATE_ORDER_KEY, String.valueOf(order.getUserId()));
+        return ApiResponse.success("订单创建成功");
+    }
+
+
+    //用户取消status小于2的订单：传订单id，从缓存中或数据库查询订单信息，如果status小于2则，更新订单并取消，同时推送给司机。如果status大于2，订单不可取消
+    @PostMapping("/cancelOrderByUser")
+    public ApiResponse<String> cancelOrderByUser(@RequestParam("id") Long id) throws MyException{
+        Order order = orderService.selectByOrderIdWithUser(id);
+        if (order == null)
+            return ApiResponse.error(600, "订单取消失败，订单不存在");
+        else if (order.getStatus() >= 2 && order.getStatus() < 5)
+            return ApiResponse.error(600, "订单已经无法取消");
+        else if (order.getStatus() == 5)
+            return ApiResponse.error(600, "订单已经取消过了");
+
+        int update = orderService.update(order.setStatus(5));
+        if (update == 0)
+            return ApiResponse.error(600, "订单取消失败，请稍后重试");
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_CANCEL_ORDER_KEY, String.valueOf(id));
+        return ApiResponse.success("订单取消成功");
+    }
+
+
+    //司机查询可接单列表：传来司机当前位置经纬度放入缓存，从缓存中查出订单开始位置距离司机位置小于20km的订单列表返回给司机
+    @GetMapping("/getAcceptList")
+    public ApiResponse<Object> getAcceptList(@RequestBody Driver driver)throws MyException {
+        //1.从redis中查询出起始点距离司机当前位置小于20km的订单
+        List<GeoResult<RedisGeoCommands.GeoLocation<Object>>> geoResults = redisUtil.georadius(
+                "position",
+                driver.getLongitude(),
+                driver.getLatitude(),
+                20 * 1000
+        );
+        if (geoResults == null)
+            return ApiResponse.error(600, "当前没有可接订单");
+
+        List<Order> orderList = new ArrayList<>();
+        for (GeoResult<RedisGeoCommands.GeoLocation<Object>>  geoResult: geoResults) {
+            String name = (String) geoResult.getContent().getName();
+            String idStr = name.split(":")[2];
+            //拿出未被接单的订单
+            Object temp = redisUtil.get("order:id:" + idStr);
+            if (temp == null) continue;
+            orderList.add((Order) temp);
+        }
+        return ApiResponse.success(orderList);
+    }
+
+
+    //司机接单：传来要接的订单信息，更新订单，如果更新失败则被别人接单或者订单被取消，如果成功则推送消息给用户，同时返回司机接单成功
+    @PutMapping("/acceptOrder")
+    public ApiResponse<String> acceptOrder(@RequestBody Order order) throws MyException{
+        String key = "order:id:" + order.getId();
+        Object result = redisUtil.get(key);
+        if (result == null){
+            return ApiResponse.error(600, "订单已失效");
+        }
+        Order redisOrder = (Order) result;
+        if (redisOrder.getDriverId() != 0)
+            return ApiResponse.error(600, "非常抱歉订单已被他人接单");
+        else if (redisOrder.getStatus() == 5) {
+            return ApiResponse.error(600, "订单已被取消");
+        }
+        int update = orderService.update(order.setStatus(1));
+        if (update == 0){
+            return ApiResponse.error(600, "非常抱歉,接单失败");
+        }
+        //锁定订单
+        redisUtil.del(key);
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_ACCEPT_ORDER_KEY, String.valueOf(order.getId()));
+        return ApiResponse.success("接单成功");
+    }
+
+
+    //司机到达指定接单位置：传来订单信息，并推送给用户，同时司机需要输入系统提供给用户的四位随机数字才能开始行驶状态，输入成功后也推送给用户
+    @PostMapping("/arriverStartAddress")
+    public ApiResponse<String> arriverStartAddress(@RequestParam("id")Long id)throws MyException{
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_ARRIVE_START_ADDRESS_KEY, String.valueOf(id));
+        return ApiResponse.success("请等待乘客提供给你四位数字");
+    }
+
+
+    //司机验证四位验证码
+    @PostMapping("/verityCode")
+    public ApiResponse<String> verityCode(@RequestParam("id")Integer id, @RequestParam("code")int code)throws MyException{
+        String verityKey = "order:verity:id:" + id;
+        int result = (int)redisUtil.get(verityKey);
+        //验证失败:
+        if (result != code){
+            return ApiResponse.error(600, "验证失败");
+        }
+        int update = orderService.update(new Order().setId(id).setStatus(2));
+        if (update == 1)
+            kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_TO_END_ADDRESS_KEY, String.valueOf(id));
+        return update == 1
+                ? ApiResponse.success("请等待乘客提供给你四位数字")
+                : ApiResponse.error(600, "请勿重复验证");
+    }
+
+
+    //到达终点时：传来订单信息，更改订单状态，更新成功则创建支付并推送给用户行程结束
+    @PostMapping("/arriveEndAddress")
+    public ApiResponse<String> arriveEndAddress(@RequestParam("id") Integer id)throws MyException{
+        int update = orderService.update(new Order().setId(id).setStatus(3));
+        if (update == 0){
+            return ApiResponse.error(600, "请勿重复点击已到达");
+        }
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_ARRIVE_END_ADDRESS_KEY, String.valueOf(id));
+        return ApiResponse.success("到达终点成功");
     }
 
 }

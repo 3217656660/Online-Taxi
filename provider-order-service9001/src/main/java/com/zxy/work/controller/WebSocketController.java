@@ -1,8 +1,6 @@
-/*
 package com.zxy.work.controller;
 
 import com.zxy.work.entities.NotificationMessage;
-import com.zxy.work.util.cache.CacheUtil;
 import com.zxy.work.vo.DriverActionTakeOrderVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,24 +16,19 @@ import java.util.List;
 public class WebSocketController {
 
     @Resource
-    private CacheUtil redisUtil;//抽象缓存工具类，以便框架替换
-
-    @Resource
     private SimpMessagingTemplate messagingTemplate;
 
-    */
-/**
+
+    /**
      * 待司机接单成功后，为用户更新司机位置
      * @param driverActionTakeOrderVo 司机端传来的信息
-     *//*
-
+     */
     @MessageMapping("/sendLocation")
     public void sendLocation(DriverActionTakeOrderVo driverActionTakeOrderVo) {
         List<Double> location = new ArrayList<>();
         assert driverActionTakeOrderVo != null;
         location.add(driverActionTakeOrderVo.getNowAddressLongitude());
         location.add(driverActionTakeOrderVo.getNowAddressLatitude());
-
         NotificationMessage message = new NotificationMessage();
         message.setType("locationUpdate")
                 .setContent(location)
@@ -45,9 +38,8 @@ public class WebSocketController {
                 "/queue/locationUpdate/notifications",
                 message
         );
+        log.info("将司机位置={}推送给用户", location);
     }
 
 
-
 }
-*/

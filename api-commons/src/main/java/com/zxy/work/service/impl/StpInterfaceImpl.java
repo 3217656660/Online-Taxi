@@ -21,7 +21,7 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
         List<String> list = new ArrayList<>();
-        list.add("101");
+        //list.add("101");
         return list;
     }
 
@@ -33,15 +33,12 @@ public class StpInterfaceImpl implements StpInterface {
         List<String> list = new ArrayList<>();
         if (Objects.equals(loginType, "user"))
             list.add("user");
-        else if (Objects.equals(loginType, "driver")) {
-            list.add("user");
+        else if (Objects.equals(loginType, "driver"))
             list.add("driver");
-        }
-        else {
-            list.add("driver");
-            list.add("user");
+        else if (Objects.equals(loginType, "admin"))
             list.add("admin");
-        }
+        else
+            list.add("anonymous");
         return list;
     }
 

@@ -10,7 +10,11 @@
         <result column="USER_ID" property="userId" jdbcType="NUMERIC"/>
         <result column="DRIVER_ID" property="driverId" jdbcType="NUMERIC"/>
         <result column="START_ADDRESS" property="startAddress" jdbcType="VARCHAR"/>
+        <result column="START_LATITUDE" property="startLatitude" jdbcType="DOUBLE"/>
+        <result column="START_LONGITUDE" property="startLongitude" jdbcType="DOUBLE"/>
         <result column="END_ADDRESS" property="endAddress" jdbcType="VARCHAR"/>
+        <result column="END_LATITUDE" property="endLatitude" jdbcType="DOUBLE"/>
+        <result column="END_LONGITUDE" property="endLongitude" jdbcType="DOUBLE"/>
         <result column="STATUS" property="status" jdbcType="INTEGER"/>
         <result column="PRICE" property="price" jdbcType="FLOAT"/>
         <result column="DISTANCE" property="distance" jdbcType="DOUBLE"/>
@@ -23,8 +27,8 @@
     </resultMap>
 
     <insert id="create" parameterType="Order" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.order(USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,DISTANCE)
-        values(#{userId},#{driverId},#{startAddress},#{endAddress},0,#{distance});
+        insert into online_taxi.order(USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,DISTANCE)
+        values(#{userId},#{driverId},#{startAddress},#{startLatitude},#{startLongitude},#{endAddress},#{endLatitude},#{endLongitude},0,#{distance});
     </insert>
 
     <update id="deleteByUser" parameterType="Long">
@@ -52,34 +56,34 @@
     </update>
 
     <select id="selectByUserId" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED
         FROM online_taxi.order WHERE user_deleted = 0 AND user_id = #{userId}
     </select>
 
     <select id="selectByDriverId" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,DRIVER_DELETED
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION,DRIVER_DELETED
         FROM online_taxi.order WHERE driver_deleted = 0 AND driver_id = #{driverId}
     </select>
 
     <select id="selectByOrderId" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
         FROM online_taxi.order WHERE (user_deleted + driver_deleted) &lt; 2 AND id = #{id}
     </select>
 
     <select id="selectByOrderIdWithUser" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED
         FROM online_taxi.order WHERE user_deleted = 0 AND id = #{id}
     </select>
 
     <select id="selectByOrderIdWithDriver" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION,DRIVER_DELETED
         FROM online_taxi.order WHERE driver_deleted = 0 AND id = #{id}
     </select>
 
 <!--    &gt;	表示大于号-->
 <!--    &lt;	表示小于号-->
     <select id="selectNotSolve" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,END_ADDRESS,STATUS,PRICE,DISTANCE,END_TIME,VERSION
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION
         FROM online_taxi.order
                  WHERE user_deleted = 0 AND driver_deleted = 0 AND user_id = #{userId} AND status &lt; 4
     </select>

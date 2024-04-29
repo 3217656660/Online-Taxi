@@ -66,6 +66,16 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.zxy.work.entities  #所有Entity别名类所在包
 
+alipay:
+  #APPID
+  appId: ${zfb.appId}
+  #应用私钥
+  appPrivateKey: ${zfb.appPrivateKey}
+  #支付宝公钥
+  alipayPublicKey: ${zfb.alipayPublicKey}
+  #网关
+  gatewayUrl: ${zfb.gatewayUrl}
+
 # 配置 sa-token
 sa-token:
   token-style: uuid

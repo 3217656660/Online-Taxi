@@ -33,6 +33,10 @@ public class Driver implements Serializable {
 
     private String carNumber;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private Date createTime;
 
     private Date updateTime;
