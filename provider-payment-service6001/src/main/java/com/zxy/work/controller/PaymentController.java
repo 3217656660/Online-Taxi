@@ -123,7 +123,7 @@ public class PaymentController {
      * @return 返回支付结果
      */
     @GetMapping("/return")
-    @ResponseBody
+    //@ResponseBody
     public ApiResponse<String> handleReturn(
             @RequestParam("out_trade_no") String out_trade_no,
             @RequestParam("total_amount") String total_amount,

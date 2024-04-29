@@ -1,5 +1,6 @@
 package com.zxy.work.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zxy.work.entities.NotificationMessage;
 import com.zxy.work.entities.Order;
 import com.zxy.work.entities.Payment;
@@ -18,7 +19,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -166,7 +170,7 @@ public class KafkaConsumer {
         //订单放入缓存
         redisUtil.set(key, order, 10*60);
         //开始地点经纬度放入缓存
-        redisUtil.geoadd("position", order.getStartLatitude(), order.getStartLongitude(), key);
+        redisUtil.geoadd("position", order.getStartLongitude(), order.getStartLatitude(), key);
         log.info("order={}创建后置属性设置成功", order);
     }
 
@@ -325,7 +329,9 @@ public class KafkaConsumer {
     private void paySuccessHandler(Long orderId){
         //1.更新订单并设置缓存
         Order order = orderService.selectByOrderId(orderId);
-        Payment payment = (Payment) paymentServiceClient.getByOrderId(orderId).getData();
+        Map<String, String> data= (Map<String, String>) paymentServiceClient.getByOrderId(orderId).getData();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Payment payment = objectMapper.convertValue(data, Payment.class);
         int i = 0;
         int update;
         do {

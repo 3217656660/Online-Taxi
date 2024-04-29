@@ -3,7 +3,6 @@ package com.zxy.work.service;
 
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
-import com.zxy.work.entities.User;
 
 
 public interface DriverService {

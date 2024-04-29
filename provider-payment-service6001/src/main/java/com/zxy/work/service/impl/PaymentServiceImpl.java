@@ -3,7 +3,6 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.PaymentMapper;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Payment;
-import com.zxy.work.entities.User;
 import com.zxy.work.service.PaymentService;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;

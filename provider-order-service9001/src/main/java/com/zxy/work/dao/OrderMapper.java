@@ -28,5 +28,5 @@ public interface OrderMapper {
     Order selectByOrderIdWithDriver(@Param("id") long id);
 
     Order selectNotSolve(@Param("userId")long userId);
-
+    int cancelOrder(@Param("id") long id);
 }

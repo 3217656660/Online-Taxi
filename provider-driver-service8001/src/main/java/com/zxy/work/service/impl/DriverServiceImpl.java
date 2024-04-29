@@ -3,7 +3,6 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.DriverMapper;
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
-import com.zxy.work.entities.User;
 import com.zxy.work.service.DriverService;
 import com.zxy.work.util.cache.CacheUtil;
 import com.zxy.work.util.encode.PasswordEncoder;

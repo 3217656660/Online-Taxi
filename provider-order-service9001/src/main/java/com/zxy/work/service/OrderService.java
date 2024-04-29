@@ -2,7 +2,6 @@ package com.zxy.work.service;
 
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -28,6 +27,8 @@ public interface OrderService {
     Order selectByOrderIdWithDriver(long id) throws MyException;
 
     Order selectNotSolve(long userId) throws MyException;
+
+    int cancelOrder(long id) throws MyException;
 
 
 }

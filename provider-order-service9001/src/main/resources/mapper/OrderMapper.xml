@@ -27,8 +27,8 @@
     </resultMap>
 
     <insert id="create" parameterType="Order" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.order(USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,DISTANCE)
-        values(#{userId},#{driverId},#{startAddress},#{startLatitude},#{startLongitude},#{endAddress},#{endLatitude},#{endLongitude},0,#{distance});
+        insert into online_taxi.order(USER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,DISTANCE)
+        values(#{userId},#{startAddress},#{startLatitude},#{startLongitude},#{endAddress},#{endLatitude},#{endLongitude},0,#{distance});
     </insert>
 
     <update id="deleteByUser" parameterType="Long">
@@ -53,6 +53,12 @@
             version = #{version} + 1
         </set>
         WHERE id = #{id} AND version = #{version} AND user_deleted = 0 AND driver_deleted = 0
+    </update>
+
+    <update id="cancelOrder" parameterType="Long">
+        UPDATE online_taxi.order
+        SET status = 5
+        WHERE id = #{id} AND user_deleted = 0 AND driver_deleted = 0
     </update>
 
     <select id="selectByUserId" parameterType="Long" resultMap="BaseResultMap">
@@ -83,7 +89,7 @@
 <!--    &gt;	表示大于号-->
 <!--    &lt;	表示小于号-->
     <select id="selectNotSolve" parameterType="Long" resultMap="BaseResultMap">
-        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION
+        SELECT ID,USER_ID,DRIVER_ID,START_ADDRESS,START_LATITUDE,START_LONGITUDE,END_ADDRESS,END_LATITUDE,END_LONGITUDE,STATUS,PRICE,DISTANCE,END_TIME,VERSION,USER_DELETED,DRIVER_DELETED
         FROM online_taxi.order
                  WHERE user_deleted = 0 AND driver_deleted = 0 AND user_id = #{userId} AND status &lt; 4
     </select>

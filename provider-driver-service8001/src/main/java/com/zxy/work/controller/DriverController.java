@@ -8,7 +8,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.zxy.work.entities.ApiResponse;
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
-import com.zxy.work.entities.User;
 import com.zxy.work.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

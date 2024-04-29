@@ -5,15 +5,11 @@ import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
 import com.zxy.work.service.OrderService;
-import com.zxy.work.util.MyString;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.GeoResult;
 import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -234,6 +230,16 @@ public class OrderController {
         else if (order.getStatus() == 5)
             return ApiResponse.error(600, "订单已经取消过了");
 
+        //未被接单时取消
+        if (order.getDriverId() == 0){
+            int cancelOrder = orderService.cancelOrder(id);
+            if (cancelOrder == 0)
+                return ApiResponse.error(600, "订单取消失败，请稍后重试");
+            kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_CANCEL_ORDER_KEY, String.valueOf(id));
+            return ApiResponse.success("订单取消成功");
+        }
+
+        //接单后被取消
         int update = orderService.update(order.setStatus(5));
         if (update == 0)
             return ApiResponse.error(600, "订单取消失败，请稍后重试");
@@ -282,7 +288,7 @@ public class OrderController {
         else if (redisOrder.getStatus() == 5) {
             return ApiResponse.error(600, "订单已被取消");
         }
-        int update = orderService.update(order.setStatus(1));
+        int update = orderService.update(order.setStatus(1).setDriverId(order.getDriverId()));
         if (update == 0){
             return ApiResponse.error(600, "非常抱歉,接单失败");
         }
@@ -305,24 +311,36 @@ public class OrderController {
     @PostMapping("/verityCode")
     public ApiResponse<String> verityCode(@RequestParam("id")Integer id, @RequestParam("code")int code)throws MyException{
         String verityKey = "order:verity:id:" + id;
-        int result = (int)redisUtil.get(verityKey);
+        Object codeInCache = redisUtil.get(verityKey);
+        if (codeInCache == null){
+            return ApiResponse.error(600, "请勿重复验证");
+        }
+        int result = (int) codeInCache;
         //验证失败:
         if (result != code){
             return ApiResponse.error(600, "验证失败");
         }
-        int update = orderService.update(new Order().setId(id).setStatus(2));
+        Order order = (Order) redisUtil.get("order:action:id:" + id);
+        int update = orderService.update(order.setStatus(2));
         if (update == 1)
             kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_TO_END_ADDRESS_KEY, String.valueOf(id));
         return update == 1
-                ? ApiResponse.success("请等待乘客提供给你四位数字")
+                ? ApiResponse.success("验证成功！开始出发")
                 : ApiResponse.error(600, "请勿重复验证");
     }
 
 
     //到达终点时：传来订单信息，更改订单状态，更新成功则创建支付并推送给用户行程结束
     @PostMapping("/arriveEndAddress")
-    public ApiResponse<String> arriveEndAddress(@RequestParam("id") Integer id)throws MyException{
-        int update = orderService.update(new Order().setId(id).setStatus(3));
+    public ApiResponse<String> arriveEndAddress(@RequestParam("id") Integer id, @RequestParam("price")Float price)throws MyException{
+        Object result = redisUtil.get("order:action:id:" + id);
+        Order order;
+        if (result == null){
+            order = orderService.selectByOrderId(id);
+        }else {
+            order = (Order) result;
+        }
+        int update = orderService.update(order.setStatus(3).setPrice(price));
         if (update == 0){
             return ApiResponse.error(600, "请勿重复点击已到达");
         }

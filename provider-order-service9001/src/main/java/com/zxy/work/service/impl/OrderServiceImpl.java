@@ -3,7 +3,6 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.OrderMapper;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
-import com.zxy.work.entities.User;
 import com.zxy.work.service.OrderService;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -339,6 +338,22 @@ public class OrderServiceImpl implements OrderService {
         }catch (Exception e){
             log.error("通过订单id的订单查询异常,msg={}", e.getMessage());
             throw new MyException("通过订单id的订单查询异常");
+        }
+    }
+
+
+    /**
+     * 通过id取消未被接单的订单
+     * @param id 订单id
+     * @return 取消结果
+     */
+    @Override
+    public int cancelOrder(long id) throws MyException {
+        try {
+            return orderMapper.cancelOrder(id);
+        }catch (Exception e){
+            log.error("通过订单id的订单取消异常,msg={}", e.getMessage());
+            throw new MyException("通过订单id的订单取消异常");
         }
     }
 
