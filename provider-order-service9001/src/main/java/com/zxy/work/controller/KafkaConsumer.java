@@ -45,6 +45,12 @@ public class KafkaConsumer {
 
 
     /**
+     * 随机数对象
+     */
+    private static final Random random = new Random();
+
+
+    /**
      * kafka topic name
      */
     private static final String TOPIC_NAME = "main";
@@ -68,11 +74,6 @@ public class KafkaConsumer {
      * 司机到达指定开始地点后处理消息key
      */
     private static final String MQ_ARRIVE_START_ADDRESS_KEY = "arriverStartAddress";
-
-    /**
-     * 随机数对象
-     */
-    private static final Random random = new Random();
 
     /**
      * 开始驾驶到终点后处理消息key
@@ -105,7 +106,7 @@ public class KafkaConsumer {
             setProperties(order);
         }else if (Objects.equals(record.key(), MQ_CANCEL_ORDER_KEY)){//取消订单
             long id = Long.parseLong(record.value());
-            //1.清楚倒计数
+            //1.清楚倒计时
             cancelOrderTimer(id);
             //2.判断是否需要通知司机
             notifyDriver(id);
@@ -129,7 +130,7 @@ public class KafkaConsumer {
 
         //手动提交
         ack.acknowledge();
-        log.info("offset={}手动提交成功", record.offset());
+        //log.info("offset={}手动提交成功", record.offset());
     }
 
     /**
@@ -148,7 +149,7 @@ public class KafkaConsumer {
             String key = "order:id:" + orderId;
             //超时处理
             //订单状态设置为已取消5
-            orderService.update(new Order().setId(orderId).setStatus(5));
+            orderService.cancelOrder(orderId);
             //位置移除缓存
             redisUtil.geodelete("position", key);
             //订单信息移出缓存
@@ -156,7 +157,7 @@ public class KafkaConsumer {
             //将倒计数移除
             orderTimeout.remove(orderId);
             log.info("key={} 倒计数结束订单超时,已自动取消",key);
-        }, 10, TimeUnit.MINUTES);
+        }, 10, TimeUnit.MINUTES);//10
         orderTimeout.put(orderId, timer);
         return false;
     }
@@ -184,6 +185,7 @@ public class KafkaConsumer {
         if (timer != null) {
             timer.shutdownNow();
             orderTimeout.remove(orderId);
+            log.info("orderId={}倒计时取消成功",orderId);
         }
         String key = "order:id:" + orderId;
         redisUtil.del(key);
@@ -219,6 +221,7 @@ public class KafkaConsumer {
         if (timer != null) {
             timer.shutdownNow();
             orderTimeout.remove(orderId);
+            log.info("orderId={}倒计时取消成功",orderId);
         }
         //重新设置缓存
         String key = "order:id:" + orderId;
@@ -245,7 +248,8 @@ public class KafkaConsumer {
         }
         //2.生成随机数，通知用户
         int randomNumber = random.nextInt(9000) + 1000;
-        redisUtil.set("order:verity:id:" + orderId, randomNumber, 24*60*60);
+        log.info("randomNumber={}",randomNumber);
+        redisUtil.set("order:verity:id:" + orderId, randomNumber, 3 * 60 * 60);
         NotificationMessage message = new NotificationMessage();
         message.setType("arrivalNotice")
                 .setContent(randomNumber)
@@ -293,6 +297,7 @@ public class KafkaConsumer {
         //1.订单移除缓存
         String key = "order:id:" + orderId;
         String actionKey = "order:action:id:" + orderId;
+        String messageKey = "message:order:id:" + orderId;
         Object result = redisUtil.get(actionKey);
         Order order;
         if (result == null){//查数据库
@@ -302,14 +307,27 @@ public class KafkaConsumer {
         }
         redisUtil.del(key,actionKey);
         redisUtil.geodelete("position", key);
-        //2.创建支付,远程调用
-        paymentServiceClient.create(
-                new Payment()
-                        .setOrderId(orderId)
-                        .setUserId(order.getUserId())
-                        .setPaymentMethod("未支付")
-                        .setAmount(order.getPrice())
-        );
+
+
+        try{//2.创建支付,远程调用
+            paymentServiceClient.create(
+                    new Payment()
+                            .setOrderId(orderId)
+                            .setUserId(order.getUserId())
+                            .setPaymentMethod("未支付")
+                            .setAmount(order.getPrice())
+            );
+        }catch (Exception e){
+            log.error("paymentServiceClient远程调用出错，msg={}", e.getMessage());
+            paymentServiceClient.create(
+                    new Payment()
+                            .setOrderId(orderId)
+                            .setUserId(order.getUserId())
+                            .setPaymentMethod("未支付")
+                            .setAmount(order.getPrice())
+            );
+        }
+
         //3.推送给用户
         NotificationMessage message = new NotificationMessage();
         message.setType("arriverEndNotice")
@@ -337,8 +355,8 @@ public class KafkaConsumer {
         do {
             update = orderService.update(order.setStatus(4).setEndTime(new Date()).setPrice(payment.getAmount()));
         }while (update == 0 && i++ < 3);
-        redisUtil.set("order:complete:id:" + orderId, order);
-        redisUtil.set("payment:order:" + orderId, payment);
+        redisUtil.set("order:complete:id:" + orderId, order, 20*60);
+        redisUtil.set("payment:order:" + orderId, payment,20*60);
     }
 
 }

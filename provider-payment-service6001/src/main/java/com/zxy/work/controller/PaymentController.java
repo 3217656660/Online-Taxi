@@ -11,6 +11,7 @@ import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-@RestController
+@Controller
 @Slf4j
 @RequestMapping("/payment")
 public class PaymentController {
@@ -45,6 +46,7 @@ public class PaymentController {
      * @return  创建支付结果
      */
     @PostMapping("/update/create")
+    @ResponseBody
     public ApiResponse<String> createPayment(@RequestBody Payment payment) throws MyException {
         log.info("创建支付服务提供者：" + payment);
         return paymentService.create(payment) == 1
@@ -58,6 +60,7 @@ public class PaymentController {
      * @return 支付删除结果
      */
     @DeleteMapping("/update/delete")
+    @ResponseBody
     public ApiResponse<String> deletePayment(@RequestParam("orderId") long orderId) throws MyException {
         log.info("删除支付服务提供者：" + orderId);
         return paymentService.delete(orderId) == 1
@@ -71,6 +74,7 @@ public class PaymentController {
      * @return  更新结果
      */
     @PutMapping("/update/message")
+    @ResponseBody
     public ApiResponse<String> update(@RequestBody Payment payment) throws MyException {
         log.info("更新支付服务提供者：" + payment);
         return paymentService.update(payment) == 1
@@ -84,6 +88,7 @@ public class PaymentController {
      * @return 查询结果
      */
     @GetMapping("/getByOrderId")
+    @ResponseBody
     public ApiResponse<Object> getPaymentByOrderId(@RequestParam("orderId")long orderId) throws MyException {
         log.info("通过订单id获取支付服务提供者：" + orderId);
         Payment payment = paymentService.selectByOrderId(orderId);
@@ -98,6 +103,7 @@ public class PaymentController {
      * @return 支付结果，成功返回支付的html信息
      */
     @GetMapping("/doPay")
+    @ResponseBody
     public ApiResponse<String> doPay(@RequestParam("id") Long orderId){
         Object result = redisUtil.get("payment:order:" + orderId);
         Payment payment;
@@ -124,7 +130,7 @@ public class PaymentController {
      */
     @GetMapping("/return")
     //@ResponseBody
-    public ApiResponse<String> handleReturn(
+    public String handleReturn(
             @RequestParam("out_trade_no") String out_trade_no,
             @RequestParam("total_amount") String total_amount,
             @RequestParam("trade_no") String trade_no,
@@ -154,7 +160,7 @@ public class PaymentController {
         //验证支付宝的签名，确保通知的真实性
         boolean isValid = AlipaySignature.verifyV1(params, publicKey, "UTF-8", "RSA2");
         if (!isValid)
-            return ApiResponse.error(600, "支付失败或交易关闭");
+            return "error";
 
         //支付成功，执行相关操作，例如更新订单状态
         long orderId = Long.parseLong(out_trade_no);
@@ -166,9 +172,9 @@ public class PaymentController {
             payment = (Payment) result;
         int update = paymentService.update(payment.setPaymentMethod("支付宝支付"));
         if (update == 0)
-            return ApiResponse.error(600, "支付失败或当前订单已支付");
+            return "error";
         kafkaTemplate.send("main", new Random().nextInt(3), "paySuccess", out_trade_no);
-        return ApiResponse.success("支付成功 order: " + orderId);
+        return "index";
     }
 
     /**

@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 @RestController
 @Slf4j
 @SaCheckLogin
-@RequestMapping("/user")
+@RequestMapping(value = "/user")
 public class UserController {
 
     @Resource
@@ -48,10 +48,9 @@ public class UserController {
      * @return  注销结果
      */
     @SaCheckRole(value = "user", mode = SaMode.OR)
-    @DeleteMapping("/update/delete")
+    @DeleteMapping(value = "/update/delete")
     public ApiResponse<String> deleteUser(@RequestParam("mobile")String mobile) throws MyException {
         log.info( "用户注销服务提供者：,mobile={}", mobile );
-        //远程调用删除用户相关的所有信息
 
         return userService.deleteByMobile(mobile) == 1
                 ? ApiResponse.success("注销成功")
@@ -67,7 +66,6 @@ public class UserController {
     @SaCheckRole(value = "user", mode = SaMode.OR)
     @GetMapping("/get")
     public ApiResponse<Object> getUserByMobile(@RequestParam("mobile") String mobile) throws MyException {
-        log.info( "用户查询服务提供者：mobile={}", mobile );
         User user = userService.selectByMobile(mobile);
         return user != null
                 ? ApiResponse.success(user.setPassword("******"))
@@ -155,6 +153,44 @@ public class UserController {
     ) throws MyException {
         log.info( "用户更新密码服务提供者：mobile={}", mobile );
         return userService.updatePassword(mobile, oldPassword, newPassword) == 1
+                ? ApiResponse.success("密码更新成功")
+                : ApiResponse.error(600, "密码更新失败");
+    }
+
+
+    /**
+     * 给用户发送邮箱验证码
+     * @param mobile 手机号
+     * @param email 邮箱
+     * @return 发送结果
+     */
+    @SaIgnore
+    @GetMapping("/sendEmail")
+    public ApiResponse<String> sendEmail(@RequestParam("mobile") String mobile, @RequestParam("email") String email) throws MyException {
+        boolean sendEmail = userService.sendEmail(mobile, email);
+        return sendEmail
+                ? ApiResponse.success("邮件发送成功")
+                : ApiResponse.error(600, "手机号和邮箱不匹配");
+    }
+
+
+    /**
+     * 通过邮箱验证码修改用户密码
+     * @param mobile 用户手机号
+     * @param email 用户邮箱
+     * @param code 用户验证码
+     * @param newPassword 明文新密码
+     * @return 修改结果
+     */
+    @SaIgnore
+    @PostMapping("/updatePwdWithVerityCode")
+    public ApiResponse<String> updatePwdWithVerityCode(
+        String mobile,
+        String email,
+        Integer code,
+        String newPassword
+    ) throws MyException {
+        return userService.updatePwdWithVerityCode(mobile, email, code, newPassword) == 1
                 ? ApiResponse.success("密码更新成功")
                 : ApiResponse.error(600, "密码更新失败");
     }

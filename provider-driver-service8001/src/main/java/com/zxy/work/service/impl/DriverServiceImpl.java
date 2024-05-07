@@ -198,6 +198,18 @@ public class DriverServiceImpl implements DriverService {
     }
 
 
+    @Transactional(readOnly = true)
+    @Override
+    public Driver selectById(Long id) {
+        try{
+            return driverMapper.selectById(id);
+        }catch (Exception e){
+            log.error("查询司机异常，msg={}", e.getMessage());
+            throw new MyException("查询司机出现异常");
+        }
+    }
+
+
     /**
      * 登录
      * @param driver 传来的司机数据

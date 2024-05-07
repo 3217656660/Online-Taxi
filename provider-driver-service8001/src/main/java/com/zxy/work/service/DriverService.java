@@ -15,6 +15,8 @@ public interface DriverService {
 
     Driver selectByMobile(String mobile) throws MyException;
 
+    Driver selectById(Long id);
+
     boolean login(Driver driver) throws MyException;
 
     int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException;

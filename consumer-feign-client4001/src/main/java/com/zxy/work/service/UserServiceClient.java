@@ -16,7 +16,7 @@ public interface UserServiceClient {
     ApiResponse<String> register(@RequestBody User user);
 
     @GetMapping("/user/get")
-    ApiResponse<Object> getByMobile(@RequestParam("mobile") String mobile);
+    ApiResponse<Object> getUserByMobile(@RequestParam("mobile") String mobile);
 
     @DeleteMapping("/user/update/delete")
     ApiResponse<String> delete(@RequestParam("mobile")String mobile);

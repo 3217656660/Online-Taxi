@@ -1,9 +1,8 @@
 package com.zxy.work.service;
 
+import com.github.pagehelper.PageInfo;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
-
-import java.util.List;
 
 
 public interface OrderService {
@@ -16,9 +15,9 @@ public interface OrderService {
 
     int update(Order order) throws MyException;
 
-    List<Order> selectByUserId(long userId) throws MyException;
+    PageInfo<Order> selectByUserId(long userId, int pageNum, int pageSize) throws MyException;
 
-    List<Order> selectByDriverId(long driverId) throws MyException;
+    PageInfo<Order> selectByDriverId(long driverId, int pageNum, int pageSize) throws MyException;
 
     Order selectByOrderId(long id) throws MyException;
 

@@ -65,6 +65,7 @@ spring:
           filters:
             - StripPrefix=1 #去前缀/taxi
             #- AddResponseHeader=X-Response-Default-Foo, Default-Bar  #响应头添加字段
+
 management:
   endpoints:
     web:

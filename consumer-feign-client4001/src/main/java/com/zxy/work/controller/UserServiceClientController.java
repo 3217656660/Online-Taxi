@@ -67,7 +67,7 @@ public class UserServiceClientController {
     public ApiResponse<Object> getByMobile(@RequestParam("mobile")String mobile){
         log.info("通过手机号获取用户" + mobile);
         try{
-            return userServiceClient.getByMobile(mobile);
+            return userServiceClient.getUserByMobile(mobile);
         }catch (Exception e){
             log.warn(e.getMessage());
             return ApiResponse.error(600, e.getMessage());
@@ -161,5 +161,6 @@ public class UserServiceClientController {
             return ApiResponse.error(600, e.getMessage());
         }
     }
+
 
 }

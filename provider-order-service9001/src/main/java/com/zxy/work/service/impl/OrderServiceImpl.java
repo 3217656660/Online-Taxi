@@ -1,5 +1,7 @@
 package com.zxy.work.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zxy.work.dao.OrderMapper;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
@@ -203,46 +205,54 @@ public class OrderServiceImpl implements OrderService {
 
 
     /**
-     * 用户查询历史订单
-     * @param userId 传来的用户id
-     * @return 历史订单
+     * 根据用户Id分页获取历史订单信息
+     * @param userId    传来的用户Id
+     * @param pageNum 页号
+     * @param pageSize 页大小
+     * @return 查询结果
      */
     @Transactional(readOnly = true)
     @Override
-    public List<Order> selectByUserId(long userId) throws MyException{
+    public PageInfo<Order> selectByUserId(long userId, int pageNum, int pageSize) throws MyException{
         List<Order> orderList;
         try{
+            PageHelper.startPage(pageNum, pageSize);
             orderList = orderMapper.selectByUserId(userId);
         }catch (Exception e){
             log.error("通过用户id的订单查询异常,msg={}", e.getMessage());
             throw new MyException("通过用户id的订单查询异常");
+        }finally {
+            PageHelper.clearPage();
         }
-        if (orderList == null)
+        if (orderList.size() == 0)
             throw new MyException("您还未有过订单");
-
-        return orderList;
+        return new PageInfo<>(orderList);
     }
 
 
     /**
-     * 司机查询历史订单
-     * @param driverId 传来的司机id
-     * @return 历史订单
+     * 根据司机Id分页获取历史订单信息
+     * @param driverId   传来的司机Id
+     * @param pageNum 页号
+     * @param pageSize 页大小
+     * @return 查询结果
      */
     @Transactional(readOnly = true)
     @Override
-    public List<Order> selectByDriverId(long driverId) throws MyException{
+    public PageInfo<Order> selectByDriverId(long driverId, int pageNum, int pageSize) throws MyException{
         List<Order> orderList;
         try{
+            PageHelper.startPage(pageNum, pageSize);
             orderList = orderMapper.selectByDriverId(driverId);
         }catch (Exception e){
             log.error("通过司机id的订单查询异常,msg={}", e.getMessage());
             throw new MyException("通过司机id的订单查询异常");
+        }finally {
+            PageHelper.clearPage();
         }
         if (orderList == null)
             throw new MyException("您还未有过订单");
-
-        return orderList;
+        return new PageInfo<>(orderList);
     }
 
 
@@ -385,7 +395,6 @@ public class OrderServiceImpl implements OrderService {
             redisUtil.set(key, order, cacheTTL);
             log.info("key={}已经设置进缓存", key);
         }
-
         //手动提交
         ack.acknowledge();
         log.info("offset={}手动提交成功", record.offset());

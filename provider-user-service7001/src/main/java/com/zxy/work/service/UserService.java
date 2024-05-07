@@ -17,4 +17,8 @@ public interface UserService {
 
     int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException;
 
+    boolean sendEmail(String mobile,String email) throws MyException;
+
+    int updatePwdWithVerityCode(String mobile, String email, Integer code, String newPassword) throws MyException;
+
 }

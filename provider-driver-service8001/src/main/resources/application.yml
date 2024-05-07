@@ -56,6 +56,20 @@ spring:
     listener:
       ack-mode: manual_immediate
 
+  # qq邮箱
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 3217656660@qq.com
+    password: ${email.password}
+    default-encoding: utf-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 management:
   endpoints:
     web:

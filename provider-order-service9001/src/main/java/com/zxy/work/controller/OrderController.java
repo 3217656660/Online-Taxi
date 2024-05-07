@@ -1,9 +1,7 @@
 package com.zxy.work.controller;
 
-import com.zxy.work.entities.ApiResponse;
-import com.zxy.work.entities.Driver;
-import com.zxy.work.entities.MyException;
-import com.zxy.work.entities.Order;
+import com.github.pagehelper.PageInfo;
+import com.zxy.work.entities.*;
 import com.zxy.work.service.OrderService;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -147,26 +145,52 @@ public class OrderController {
 
 
     /**
-     * 根据用户Id获取历史订单信息
+     * 根据用户Id分页获取历史订单信息
      * @param userId    传来的用户Id
-     * @return  获取的结果以及数据
+     * @param pageNum 页号
+     * @param pageSize 页大小
+     * @return 查询结果
      */
     @GetMapping("/get/user/history")
-    public ApiResponse< List<Order> > getOrderByUserId(@RequestParam("userId")long userId) throws MyException {
+    public ApiResponse< PageResult<Order> > getOrderByUserId(
+            @RequestParam("userId")long userId,
+            @RequestParam("pageNum") int pageNum,
+            @RequestParam("pageSize") int pageSize
+    ) throws MyException {
         log.info("根据用户Id获取历史订单服务提供者:" + userId);
-        return ApiResponse.success(orderService.selectByUserId(userId));
+        PageInfo<Order> pageInfo = orderService.selectByUserId(userId, pageNum, pageSize);
+        PageResult<Order> pageResult = new PageResult<>(
+                pageInfo.getTotal(),
+                pageSize,
+                pageNum,
+                pageInfo.getList()
+        );
+        return ApiResponse.success(pageResult);
     }
 
 
     /**
-     * 根据司机Id获取历史订单信息
+     * 根据司机Id分页获取历史订单信息
      * @param driverId   传来的司机Id
-     * @return  获取的结果以及数据
+     * @param pageNum 页号
+     * @param pageSize 页大小
+     * @return 查询结果
      */
     @GetMapping("/get/driver/history")
-    public ApiResponse< List<Order> > getOrderByDriverId(@RequestParam("driverId")long driverId) throws MyException {
+    public ApiResponse< PageResult<Order> > getOrderByDriverId(
+            @RequestParam("driverId")long driverId,
+            @RequestParam("pageNum") int pageNum,
+            @RequestParam("pageSize") int pageSize
+    ) throws MyException {
         log.info("根据司机Id获取历史订单服务提供者:" + driverId);
-        return ApiResponse.success(orderService.selectByDriverId(driverId));
+        PageInfo<Order> pageInfo = orderService.selectByDriverId(driverId, pageNum, pageSize);
+        PageResult<Order> pageResult = new PageResult<>(
+                pageInfo.getTotal(),
+                pageSize,
+                pageNum,
+                pageInfo.getList()
+        );
+        return ApiResponse.success(pageResult);
     }
 
 
@@ -219,6 +243,17 @@ public class OrderController {
     }
 
 
+    //获取订单倒计时所剩余时间
+    @GetMapping("/getOrderTimeOut")
+    public ApiResponse<String> getOrderTimeOut(@RequestParam("id") Long id){
+        long expire = redisUtil.getExpire("order:id:" + id);
+        if (expire == -2)
+            return ApiResponse.error(600, "订单已经过期");
+         else
+            return ApiResponse.success(expire+"");
+    }
+
+
     //用户取消status小于2的订单：传订单id，从缓存中或数据库查询订单信息，如果status小于2则，更新订单并取消，同时推送给司机。如果status大于2，订单不可取消
     @PostMapping("/cancelOrderByUser")
     public ApiResponse<String> cancelOrderByUser(@RequestParam("id") Long id) throws MyException{
@@ -256,7 +291,7 @@ public class OrderController {
                 "position",
                 driver.getLongitude(),
                 driver.getLatitude(),
-                20 * 1000
+                5 * 1000
         );
         if (geoResults == null)
             return ApiResponse.error(600, "当前没有可接订单");

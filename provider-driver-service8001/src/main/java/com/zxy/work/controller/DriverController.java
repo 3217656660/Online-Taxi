@@ -81,7 +81,23 @@ public class DriverController {
         Driver driver = driverService.selectByMobile(mobile);
         return driver != null
                 ? ApiResponse.success(driver)
-                : ApiResponse.error(600, "司机更新查询失败");
+                : ApiResponse.error(600, "司机查询失败");
+    }
+
+
+    /**
+     * 根据手机号获取司机信息
+     * @param id    传来的司机id
+     * @return  获取的结果以及数据
+     */
+    @GetMapping("/getById")
+    public ApiResponse<Object> getById(@RequestParam("id") Long id) throws MyException {
+        log.info("通过电话获取司机服务提供者：" + id);
+        //参数校验
+        Driver driver = driverService.selectById(id);
+        return driver != null
+                ? ApiResponse.success(driver)
+                : ApiResponse.error(600, "司机查询失败");
     }
 
 
@@ -151,4 +167,6 @@ public class DriverController {
                 ? ApiResponse.success("密码更新成功")
                 : ApiResponse.error(600, "密码更新失败");
     }
+
+
 }

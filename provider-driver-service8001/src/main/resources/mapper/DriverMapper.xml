@@ -52,4 +52,8 @@
         SELECT ID,USERNAME,MOBILE,PASSWORD,EMAIL,CAR_TYPE,CAR_NUMBER,LATITUDE,LONGITUDE,CREATE_TIME,UPDATE_TIME,VERSION FROM online_taxi.driver WHERE is_deleted = 0 AND mobile = #{mobile}
     </select>
 
+    <select id="selectById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT ID,USERNAME,MOBILE,PASSWORD,EMAIL,CAR_TYPE,CAR_NUMBER,LATITUDE,LONGITUDE,CREATE_TIME,UPDATE_TIME,VERSION FROM online_taxi.driver WHERE is_deleted = 0 AND id = #{id}
+    </select>
+
 </mapper>
