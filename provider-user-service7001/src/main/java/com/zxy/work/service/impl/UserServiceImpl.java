@@ -373,7 +373,7 @@ public class UserServiceImpl implements UserService {
             String key = commonKey + mobile;
             redisUtil.del(key);
             log.info("key={}已经移除缓存", key);
-        }else if (Objects.equals(record.key(), MQ_SEND_EMAIL_KEY)){//移除缓存
+        }else if (Objects.equals(record.key(), MQ_SEND_EMAIL_KEY)){//发邮件
             String email = record.value();
             //验证码存在就不要再生成新的
             Object codeObj = redisUtil.get("verityCode:email:" + email);

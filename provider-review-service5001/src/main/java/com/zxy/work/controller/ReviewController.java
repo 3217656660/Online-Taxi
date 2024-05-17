@@ -43,7 +43,7 @@ public class ReviewController {
      */
     @SaCheckRole(value = {"user", "admin"}, mode = SaMode.OR)
     @DeleteMapping("/update/delete")
-    public ApiResponse<String> deleteReview(@RequestParam("orderId") Integer orderId) throws MyException {
+    public ApiResponse<String> deleteReview(@RequestParam("orderId") long orderId) throws MyException {
         log.info("删除评论服务提供者：" + orderId);
         return reviewService.delete(orderId) == 1
                 ? ApiResponse.success("评价删除成功")
@@ -57,7 +57,7 @@ public class ReviewController {
      * @return  查询结果
      */
     @GetMapping("/getByOrderId")
-    public ApiResponse<Object> getReviewByOrderId(@RequestParam("orderId") Integer orderId) throws MyException {
+    public ApiResponse<Object> getReviewByOrderId(@RequestParam("orderId") long orderId) throws MyException {
         log.info("通过订单id获得评论服务提供者：" + orderId);
         Review review = reviewService.selectByOrderId(orderId);
         return review != null

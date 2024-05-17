@@ -351,9 +351,16 @@ public interface CacheUtil {
      * @param longitude 经度
      * @param latitude  纬度
      * @param radius    半径（米）
+     * @param count    限制返回的个数
      * @return 相距位置小于等于 radius（米）的地理位置列表
      */
-    List<GeoResult<RedisGeoCommands.GeoLocation<Object>>> georadius(String key, double longitude, double latitude, double radius);
+    List<GeoResult<RedisGeoCommands.GeoLocation<Object>>> georadius(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            long count
+    );
 
 
     /**

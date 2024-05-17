@@ -1,5 +1,6 @@
 package com.zxy.work.dao;
 
+import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,5 +29,8 @@ public interface OrderMapper {
     Order selectByOrderIdWithDriver(@Param("id") long id);
 
     Order selectNotSolve(@Param("userId")long userId);
+
+    Order selectNotSolveByDriver(@Param("driverId") long driverId) throws MyException;
+
     int cancelOrder(@Param("id") long id);
 }

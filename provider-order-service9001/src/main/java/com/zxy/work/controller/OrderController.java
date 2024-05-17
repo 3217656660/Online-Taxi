@@ -3,6 +3,7 @@ package com.zxy.work.controller;
 import com.github.pagehelper.PageInfo;
 import com.zxy.work.entities.*;
 import com.zxy.work.service.OrderService;
+import com.zxy.work.util.MyNotify;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.GeoResult;
@@ -217,14 +218,25 @@ public class OrderController {
 
 
     /**
-     * 检查未解决的订单
+     * 检查乘客未解决的订单
      * @param userId 传来的乘客id
      * @return 处理结果
      */
     @GetMapping("/checkOrder")
     public ApiResponse<Order> checkOrder(@RequestParam("userId") long userId) throws MyException {
-        log.info("检查是否有未解决的订单userId={}", userId);
+        log.info("检查用户是否有未解决的订单userId={}", userId);
         return ApiResponse.success(orderService.selectNotSolve(userId));
+    }
+
+
+    /**
+     * 查询司机未解决的订单
+     * @param driverId 司机id
+     */
+    @GetMapping("/checkDriverOrder")
+    public ApiResponse<Order> checkDriverOrder(@RequestParam("driverId") long driverId) throws MyException{
+        log.info("检查司机是否有未解决的订单userId={}", driverId);
+        return ApiResponse.success(orderService.selectNotSolveByDriver(driverId));
     }
 
 
@@ -246,7 +258,7 @@ public class OrderController {
     //获取订单倒计时所剩余时间
     @GetMapping("/getOrderTimeOut")
     public ApiResponse<String> getOrderTimeOut(@RequestParam("id") Long id){
-        long expire = redisUtil.getExpire("order:id:" + id);
+        long expire = redisUtil.getExpire("expire:order:id:" + id);
         if (expire == -2)
             return ApiResponse.error(600, "订单已经过期");
          else
@@ -283,29 +295,45 @@ public class OrderController {
     }
 
 
-    //司机查询可接单列表：传来司机当前位置经纬度放入缓存，从缓存中查出订单开始位置距离司机位置小于20km的订单列表返回给司机
+    //司机分页查询可接单列表：传来司机当前位置经纬度放入缓存，从缓存中查出订单开始位置距离司机位置小于20km的订单列表返回给司机
+    @MyNotify("查询时间较慢，需要增加效率")
     @GetMapping("/getAcceptList")
-    public ApiResponse<Object> getAcceptList(@RequestBody Driver driver)throws MyException {
-        //1.从redis中查询出起始点距离司机当前位置小于20km的订单
+    public ApiResponse<Object> getAcceptList(
+            @RequestParam("longitude")Double longitude,
+            @RequestParam("latitude")Double latitude,
+            @RequestParam("pageNum")int pageNum,
+            @RequestParam("pageSize")int pageSize
+    )throws MyException {
+        //1.从redis中查询出起始点距离司机当前位置小于5km的订单
         List<GeoResult<RedisGeoCommands.GeoLocation<Object>>> geoResults = redisUtil.georadius(
                 "position",
-                driver.getLongitude(),
-                driver.getLatitude(),
-                5 * 1000
+                longitude,
+                latitude,
+                5 * 1000,
+                (long) pageNum * pageSize  //限制返回的订单个数
         );
-        if (geoResults == null)
-            return ApiResponse.error(600, "当前没有可接订单");
-
+        if (geoResults == null) return ApiResponse.error(600, "当前没有可接订单");
         List<Order> orderList = new ArrayList<>();
+        //计算起点页位置，终点页位置
+        int start = Math.min(geoResults.size(), (pageNum-1) * pageSize);
+        //范围限制
+        int end = Math.min(geoResults.size(), pageNum * pageSize);
+        //判断参数正确性
+        if (start == end) return ApiResponse.success("over");
+        //截断列表
+        geoResults = geoResults.subList(start, end);
+        //遍历
         for (GeoResult<RedisGeoCommands.GeoLocation<Object>>  geoResult: geoResults) {
+            System.out.println(geoResult);
             String name = (String) geoResult.getContent().getName();
             String idStr = name.split(":")[2];
             //拿出未被接单的订单
             Object temp = redisUtil.get("order:id:" + idStr);
-            if (temp == null) continue;
+            //过滤
+            if (temp == null || redisUtil.getExpire("expire:order:id:" + idStr) == -2) continue;
             orderList.add((Order) temp);
         }
-        return ApiResponse.success(orderList);
+        return orderList.size() == 0 ? ApiResponse.success("over"): ApiResponse.success(orderList);
     }
 
 
@@ -314,7 +342,8 @@ public class OrderController {
     public ApiResponse<String> acceptOrder(@RequestBody Order order) throws MyException{
         String key = "order:id:" + order.getId();
         Object result = redisUtil.get(key);
-        if (result == null){
+        long expire = redisUtil.getExpire("expire:order:id:" + order.getId());
+        if (result == null || expire == -2){
             return ApiResponse.error(600, "订单已失效");
         }
         Order redisOrder = (Order) result;
@@ -323,7 +352,16 @@ public class OrderController {
         else if (redisOrder.getStatus() == 5) {
             return ApiResponse.error(600, "订单已被取消");
         }
-        int update = orderService.update(order.setStatus(1).setDriverId(order.getDriverId()));
+        Float price = (float) (
+                order.getDistance() <= 3000
+                        ? 8
+                        : ( 8 + 2.4 * ( order.getDistance() - 3000 ) )
+        );
+        int update = orderService.update(
+                order.setStatus(1)
+                        .setDriverId(order.getDriverId())
+                        .setPrice(price)
+        );
         if (update == 0){
             return ApiResponse.error(600, "非常抱歉,接单失败");
         }
@@ -337,6 +375,16 @@ public class OrderController {
     //司机到达指定接单位置：传来订单信息，并推送给用户，同时司机需要输入系统提供给用户的四位随机数字才能开始行驶状态，输入成功后也推送给用户
     @PostMapping("/arriverStartAddress")
     public ApiResponse<String> arriverStartAddress(@RequestParam("id")Long id)throws MyException{
+        Object resultOrder = redisUtil.get("order:action:id:" + id);
+        Order order;
+        if (resultOrder == null)
+            order = orderService.selectByOrderId(id);
+        else
+            order = (Order) resultOrder;
+
+        if (order == null)
+            return ApiResponse.error(600, "订单不存在");
+
         kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_ARRIVE_START_ADDRESS_KEY, String.valueOf(id));
         return ApiResponse.success("请等待乘客提供给你四位数字");
     }
@@ -344,38 +392,71 @@ public class OrderController {
 
     //司机验证四位验证码
     @PostMapping("/verityCode")
-    public ApiResponse<String> verityCode(@RequestParam("id")Integer id, @RequestParam("code")int code)throws MyException{
+    public ApiResponse<String> verityCode(@RequestParam("id")Long id, @RequestParam("code")int code)throws MyException{
         String verityKey = "order:verity:id:" + id;
         Object codeInCache = redisUtil.get(verityKey);
         if (codeInCache == null){
-            return ApiResponse.error(600, "请勿重复验证");
+            return ApiResponse.error(600, "重复验证或者验证码不正确");
         }
         int result = (int) codeInCache;
         //验证失败:
         if (result != code){
             return ApiResponse.error(600, "验证失败");
         }
-        Order order = (Order) redisUtil.get("order:action:id:" + id);
+        Order order;
+
+        Object resultOrder = redisUtil.get("order:action:id:" + id);
+        if (resultOrder == null)
+            order = orderService.selectByOrderId(id);
+        else
+            order = (Order) resultOrder;
+
         int update = orderService.update(order.setStatus(2));
         if (update == 1)
             kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_TO_END_ADDRESS_KEY, String.valueOf(id));
         return update == 1
                 ? ApiResponse.success("验证成功！开始出发")
-                : ApiResponse.error(600, "请勿重复验证");
+                : ApiResponse.error(600, "重复验证或者验证码不正确");
+    }
+
+
+    //检查该订单是否已经到达起点
+    @GetMapping("/checkArriveStartAddress")
+    public ApiResponse<String> checkArriveStartAddress(@RequestParam("id")Long id)throws MyException{
+        String verityKey = "order:verity:id:" + id;
+        Object codeInCache = redisUtil.get(verityKey);
+        return codeInCache != null
+                ? ApiResponse.success("已经到达过起点了")
+                : ApiResponse.error(600, "还未到达起点");
+    }
+
+
+    /**
+     * 查找对应订单对应的用户端的验证码
+     * @param id 订单id
+     */
+    @GetMapping("/getVerityCode")
+    public ApiResponse<Object> getVerityCode(@RequestParam("id")Long id)throws MyException{
+        String verityKey = "order:verity:id:" + id;
+        Object codeInCache = redisUtil.get(verityKey);
+        if (codeInCache == null){
+            return ApiResponse.error(600, "验证码已经过期");
+        }
+        return ApiResponse.success(codeInCache);
     }
 
 
     //到达终点时：传来订单信息，更改订单状态，更新成功则创建支付并推送给用户行程结束
     @PostMapping("/arriveEndAddress")
-    public ApiResponse<String> arriveEndAddress(@RequestParam("id") Integer id, @RequestParam("price")Float price)throws MyException{
+    public ApiResponse<String> arriveEndAddress(@RequestParam("id") Long id)throws MyException{
         Object result = redisUtil.get("order:action:id:" + id);
         Order order;
-        if (result == null){
+        if (result == null)
             order = orderService.selectByOrderId(id);
-        }else {
+        else
             order = (Order) result;
-        }
-        int update = orderService.update(order.setStatus(3).setPrice(price));
+
+        int update = orderService.update(order.setStatus(3));
         if (update == 0){
             return ApiResponse.error(600, "请勿重复点击已到达");
         }

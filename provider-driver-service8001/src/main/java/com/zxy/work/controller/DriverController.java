@@ -168,5 +168,42 @@ public class DriverController {
                 : ApiResponse.error(600, "密码更新失败");
     }
 
+    /**
+     * 给司机发送邮箱验证码
+     * @param mobile 手机号
+     * @param email 邮箱
+     * @return 发送结果
+     */
+    @SaIgnore
+    @GetMapping("/sendEmail")
+    public ApiResponse<String> sendEmail(@RequestParam("mobile") String mobile, @RequestParam("email") String email) throws MyException {
+        boolean sendEmail = driverService.sendEmail(mobile, email);
+        return sendEmail
+                ? ApiResponse.success("邮件发送成功")
+                : ApiResponse.error(600, "手机号和邮箱不匹配");
+    }
+
+
+    /**
+     * 通过邮箱验证码修改司机密码
+     * @param mobile 用户手机号
+     * @param email 用户邮箱
+     * @param code 用户验证码
+     * @param newPassword 明文新密码
+     * @return 修改结果
+     */
+    @SaIgnore
+    @PostMapping("/updatePwdWithVerityCode")
+    public ApiResponse<String> updatePwdWithVerityCode(
+            String mobile,
+            String email,
+            Integer code,
+            String newPassword
+    ) throws MyException {
+        return driverService.updatePwdWithVerityCode(mobile, email, code, newPassword) == 1
+                ? ApiResponse.success("密码更新成功")
+                : ApiResponse.error(600, "密码更新失败");
+    }
+
 
 }

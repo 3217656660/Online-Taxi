@@ -3,7 +3,9 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.DriverMapper;
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
+import com.zxy.work.entities.User;
 import com.zxy.work.service.DriverService;
+import com.zxy.work.service.EmailService;
 import com.zxy.work.util.cache.CacheUtil;
 import com.zxy.work.util.encode.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,9 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Resource
+    private EmailService emailService;
+
 
     /**
      * 设置通用缓存TTL(30分钟)
@@ -56,6 +61,11 @@ public class DriverServiceImpl implements DriverService {
      * 移除缓存消息key
      */
     private static final String MQ_REMOVE_CACHE_KEY = "removeCache";
+
+    /**
+     * 发送邮箱验证码消息key
+     */
+    private static final String MQ_SEND_EMAIL_KEY = "sendEmail";
 
     /**
      * 用于不需要指定顺序的消息随机分区
@@ -285,6 +295,74 @@ public class DriverServiceImpl implements DriverService {
 
 
     /**
+     * 发送邮箱验证码
+     * @param mobile 传来的手机号
+     * @param email 传来的邮箱
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public boolean sendEmail(String mobile, String email) throws MyException {
+        Object result = redisUtil.get(commonKey + mobile);
+        Driver driver;
+        try {
+            if (result == null)
+                driver = driverMapper.selectByMobile(mobile);
+            else
+                driver = (Driver) result;
+        }catch (Exception e){
+            log.error("查询司机出现异常mobile={}", mobile);
+            throw new MyException("查询司机出现异常");
+        }
+        if (!Objects.equals(driver.getEmail(), email))
+            return false;
+
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, mobile);
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SEND_EMAIL_KEY, email);
+        return true;
+    }
+
+
+    /**
+     * 通过邮箱验证码修改用户密码
+     * @param mobile 用户手机号
+     * @param email 用户邮箱
+     * @param code 用户验证码
+     * @param newPassword 明文新密码
+     * @return 修改结果
+     */
+    @Transactional
+    @Override
+    public int updatePwdWithVerityCode(String mobile, String email, Integer code, String newPassword) throws MyException {
+        Object codeObj = redisUtil.get("verityCode:email:" + email);
+        if (codeObj == null)
+            throw new MyException("验证码过期,请重新获取");
+        Integer codeStored = (Integer) codeObj;
+        if (!codeStored.equals(code))
+            throw new MyException("验证码错误");
+
+        redisUtil.del("verityCode:email:" + email);
+
+        Driver driver;
+        try {
+            driver = driverMapper.selectByMobile(mobile);
+        }catch (Exception e){
+            log.error("查询司机出现异常mobile={}", mobile);
+            throw new MyException("查询司机出现异常");
+        }
+        if (driver == null)
+            throw new MyException("该手机号未注册");
+
+        try {
+            String encodedNewPwd = PasswordEncoder.encode(newPassword);
+            return driverMapper.update(driver.setPassword(encodedNewPwd));
+        }catch (Exception e){
+            log.error("查询司机出现异常mobile={}", mobile);
+            throw new MyException("查询司机出现异常");
+        }
+    }
+
+
+    /**
      * 消费者监听器
      * @param record 生产者传来的数据
      * @param ack 回复
@@ -303,6 +381,20 @@ public class DriverServiceImpl implements DriverService {
             String key = commonKey + mobile;
             redisUtil.del(key);
             log.info("key={}已经移除缓存", key);
+        }else if (Objects.equals(record.key(), MQ_SEND_EMAIL_KEY)){//发邮件
+            String email = record.value();
+            //验证码存在就不要再生成新的
+            Object codeObj = redisUtil.get("verityCode:email:" + email);
+            int code;
+            if (codeObj == null){
+                code = random.nextInt(900000) + 100000;
+            }else {
+                code = (int) codeObj;
+            }
+            String message = "验证码为:" + code + ",有效期30分钟,如非本人操作请忽略此信息";
+            emailService.sendSimpleMessage(email, "验证码", message);
+            redisUtil.set("verityCode:email:" + email, code, 30*60);
+            log.info("code={}已经发送成功并放入缓存", code);
         }
         //手动提交
         ack.acknowledge();

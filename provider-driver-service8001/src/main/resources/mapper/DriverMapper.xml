@@ -22,8 +22,8 @@
     </resultMap>
 
     <insert id="create" parameterType="Driver" useGeneratedKeys="true" keyProperty = "id" keyColumn = "id">
-        insert into online_taxi.driver(USERNAME,PASSWORD,MOBILE,EMAIL,CAR_TYPE,CAR_NUMBER,LATITUDE,LONGITUDE)
-        values(#{username},#{password},#{mobile},#{email},#{carType},#{carNumber},#{latitude},#{longitude});
+        insert into online_taxi.driver(USERNAME,PASSWORD,MOBILE,EMAIL,CAR_TYPE,CAR_NUMBER)
+        values(#{username},#{password},#{mobile},#{email},#{carType},#{carNumber});
     </insert>
 
     <update id="delete" parameterType="Long">

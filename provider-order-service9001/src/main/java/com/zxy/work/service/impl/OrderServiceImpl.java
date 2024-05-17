@@ -9,6 +9,7 @@ import com.zxy.work.service.OrderService;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
@@ -94,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         try{
-            int result = orderMapper.create(order.setStatus(0));
+            int result = orderMapper.create(order.setStatus(0).setDriverId(0));
             if (result == 1){
                 kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_CREATE_ORDER_KEY, String.valueOf(order.getUserId()));
             }
@@ -244,6 +245,7 @@ public class OrderServiceImpl implements OrderService {
         try{
             PageHelper.startPage(pageNum, pageSize);
             orderList = orderMapper.selectByDriverId(driverId);
+            System.out.println(orderList);
         }catch (Exception e){
             log.error("通过司机id的订单查询异常,msg={}", e.getMessage());
             throw new MyException("通过司机id的订单查询异常");
@@ -346,8 +348,23 @@ public class OrderServiceImpl implements OrderService {
             }
             return order;
         }catch (Exception e){
-            log.error("通过订单id的订单查询异常,msg={}", e.getMessage());
-            throw new MyException("通过订单id的订单查询异常");
+            log.error("通过用户id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("通过用户id的订单查询异常");
+        }
+    }
+
+
+    /**
+     * 查询司机未解决的订单
+     * @param driverId 司机id
+     */
+    @Override
+    public Order selectNotSolveByDriver(long driverId) throws MyException {
+        try{
+            return orderMapper.selectNotSolveByDriver(driverId);
+        }catch (Exception e){
+            log.error("通过司机id的订单查询异常,msg={}", e.getMessage());
+            throw new MyException("通过司机id的订单查询异常");
         }
     }
 

@@ -199,7 +199,7 @@ public class MainServiceClientController {
      * @param nowAddressLatitude  司机所在纬度
      * @return 可以接单的列表
      */
-    @GetMapping("/getAbleOrderList")
+/*    @GetMapping("/getAbleOrderList")
     @MyNotify("待改善:1.")
     public ResponseEntity<Object> getAbleOrderList(@RequestParam("nowAddressLongitude") Double nowAddressLongitude,
                                                    @RequestParam("nowAddressLatitude") Double nowAddressLatitude){
@@ -226,7 +226,7 @@ public class MainServiceClientController {
         return orderList.size() == 0
                 ? ResponseEntity.ok(MyString.NO_ACCEPTABLE_ORDER)
                 : ResponseEntity.ok(orderList);
-    }
+    }*/
 
 
 /*    *//**

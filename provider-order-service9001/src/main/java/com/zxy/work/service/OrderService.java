@@ -3,7 +3,7 @@ package com.zxy.work.service;
 import com.github.pagehelper.PageInfo;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
-
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 public interface OrderService {
 
@@ -26,6 +26,8 @@ public interface OrderService {
     Order selectByOrderIdWithDriver(long id) throws MyException;
 
     Order selectNotSolve(long userId) throws MyException;
+
+    Order selectNotSolveByDriver(long driverId) throws MyException;
 
     int cancelOrder(long id) throws MyException;
 

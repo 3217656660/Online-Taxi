@@ -19,10 +19,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Component
 @Slf4j
@@ -34,7 +31,7 @@ public class KafkaConsumer {
     @Resource
     private CacheUtil redisUtil;
 
-    private final Map<Long, ScheduledExecutorService> orderTimeout = new ConcurrentHashMap<>();
+    private static final Map<Long, ScheduledExecutorService> orderTimeout = new ConcurrentHashMap<>();
 
     @Resource
     private SimpMessagingTemplate messagingTemplate;
@@ -85,6 +82,11 @@ public class KafkaConsumer {
      */
     private static final String MQ_ARRIVE_END_ADDRESS_KEY = "arriveEndAddress";
 
+    /**
+     * 线程池（核心线程数：10）
+     */
+    private static final ExecutorService executor = Executors.newFixedThreadPool(10);
+
 
     /**
      * 消费者监听器
@@ -93,6 +95,12 @@ public class KafkaConsumer {
      */
     @KafkaListener(topics = TOPIC_NAME, groupId = "myGroup1")
     public void listenMain(ConsumerRecord<String, String> record, Acknowledgment ack){
+        //添加线程池执行
+        executor.submit( ()-> handleMessage(record, ack) );
+    }
+
+
+    private void handleMessage(ConsumerRecord<String, String> record, Acknowledgment ack){
         //消息分类
         if (Objects.equals(record.key(), MQ_CREATE_ORDER_KEY)){//创建订单
             long userId = Long.parseLong(record.value());
@@ -113,6 +121,7 @@ public class KafkaConsumer {
         }else if (Objects.equals(record.key(), MQ_ACCEPT_ORDER_KEY)){//司机接单后置处理
             long orderId = Long.parseLong(record.value());
             //1.停止倒计时并重新设置缓存
+            //2.推送给用户消息，告诉用户订单已被接单
             closeTimeOut(orderId);
         } else if (Objects.equals(record.key(), MQ_ARRIVE_START_ADDRESS_KEY)) {//到达开始位置后置处理
             long orderId = Long.parseLong(record.value());
@@ -133,6 +142,7 @@ public class KafkaConsumer {
         //log.info("offset={}手动提交成功", record.offset());
     }
 
+
     /**
      * 订单倒计时
      * @param orderId 订单id
@@ -144,23 +154,27 @@ public class KafkaConsumer {
             log.info("orderId={}重复倒计时被阻止", orderId);
             return true;
         }
-        ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-        timer.schedule(() -> {
-            String key = "order:id:" + orderId;
-            //超时处理
-            //订单状态设置为已取消5
-            orderService.cancelOrder(orderId);
-            //位置移除缓存
-            redisUtil.geodelete("position", key);
-            //订单信息移出缓存
-            redisUtil.del(key);
-            //将倒计数移除
-            orderTimeout.remove(orderId);
-            log.info("key={} 倒计数结束订单超时,已自动取消",key);
-        }, 10, TimeUnit.MINUTES);//10
+        ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
         orderTimeout.put(orderId, timer);
+        timer.schedule(() -> timeOut(timer, orderId), 10, TimeUnit.MINUTES);//10
         return false;
     }
+
+    private void timeOut(ScheduledExecutorService timer, Long orderId){
+        String key = "order:id:" + orderId;
+        //超时处理
+        //订单状态设置为已取消5
+        orderService.cancelOrder(orderId);
+        //位置移除缓存
+        redisUtil.geodelete("position", key);
+        //订单信息移出缓存
+        redisUtil.del(key, "expire:order:id:" + orderId);
+        //将倒计数移除
+        orderTimeout.remove(orderId);
+        log.info("key={} 倒计数结束订单超时,已自动取消",key);
+        timer.shutdown();
+    }
+
 
     /**
      * 设置创建订单后的属性
@@ -170,6 +184,8 @@ public class KafkaConsumer {
         String key = "order:id:" + order.getId();
         //订单放入缓存
         redisUtil.set(key, order, 10*60);
+        //设置订单倒计时时间
+        redisUtil.set("expire:order:id:" + order.getId(), null,10*60);
         //开始地点经纬度放入缓存
         redisUtil.geoadd("position", order.getStartLongitude(), order.getStartLatitude(), key);
         log.info("order={}创建后置属性设置成功", order);
@@ -188,7 +204,7 @@ public class KafkaConsumer {
             log.info("orderId={}倒计时取消成功",orderId);
         }
         String key = "order:id:" + orderId;
-        redisUtil.del(key);
+        redisUtil.del(key, "expire:order:id:" + orderId);
         redisUtil.geodelete("position", key);
         log.info("orderId={}取消成功",orderId);
     }
@@ -229,8 +245,17 @@ public class KafkaConsumer {
         //将已经接了的订单设置到另一个区域
         String actionKey = "order:action:id:" + orderId;
         Order order = orderService.selectByOrderId(orderId);
+        NotificationMessage message = new NotificationMessage();
+        message.setType("takeOrder").setContent("订单已被司机接单").setUserId(order.getUserId());
+        //推送到指定客户端
+        messagingTemplate.convertAndSendToUser(
+                String.valueOf(order.getUserId()),
+                "/queue/orderAccept/notifications",
+                message
+        );
         redisUtil.set(actionKey, order, 30*60);
     }
+
 
     /**
      * 司机到达起始位置，给用户推送信息
@@ -305,7 +330,7 @@ public class KafkaConsumer {
         }else {
             order = (Order) result;
         }
-        redisUtil.del(key,actionKey);
+        redisUtil.del(key,actionKey,messageKey);
         redisUtil.geodelete("position", key);
 
 

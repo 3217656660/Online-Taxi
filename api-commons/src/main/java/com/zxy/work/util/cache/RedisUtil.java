@@ -573,14 +573,28 @@ public final class RedisUtil implements CacheUtil {
      * @param longitude 经度
      * @param latitude  纬度
      * @param radius    半径（米）
+     * @param count    限制返回的个数
      * @return 相距位置小于等于 radius（米）的地理位置列表
      */
     @Override
-    public List< GeoResult<RedisGeoCommands.GeoLocation<Object>> > georadius(String key, double longitude, double latitude, double radius) {
+    public List< GeoResult<RedisGeoCommands.GeoLocation<Object>> > georadius(
+            String key,
+            double longitude,
+            double latitude,
+            double radius,
+            long count
+    ) {
         Point point = new Point(longitude, latitude);
         Circle circle = new Circle(point, new Distance(radius));
-        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults
-                = redisTemplate.opsForGeo().radius(key, circle, RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().sortAscending());
+        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults = redisTemplate.opsForGeo().radius(
+                key,
+                circle,
+                RedisGeoCommands
+                        .GeoRadiusCommandArgs
+                        .newGeoRadiusArgs()
+                        .sortAscending()
+                        .limit(count)
+        );
         if (geoResults == null) return null;
 
         return geoResults.getContent();
