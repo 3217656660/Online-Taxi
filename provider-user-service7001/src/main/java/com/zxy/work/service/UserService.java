@@ -15,6 +15,8 @@ public interface UserService {
 
     boolean login(User user) throws MyException;
 
+    void logout(String mobile) throws MyException;
+
     int updatePassword(String mobile, String inputOldPassword,String newPassword) throws MyException;
 
     boolean sendEmail(String mobile,String email) throws MyException;

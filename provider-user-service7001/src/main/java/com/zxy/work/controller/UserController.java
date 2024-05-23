@@ -4,7 +4,6 @@ package com.zxy.work.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.dev33.satoken.annotation.SaMode;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.zxy.work.entities.ApiResponse;
@@ -47,7 +46,7 @@ public class UserController {
      * @param mobile 传来的用户手机号
      * @return  注销结果
      */
-    @SaCheckRole(value = "user", mode = SaMode.OR)
+    @SaCheckRole(value = "user")
     @DeleteMapping(value = "/update/delete")
     public ApiResponse<String> deleteUser(@RequestParam("mobile")String mobile) throws MyException {
         log.info( "用户注销服务提供者：,mobile={}", mobile );
@@ -63,7 +62,7 @@ public class UserController {
      * @param mobile   传来的用户手机号
      * @return  获取的结果以及数据
      */
-    @SaCheckRole(value = "user", mode = SaMode.OR)
+    @SaCheckRole(value = "user")
     @GetMapping("/get")
     public ApiResponse<Object> getUserByMobile(@RequestParam("mobile") String mobile) throws MyException {
         User user = userService.selectByMobile(mobile);
@@ -110,14 +109,15 @@ public class UserController {
      * 退出登录
      * @param mobile 登录时使用的手机号
      */
+    @SaCheckRole(value = "user")
     @PostMapping("/logout")
     public ApiResponse<String> logout(@RequestParam("mobile") String mobile){
         log.info( "用户退出登录服务提供者mobile={}", mobile );
         //退出登录需要的处理逻辑
         //1.使token失效
-        StpUtil.logout(mobile);
+        StpUtil.logout(StpUtil.getTokenValue());
         //2.从redis中移除用户所有信息(消息队列)
-
+        userService.logout(mobile);
         return ApiResponse.success("退出登录成功");
     }
 
@@ -127,7 +127,7 @@ public class UserController {
      * @param user 传来的用户信息json
      * @return  更新的用户信息结果
      */
-    @SaCheckRole(value = "user", mode = SaMode.OR)
+    @SaCheckRole(value = "user")
     @PutMapping("/update/message")
     public ApiResponse<String> updateUser(@RequestBody User user) throws MyException {
         log.info( "用户更新信息服务提供者：mobile={}", user.getMobile() );
@@ -144,7 +144,7 @@ public class UserController {
      * @param newPassword 传来的新密码
      * @return 更新结果
      */
-    @SaCheckRole(value = "user", mode = SaMode.OR)
+    @SaCheckRole(value = "user")
     @PutMapping("/update/password")
     public ApiResponse<String> updatePassword(
             @RequestParam("mobile") String mobile,

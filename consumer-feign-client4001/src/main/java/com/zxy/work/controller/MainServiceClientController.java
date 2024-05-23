@@ -2,24 +2,16 @@ package com.zxy.work.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
-import com.zxy.work.entities.Order;
 import com.zxy.work.service.*;
 import com.zxy.work.util.MyNotify;
-import com.zxy.work.util.MyString;
 import com.zxy.work.util.cache.CacheUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.geo.GeoResult;
-import org.springframework.data.redis.connection.RedisGeoCommands;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 主要操作控制器，用于用户、订单、司机、支付、评价，协同通信，完成业复杂业务等

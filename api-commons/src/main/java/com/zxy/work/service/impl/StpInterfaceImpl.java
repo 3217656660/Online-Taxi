@@ -35,8 +35,6 @@ public class StpInterfaceImpl implements StpInterface {
             list.add("user");
         else if (Objects.equals(loginType, "driver"))
             list.add("driver");
-        else if (Objects.equals(loginType, "admin"))
-            list.add("admin");
         else
             list.add("anonymous");
         return list;

@@ -1,8 +1,8 @@
 package com.zxy.work.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.dev33.satoken.annotation.SaMode;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.zxy.work.entities.ApiResponse;
@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 
 @RestController
 @Slf4j
+@SaCheckLogin
 @RequestMapping("/driver")
 public class DriverController {
 
@@ -43,6 +44,7 @@ public class DriverController {
      * @param mobile 传来的用户手机号
      * @return  注销结果
      */
+    @SaCheckRole(value = "driver")
     @DeleteMapping("/update/delete")
     public ApiResponse<String> deleteDriver(@RequestParam("mobile") String mobile) throws MyException {
         log.info("注销司机服务提供者：" + mobile);
@@ -59,6 +61,7 @@ public class DriverController {
      * @param driver 传来的信息json
      * @return  更新的信息结果
      */
+    @SaCheckRole(value = "driver")
     @PutMapping("/update/message")
     public ApiResponse<String> updateDriver(@RequestBody Driver driver) throws MyException {
         log.info("更新司机信息服务提供者：" + driver);
@@ -71,9 +74,10 @@ public class DriverController {
 
     /**
      * 根据手机号获取司机信息
-     * @param mobile    传来的司机手机号
+     * @param mobile 传来的司机手机号
      * @return  获取的结果以及数据
      */
+    //用户和公共方法
     @GetMapping("/getByMobile")
     public ApiResponse<Object> getDriverByMobile(@RequestParam("mobile") String mobile) throws MyException {
         log.info("通过电话获取司机服务提供者：" + mobile);
@@ -87,9 +91,10 @@ public class DriverController {
 
     /**
      * 根据手机号获取司机信息
-     * @param id    传来的司机id
+     * @param id 传来的司机id
      * @return  获取的结果以及数据
      */
+    //用户和公共方法
     @GetMapping("/getById")
     public ApiResponse<Object> getById(@RequestParam("id") Long id) throws MyException {
         log.info("通过电话获取司机服务提供者：" + id);
@@ -137,13 +142,15 @@ public class DriverController {
      * 退出登录
      * @param mobile 登录时使用的手机号
      */
+    @SaCheckRole(value = "driver")
     @PostMapping("/logout")
     public ApiResponse<String> logout(@RequestParam("mobile") String mobile){
         log.info( "司机退出登录服务提供者mobile={}", mobile );
         //退出登录需要的处理逻辑
         //1.使token失效
-        StpUtil.logout(mobile);
+        StpUtil.logout(StpUtil.getTokenValue());
         //2.从redis中移除用户所有信息(消息队列)
+
 
         return ApiResponse.success("退出登录成功");
     }
@@ -156,7 +163,7 @@ public class DriverController {
      * @param newPassword 传来的新密码
      * @return 更新结果
      */
-    @SaCheckRole(value = "driver", mode = SaMode.OR)
+    @SaCheckRole(value = "driver")
     @PutMapping("/update/password")
     public ApiResponse<String> updatePassword(
             @RequestParam("mobile") String mobile,

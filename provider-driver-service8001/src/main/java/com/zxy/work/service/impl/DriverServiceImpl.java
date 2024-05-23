@@ -3,7 +3,6 @@ package com.zxy.work.service.impl;
 import com.zxy.work.dao.DriverMapper;
 import com.zxy.work.entities.Driver;
 import com.zxy.work.entities.MyException;
-import com.zxy.work.entities.User;
 import com.zxy.work.service.DriverService;
 import com.zxy.work.service.EmailService;
 import com.zxy.work.util.cache.CacheUtil;
@@ -249,6 +248,11 @@ public class DriverServiceImpl implements DriverService {
         return matches;
     }
 
+    @Override
+    public void logout(String mobile) throws MyException {
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_REMOVE_CACHE_KEY, mobile);
+    }
+
 
     /**
      * 更新用户密码
@@ -313,7 +317,8 @@ public class DriverServiceImpl implements DriverService {
             log.error("查询司机出现异常mobile={}", mobile);
             throw new MyException("查询司机出现异常");
         }
-        if (!Objects.equals(driver.getEmail(), email))
+        //排除注册情况和非本人邮箱
+        if (driver != null && !Objects.equals(driver.getEmail(), email))
             return false;
 
         kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_SET_CACHE_KEY, mobile);
@@ -374,8 +379,10 @@ public class DriverServiceImpl implements DriverService {
             String mobile = record.value();
             String key = commonKey + mobile;
             Driver driver = driverMapper.selectByMobile(mobile);
-            redisUtil.set(key, driver.setPassword("******"), cacheTTL);
-            log.info("key={}已经放入缓存", key);
+            if(driver != null){
+                redisUtil.set(key, driver.setPassword("******"), cacheTTL);
+                log.info("key={}已经放入缓存", key);
+            }
         }else if (Objects.equals(record.key(), MQ_REMOVE_CACHE_KEY)){//移除缓存
             String mobile = record.value();
             String key = commonKey + mobile;

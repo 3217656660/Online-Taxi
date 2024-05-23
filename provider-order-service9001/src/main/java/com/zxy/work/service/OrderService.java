@@ -3,7 +3,6 @@ package com.zxy.work.service;
 import com.github.pagehelper.PageInfo;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Order;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 public interface OrderService {
 

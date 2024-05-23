@@ -1,8 +1,6 @@
 package com.zxy.work.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import cn.dev33.satoken.annotation.SaMode;
+
 import com.zxy.work.entities.ApiResponse;
 import com.zxy.work.entities.MyException;
 import com.zxy.work.entities.Review;
@@ -15,7 +13,6 @@ import javax.annotation.Resource;
 @RestController
 @Slf4j
 @RequestMapping("/review")
-@SaCheckLogin
 public class ReviewController {
 
     @Resource
@@ -26,7 +23,6 @@ public class ReviewController {
      * @param review 评论信息
      * @return  创建结果
      */
-    @SaCheckRole(value = "user")
     @PostMapping("/update/create")
     public ApiResponse<String> createReview(@RequestBody Review review) throws MyException {
         log.info("创建评论服务提供者：" + review);
@@ -41,7 +37,6 @@ public class ReviewController {
      * @param  orderId  传来的订单id
      * @return  评论删除结果
      */
-    @SaCheckRole(value = {"user", "admin"}, mode = SaMode.OR)
     @DeleteMapping("/update/delete")
     public ApiResponse<String> deleteReview(@RequestParam("orderId") long orderId) throws MyException {
         log.info("删除评论服务提供者：" + orderId);

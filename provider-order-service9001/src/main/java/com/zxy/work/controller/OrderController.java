@@ -1,7 +1,10 @@
 package com.zxy.work.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.zxy.work.entities.*;
+import com.zxy.work.entities.ApiResponse;
+import com.zxy.work.entities.MyException;
+import com.zxy.work.entities.Order;
+import com.zxy.work.entities.PageResult;
 import com.zxy.work.service.OrderService;
 import com.zxy.work.util.MyNotify;
 import com.zxy.work.util.cache.CacheUtil;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -456,7 +460,7 @@ public class OrderController {
         else
             order = (Order) result;
 
-        int update = orderService.update(order.setStatus(3));
+        int update = orderService.update(order.setStatus(3).setEndTime(new Date()));
         if (update == 0){
             return ApiResponse.error(600, "请勿重复点击已到达");
         }

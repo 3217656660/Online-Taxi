@@ -241,6 +241,11 @@ public class UserServiceImpl implements UserService {
         return matches;
     }
 
+    @Override
+    public void logout(String mobile) throws MyException {
+        kafkaTemplate.send(TOPIC_NAME, random.nextInt(3), MQ_REMOVE_CACHE_KEY, mobile);
+    }
+
 
     /**
      * 更新用户密码
